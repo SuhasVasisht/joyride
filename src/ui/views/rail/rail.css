@@ -1,0 +1,65 @@
+/* The attention rail. Hairline-separated items, no cards. The signal edge marks
+   L3/L4; a new one slides in once. Nothing else here moves. */
+.rail-sec h3 { font-size: var(--step-1); }
+.rail-sec h3 .count { font: 600 12px/1 var(--font-ui); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rail-sec.has-items.approvals h3 .count, .rail-sec.has-items.needs-you h3 .count { color: var(--signal); }
+.rail-sec h3 .rail-action { margin-left: auto; font-family: var(--font-ui); }
+.rail-list { list-style: none; margin: 0; padding: 0; }
+.rail-list > li { padding: var(--s3) 0 var(--s3) var(--s3); border-top: 1px solid var(--rule); position: relative; }
+.rail-list > li:last-child { border-bottom: 1px solid var(--rule); }
+.rail-list > li.approval, .rail-list > li.att.lvl-L3, .rail-list > li.att.lvl-L4 { box-shadow: inset 3px 0 0 var(--signal); }
+.rail-list > li.att.lvl-L2 { box-shadow: inset 2px 0 0 var(--review); }
+.rail-list > li.acked { box-shadow: inset 3px 0 0 color-mix(in srgb, var(--signal) 35%, transparent); }
+
+@keyframes rail-arrive {
+  from { transform: translateX(16px); opacity: 0; box-shadow: inset 0 0 0 var(--signal); }
+  60% { opacity: 1; }
+  to { transform: none; opacity: 1; box-shadow: inset 3px 0 0 var(--signal); }
+}
+.rail-list > li.arrive { animation: rail-arrive 420ms var(--ease) 1 both; }
+
+/* approvals */
+.ap-head, .att-head { display: flex; align-items: flex-start; gap: 8px; }
+.ap-title, .att-title { flex: 1; min-width: 0; font-weight: 600; font-size: var(--step--1); line-height: 1.35; padding-top: 1px; }
+.ap-clock { font: 500 12px/18px var(--font-code); color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ap-clock.hot { color: var(--signal); }
+.ap-cmd { margin: var(--s2) 0 6px; padding: 7px 9px; font-size: 12px; line-height: 1.45; max-height: 7.5em; overflow: auto; background: var(--paper-sunk); border-radius: 4px; }
+.ap-where, .att-context { display: flex; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-3); margin: 0 0 var(--s2); }
+.ap-where > * + *::before, .att-context > * + *::before { content: ""; display: inline-block; width: 1px; height: 10px; background: var(--rule-strong); margin: 0 7px; vertical-align: -1px; }
+.ap-where a, .att-context a { color: var(--ink-2); }
+.ap-where { flex-wrap: nowrap; white-space: nowrap; min-width: 0; }
+.ap-where .mono { font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.ap-where > :not(.mono) { flex: none; }
+.ap-actions { display: flex; gap: var(--s2); }
+.ap-actions .btn { flex: 1; justify-content: center; }
+.ap-remember { display: flex; gap: var(--s3); margin-top: var(--s2); font-size: 12px; }
+.ap-remember .btn.link { font-size: 12px; }
+.ap-remember .btn.link:disabled { text-decoration: none; color: var(--ink-3); }
+
+/* needs you / review */
+.att-why { margin: 6px 0 4px; font-family: var(--font-display); font-style: italic; font-size: 14.5px; line-height: 1.4; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.att-context time::before { display: none; }
+.att .reply-box { margin: 6px 0 8px; }
+.att .prompt-answer { margin: 6px 0 8px; }
+.att-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.att-actions .btn.small { background: transparent; }
+.relevel { font: 500 12px var(--font-ui); color: var(--ink-2); background: transparent; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); padding: 3px 6px; cursor: pointer; }
+
+/* digest */
+.digest summary { list-style: none; cursor: pointer; }
+.digest summary::-webkit-details-marker { display: none; }
+.digest summary h3 { margin-bottom: 0; }
+.digest summary h3::after { content: "Show"; margin-left: auto; font: 500 12px var(--font-ui); color: var(--ink-3); }
+.digest details[open] summary h3::after { content: "Hide"; }
+.digest details[open] summary { margin-bottom: var(--s2); }
+.digest-list { list-style: none; margin: 0 0 var(--s3); padding: 0; }
+.digest-list li { display: grid; gap: 2px; padding: 7px 0; border-top: 1px solid var(--rule); font-size: var(--step--1); }
+.dg-title { font-weight: 500; }
+.dg-why { color: var(--ink-3); font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dg-meta { display: flex; gap: 10px; font-size: 12px; color: var(--ink-3); }
+.dg-meta .btn.link { font-size: 12px; }
+.att-same { margin: 4px 0 8px; font-size: 12px; }
+
+/* the agent's goal under a needs-you item (intentions) */
+.att-goal { margin: 4px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.att-goal > span { color: var(--ink-3); margin-right: 4px; }

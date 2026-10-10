@@ -1,0 +1,95 @@
+/* Task sheet (#/task/<id>) and the crew list (#/task). Peek width keeps more of the map in
+   view; Widen restores the standard sheet. Signal orange only on asks that need the captain. */
+.pane-sheet:has(> .task-sheet.peek) { width: min(560px, calc(100% - 48px)); padding: var(--s5) var(--s5) 0; }
+.pane-sheet:has(> .task-sheet:not(.peek)) { padding-bottom: 0; }
+.task-sheet { display: flex; flex-direction: column; min-height: 100%; min-width: 0; }
+.ts-title { font-size: var(--step-3); line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 var(--s2); outline: none; overflow-wrap: anywhere; }
+.task-sheet.peek .ts-title { font-size: var(--step-2); }
+.ts-status { margin-bottom: var(--s2); row-gap: 4px; }
+.ts-status .mono { font-size: 12px; }
+.ts-now { margin: 0 0 var(--s2); font-size: var(--step--1); }
+.ts-actions { flex-wrap: wrap; gap: 8px; }
+
+/* asks pinned on top */
+.ts-asks { display: grid; gap: var(--s3); margin-top: var(--s4); }
+.ask-card { border: 1px solid var(--rule); border-left: 3px solid var(--working); border-radius: var(--radius-sheet); padding: 10px 14px; background: var(--paper-raised); min-width: 0; }
+.ask-card.needs-you { border-color: color-mix(in srgb, var(--signal) 45%, var(--rule)); border-left-color: var(--signal); }
+.ask-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.ask-state { font-size: 12px; font-weight: 600; color: var(--working); }
+.ask-card.needs-you .ask-state { color: var(--signal); }
+.ask-title { font-weight: 600; font-size: var(--step--1); color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.ask-why { margin: 2px 0 0; font-size: 12px; }
+.ask-preamble { margin: 6px 0 0; font-family: var(--font-display); font-size: var(--step-0); color: var(--ink-2); max-width: 64ch; overflow-wrap: anywhere; }
+.ask-call { border: 0; padding: 0; margin: 10px 0 0; min-width: 0; }
+.ask-call legend { padding: 0; font-size: var(--step--1); font-weight: 500; color: var(--ink); margin-bottom: 4px; display: flex; gap: 8px; }
+.ask-n { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--paper-sunk); font-size: 11px; font-weight: 600; flex: none; }
+.ask-opt { display: flex; align-items: baseline; gap: 8px; padding: 3px 6px; border-radius: var(--radius-control); font-size: var(--step--1); color: var(--ink-2); cursor: pointer; }
+.ask-opt:hover { background: var(--paper-sunk); }
+.ask-opt.on { color: var(--ink); background: var(--working-wash); }
+.ask-opt input { margin: 0; flex: none; transform: translateY(1px); }
+.ask-rec { font-size: 11px; color: var(--review); font-weight: 600; white-space: nowrap; }
+.ask-src, .ask-ro { margin: 6px 0 0; font-size: 12px; }
+.ask-form { margin-top: 8px; display: grid; gap: 6px; }
+.ask-form textarea { width: 100%; min-width: 0; resize: vertical; }
+.ask-actions { flex-wrap: wrap; justify-content: flex-end; }
+.ask-actions select { width: auto; padding-block: 3px; font-size: 12.5px; }
+.ask-card .cap-ok, .ask-card .inline-error { margin: 6px 0 0; }
+
+/* tabs */
+.task-sheet .wp-tabbar { margin-top: var(--s4); }
+.task-sheet.peek .wp-tabs { gap: var(--s4); }
+.ts-count { display: inline-grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; margin-left: 6px; border-radius: 8px; background: var(--signal-wash); color: var(--signal); font-size: 11px; font-weight: 600; }
+.ts-panel { flex: 1; min-width: 0; padding-bottom: var(--s4); }
+.ts-doc .md { font-size: var(--step--1); line-height: 1.55; }
+.ts-doc .meta.mono { font-size: 11.5px; margin: 0 0 var(--s2); overflow-wrap: anywhere; }
+.ts-calls { display: grid; gap: var(--s3); margin-bottom: var(--s5); }
+.ts-call-ref { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 6px 0 6px 12px; border-left: 3px solid var(--working); font-size: var(--step--1); }
+.ts-call-ref.needs-you { border-left-color: var(--signal); }
+.ts-call-ref.needs-you .meta { color: var(--signal); font-weight: 600; }
+.ts-calls h2, .ts-h2 { font-size: var(--step-1); margin: 0; }
+.ts-h2 { margin: var(--s4) 0 var(--s2); }
+
+/* timeline: one rail, time on the left, who and what on the right */
+.ts-timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.ts-timeline::before { content: ""; position: absolute; left: 76px; top: 6px; bottom: 6px; width: 1px; background: var(--rule); }
+.tl { display: grid; grid-template-columns: 68px 1fr; column-gap: 18px; padding: 7px 0; position: relative; min-width: 0; }
+.tl::after { content: ""; position: absolute; left: 73px; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--paper-raised); border: 1.5px solid var(--idle); }
+.tl-time { grid-row: span 2; font-size: 11.5px; color: var(--ink-3); text-align: right; padding-top: 2px; white-space: nowrap; }
+.tl-who { font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.tl-body { grid-column: 2; min-width: 0; }
+.tl-what { font-size: var(--step--1); font-weight: 500; color: var(--ink); }
+.tl-text { margin: 2px 0 0; font-size: var(--step--1); color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; max-width: 64ch; }
+.tl-status.v-working::after, .tl-status.v-starting::after { border-color: var(--working); }
+.tl-status.v-done::after, .tl-status.v-reported::after, .tl-status.v-merged::after, .tl-status.v-resolved::after, .tl-report::after { border-color: var(--review); background: var(--review); }
+.tl-status.v-failed::after { border-color: var(--fail); background: var(--fail); }
+.tl-status.st-open::after, .tl.needs-you::after { border-color: var(--signal); background: var(--signal); }
+.tl-status.st-open .tl-what, .tl.needs-you .tl-who { color: var(--signal); }
+.tl-status.st-closed .tl-text { color: var(--ink-3); }
+.tl-note .tl-text { font-family: var(--font-display); font-style: italic; font-size: var(--step-0); }
+.tl-steer .tl-text { background: var(--paper-sunk); padding: 6px 9px; border-radius: 4px; }
+.tl-steer.st-pending .tl-what { color: var(--working); }
+.tl-brief::after { border-color: var(--ink-2); }
+
+/* crew tab */
+.ts-facts { gap: var(--s2) var(--s5); }
+.ts-facts dd.mono { font-family: var(--font-code); font-size: 12px; overflow-wrap: anywhere; }
+.ts-workers { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ts-workers li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: var(--step--1); min-width: 0; }
+.ts-workers a:not(.btn) { font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
+.ts-workers a:not(.btn):hover { text-decoration: underline; }
+
+/* the steer box stays at the bottom of the sheet */
+.ts-steer { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--s5)); padding: var(--s3) var(--s5) var(--s4); background: var(--paper-raised); border-top: 1px solid var(--rule); z-index: 1; }
+.task-sheet:not(.peek) .ts-steer { margin: 0 calc(-1 * var(--s7)); padding: var(--s3) var(--s7) var(--s4); }
+.ts-steer .steer { margin-top: 0; }
+.ts-steer .reply-row textarea { flex: 1; min-width: 0; }
+.ts-steer > .meta { margin: 0; }
+.ts-pending { margin: 6px 0 0; font-size: 12px; }
+
+@media (max-width: 1100px) {
+  .pane-sheet:has(> .task-sheet.peek) { width: calc(100% - 48px); }
+  .task-sheet:not(.peek) .ts-steer { margin: 0 calc(-1 * var(--s5)); padding: var(--s3) var(--s5) var(--s4); }
+}
+
+/* Notes on this task, from the task-sheet slot (views/notes/contribute.tsx). */
+.task-sheet .ts-notes { margin: 0 0 var(--s3); }

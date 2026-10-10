@@ -1,0 +1,38 @@
+import { test, expect } from "@playwright/test";
+import fs from "node:fs";
+import path from "node:path";
+import { shot } from "./shot";
+
+const port = Number(process.env.E2E_PORT ?? 4399);
+if (port === 4317 || port === 3000) throw new Error("Search UI e2e requires a private port.");
+const home = `/tmp/joyride-e2e-${port}/home`;
+const idea = "search-ui", term = "lanternfish";
+test("Search opens ideas, authored notes, reports and preserved sessions from the nav", async ({ request, page }) => {
+  await request.post("/api/missions", { data: { id: idea, title: `${term} idea` } });
+  const note = await (await request.post("/api/notes", { data: { idea, bullets: [`${term} note: save first`] } })).json();
+  const reportFile = path.join(home, "search-ui-report.md"), savedFile = path.join(home, "search-ui-session.json");
+  fs.writeFileSync(reportFile, `# ${term} report\n\n## Findings\n\nRead the original source.\n`);
+  const command = "codex resume recorded-session";
+  fs.writeFileSync(savedFile, JSON.stringify({ summary: `${term} triage`, work_done: "Saved the findings", resume_context: "Read the handoff", learnings: [{ title: "Keep sources", body: "Read the original report" }], resume: { command, cwd: "/tmp/source" } }));
+  const report = await (await request.post("/api/artifacts", { data: { local_source: reportFile, kind: "report", title: `${term} report`, mission: idea } })).json();
+  const saved = await (await request.post("/api/artifacts", { data: { local_source: savedFile, kind: "session", title: `${term} saved session`, mission: idea } })).json();
+  await page.goto("/#/agents");
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: /^Search$/ }).click();
+  await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
+  await page.getByTestId("knowledge-search").fill(term);
+  for (const key of [`idea:${idea}`, `note:${note.id}`, `artifact:${report.id}`, `artifact:${saved.id}`]) await expect(page.locator(`[data-key="${key}"]`)).toBeVisible();
+  await expect(page.getByRole("link", { name: "To review", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "What agents get", exact: true })).toHaveCount(0);
+  await shot(page, "memory-cut", "search-authored-and-projected-sources");
+  await page.locator(`[data-key="note:${note.id}"] .kn-row-main`).click();
+  await expect(page.getByTestId("note-detail")).toContainText(`${term} note`);
+  await expect(page.getByTestId("open-on-board")).toHaveAttribute("href", `#/board?item=${note.id}`);
+  await page.goto(`/#/knowledge?q=${term}&open=artifact:${saved.id}`);
+  await expect(page.getByTestId("knowledge-sheet")).toContainText(command);
+  await shot(page, "memory-cut", "preserved-session-resume");
+  await page.goto(`/#/artifacts/${report.id}`);
+  await expect(page.getByTestId("artifact-report")).toContainText("Read the original source");
+  await page.goto("/#/memory/entries/old");
+  await expect(page).toHaveURL(/#\/knowledge$/);
+});

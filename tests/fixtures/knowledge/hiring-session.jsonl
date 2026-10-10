@@ -1,0 +1,2 @@
+{"type":"user","sessionId":"bbbbbbbb-1111-4111-8111-111111111111","cwd":"{{PRIVATE_CWD}}","timestamp":"{{T-1h}}","uuid":"hiring-fixture-prompt","isSidechain":false,"userType":"external","origin":{"kind":"human"},"message":{"role":"user","content":"Review the hiringonlyquasar candidate submission."}}
+{"type":"assistant","sessionId":"bbbbbbbb-1111-4111-8111-111111111111","cwd":"{{PRIVATE_CWD}}","timestamp":"{{T-1h}}","uuid":"hiring-fixture-outcome","message":{"role":"assistant","content":[{"type":"text","text":"The hiringonlyquasar interview assessment is confidential."}]}}

@@ -1,0 +1,12 @@
+# Jev evidence judge. Tuned by the hill-climb engine (target judge:evidence); every accepted change is a commit.
+version: 1
+verdict:
+  instructions: Judge whether the recorded checks prove this done-when requirement of a software mission. Test results and exit codes decide; a claim with no run behind it proves nothing.
+  criteria:
+    insufficient: Nothing shown speaks to this requirement, or what is shown covers only part of it, so it cannot be judged yet.
+    fail: "A relevant check shows the requirement is not met: its outcome is fail (non-zero exit status or failing tests)."
+    pass: "Relevant checks show the requirement is met: their outcome is pass (zero exit status, no failing tests) and they cover the whole requirement."
+caption:
+  instructions: The screenshot captions show something that contradicts the requirement (a broken, empty or wrong screen where the requirement expects it to work).
+  "true": A caption contradicts the requirement
+  "false": The captions are consistent with the requirement or say nothing about it

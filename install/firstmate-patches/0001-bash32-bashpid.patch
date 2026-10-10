@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Suhas Vasisht <suhas.vasisht@gmail.com>
+Date: Sun, 4 Oct 2026 18:03:25 -0700
+Subject: [PATCH] fix(bin): resolve fm_exec_timed's own pid on Bash 3.2, which
+ has no BASHPID
+
+Under stock macOS Bash 3.2 with set -u, the bare $BASHPID reference aborted
+every caller, including the spawn's backlog transition to In flight. Fall back
+to a child /bin/sh's PPID, the same idiom fm-wake-lib.sh uses, with an
+absolute path so a narrowed PATH still resolves it.
+---
+ bin/fm-timeout-lib.sh | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/bin/fm-timeout-lib.sh b/bin/fm-timeout-lib.sh
+index a785ad8..4908267 100644
+--- a/bin/fm-timeout-lib.sh
++++ b/bin/fm-timeout-lib.sh
+@@ -206,7 +206,7 @@ fm_timed_out() {  # <status>
+ # which keeps the bound off perl's platform-dependent syscall-restart signal
+ # semantics and off the drift of counting sleep intervals.
+ fm_exec_timed() {  # <seconds> <grace-seconds> <command...>
+-  local seconds=${1:-} grace=${2:-} value owner
++  local seconds=${1:-} grace=${2:-} value owner self
+   for value in "$seconds" "$grace"; do
+     case "$value" in
+       '' | 0* | *[!0-9]*)
+@@ -221,7 +221,9 @@ fm_exec_timed() {  # <seconds> <grace-seconds> <command...>
+     exit 125
+   fi
+   owner=${FM_EXEC_TIMED_OWNER_PID:-$$}
+-  [ "$owner" != "$BASHPID" ] || owner=$PPID
++  # Bash 3.2 has no BASHPID, so a child /bin/sh reports this process's pid as its PPID.
++  self=${BASHPID:-$(exec /bin/sh -c 'printf "%s\n" "$PPID"')}
++  [ "$owner" != "$self" ] || owner=$PPID
+   unset FM_EXEC_TIMED_OWNER_PID
+   if command -v perl >/dev/null 2>&1; then
+     exec perl -MPOSIX=WNOHANG,setpgid -MTime::HiRes=time -e '

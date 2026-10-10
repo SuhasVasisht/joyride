@@ -1,0 +1,42 @@
+/* Usage limits: one card per account, a thin bar per window. Bars darken as a window fills
+   and turn the fail red when nearly out (90%+); the signal edge marks a state that needs you
+   (Keychain approval, sign-in, a folder not signed in yet). */
+.us-cards { display: grid; gap: var(--s3); }
+.us-cards.full { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: var(--s4); margin-top: var(--s4); }
+.us-card { border: 1px solid var(--rule); border-radius: var(--radius-control); padding: var(--s3); background: var(--paper-raised); min-width: 0; }
+.us-cards.full .us-card { padding: var(--s4); }
+.us-card.state-keychain, .us-card.state-signed_out, .us-card.state-not_signed_in { box-shadow: inset 3px 0 0 var(--signal); }
+.us-card-head { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s2); min-width: 0; }
+.us-card-head h4 { margin: 0; font-size: var(--step-0); font-weight: 600; }
+.us-cards.full .us-card-head h4 { font-family: var(--font-display); font-size: var(--step-2); font-weight: 500; }
+.us-card-head .chip { margin-left: auto; }
+.us-plan { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.us-win { padding: var(--s2) 0; border-top: 1px solid var(--rule); }
+.us-win-head { display: flex; align-items: baseline; gap: var(--s2); font-size: var(--step--1); }
+.us-span { font-weight: 600; }
+.us-home { margin: 0 0 var(--s2); font-size: 12px; }
+.us-pct { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.us-pct strong { font-weight: 600; }
+.us-bar { height: 6px; margin: 6px 0 5px; background: var(--paper-sunk); border-radius: 3px; overflow: hidden; }
+.us-bar span { display: block; height: 100%; background: var(--ink-3); border-radius: 3px; min-width: 2px; }
+.us-win.tone-warm .us-bar span { background: var(--ink); }
+.us-win.tone-hot .us-bar span { background: var(--fail); }
+.us-win.tone-hot .us-pct strong { color: var(--fail); }
+.us-win.compact { padding: 6px 0 2px; }
+.us-win.compact .us-span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.us-win.compact .us-detail { margin: 1px 0 0; }
+.us-win.compact .us-pct { margin-left: auto; }
+.us-rel { white-space: nowrap; font-size: 12px; font-variant-numeric: tabular-nums; }
+.us-win.compact .us-bar { height: 4px; margin: 4px 0 2px; }
+.us-reset { display: flex; flex-wrap: wrap; gap: 2px var(--s3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.us-pace { color: var(--ink-2); }
+.us-win.none .us-win-head { color: var(--ink-3); }
+.us-cycle { margin: 0 0 var(--s2); font-size: 12px; }
+.us-detail { margin: 2px 0 0; font-size: 12px; color: var(--ink-2); }
+.us-note { margin: 2px 0 0; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
+.us-msg { margin: var(--s1) 0 var(--s2); font-size: var(--step--1); line-height: 1.45; color: var(--ink-2); }
+.us-cmd { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); min-width: 0; }
+.us-cmd code { flex: 1 1 auto; min-width: min(100%, 17rem); display: block; padding: 5px 8px; border-radius: var(--radius-control); background: var(--paper-sunk); font-size: 12px; overflow-x: auto; white-space: nowrap; }
+.us-lede { color: var(--ink-2); max-width: 64ch; }
+.us-toolbar { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.usage-rail { margin-bottom: var(--s4); }

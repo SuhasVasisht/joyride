@@ -1,0 +1,8 @@
+# Map layout and theme. Edit this file to change the workspace.
+title: Joyride
+home:
+  group_by: lens
+  show_archive: false
+  regions: []
+  rail: [approvals, usage, attention, nudges, review, digest]
+theme: {}

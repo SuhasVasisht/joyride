@@ -1,0 +1,26 @@
+{
+  "about": "Joyride's local Firstmate patches, applied in order with `git am` on top of the upstream pin by `./bin/joyride vendor firstmate`. They are never pushed upstream, so the pin stays at the upstream commit and vendor/firstmate counts as pinned only when every commit after the pin matches one of these patches (by `git patch-id --stable`, because re-applying a patch gives it a new SHA). `pin` must match FIRSTMATE_PIN in src/modules/firstmate/seed.ts. Regenerate a patch with `git -C vendor/firstmate format-patch -1 <sha> --zero-commit --no-signature`.",
+  "pin": "fede6197556c188dd2f451809d17851760d1ef46",
+  "patches": [
+    {
+      "id": "bash32-bashpid",
+      "file": "0001-bash32-bashpid.patch",
+      "why": "bin/fm-timeout-lib.sh reads a bare $BASHPID under set -u, which aborts every caller on stock macOS Bash 3.2"
+    },
+    {
+      "id": "codex-worker-accounts",
+      "file": "0002-codex-worker-accounts.patch",
+      "why": "select Codex worker accounts and dispatch crewmates by account"
+    },
+    {
+      "id": "cursor-native-trust",
+      "file": "0003-cursor-native-trust.patch",
+      "why": "Cursor CLI 2026.07.17 rejects --trust outside headless mode; interactive workers approve native workspace trust instead"
+    },
+    {
+      "id": "fm-inbox-perf",
+      "file": "0004-fm-inbox-perf.patch",
+      "why": "fm-inbox.sh note was CPU-bound on large bodies (47 KB took 45 s+), so Joyride's primary handoff timed out; now linear-time"
+    }
+  ]
+}

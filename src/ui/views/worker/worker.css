@@ -1,0 +1,46 @@
+.wp-title { display: flex; align-items: center; gap: 12px; font-size: var(--step-3); max-width: none; }
+.wp-status { display: flex; flex-wrap: wrap; align-items: center; gap: 0; font-size: var(--step--1); color: var(--ink-3); margin: 0 0 var(--s4); }
+.wp-status > * + *::before { content: ""; display: inline-block; width: 1px; height: 11px; background: var(--rule-strong); margin: 0 10px; vertical-align: -1px; }
+.wp-status .chip::before { content: ""; width: 7px; height: 7px; margin: 0; background: currentColor; }
+.wp-now { display: grid; grid-template-columns: 120px 1fr; gap: 10px 16px; align-items: baseline; }
+.wp-label { font-size: 12px; color: var(--ink-3); }
+.wp-action { font-size: 13px; background: var(--paper-sunk); padding: 6px 9px; border-radius: 4px; word-break: break-word; white-space: pre-wrap; }
+.wp-msg { margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: var(--lh-serif); color: var(--ink-2); white-space: pre-wrap; max-height: 16em; overflow: auto; }
+.wp-attn { padding: 8px 0 8px 12px; margin-bottom: var(--s3); box-shadow: inset 2px 0 0 var(--rule-strong); font-size: var(--step--1); }
+.wp-attn.lvl-L3, .wp-attn.lvl-L4 { box-shadow: inset 3px 0 0 var(--signal); }
+.wp-attn.lvl-L2 { box-shadow: inset 2px 0 0 var(--review); }
+.wp-attn p { margin: 4px 0 0; font-family: var(--font-display); font-style: italic; color: var(--ink-2); font-size: var(--step-0); }
+.wp-outside { padding: 10px 12px; border-left: 2px solid var(--rule-strong); background: var(--paper); margin-bottom: var(--s3); font-size: var(--step--1); }
+.wp-outside p { margin: 0 0 6px; }
+.wp-approvals .rail-list > li { padding-left: var(--s4); }
+.tool-list { list-style: none; margin: 0 0 var(--s3); padding: 0; }
+.tool-list li { display: grid; grid-template-columns: 110px 1fr auto; gap: 12px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--rule); font-size: var(--step--1); }
+.tool-name { font-weight: 600; color: var(--ink-2); }
+.tool-sum { font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- tabs: chat, terminal, details ---------- */
+.worker-pane.wide { max-width: none; }
+.wp-tabbar { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); margin: var(--s5) 0 var(--s3); border-bottom: 1px solid var(--rule); }
+.wp-tabs { display: flex; gap: var(--s5); }
+.wp-tabs button { border: 0; background: none; padding: 6px 0 9px; margin-bottom: -1px; cursor: pointer; font-size: var(--step-0); font-weight: 500; color: var(--ink-3); border-bottom: 2px solid transparent; }
+.wp-tabs button:hover { color: var(--ink); }
+.wp-tabs button.on { color: var(--ink); border-bottom-color: var(--ink); }
+.wp-tabbar .wp-actions { padding-bottom: 6px; }
+.wp-tabbar .ha { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; }
+.wp-tabbar .ha-note { margin: 0; font-size: 12px; max-width: 46ch; }
+.wp-panel { min-width: 0; }
+.wp-panel > .wp-approvals { margin-bottom: var(--s4); }
+.wp-panel > .wp-approvals h2 { font-size: var(--step-1); margin-bottom: var(--s2); }
+.wp-panel > .wp-attn { margin-bottom: var(--s3); }
+.wp-details.mpanel { margin-top: 0; border-top: 0; padding-top: 0; }
+
+/* a prompt it is stuck on, at the end of the conversation */
+.wp-prompt { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--signal) 45%, var(--rule)); border-radius: var(--radius-sheet); background: var(--paper-raised); }
+.wp-prompt-title { font-family: var(--font-ui); font-size: var(--step--1); font-weight: 600; color: var(--signal); margin: 0 0 2px; }
+.wp-prompt .panel-meta { margin: 0 0 var(--s2); font-size: 12.5px; color: var(--ink-3); }
+.wp-reply-note { margin: 0 0 6px; font-size: 12px; }
+.wp-reply .wp-outside { margin-bottom: var(--s2); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* the chat fills what is left of the window under the header, so the reply box stays in view */
+.worker-pane.tab-chat .chat { --chat-h: max(380px, calc(100vh - 380px)); }
+.worker-pane .wp-status .mono { font-size: 12px; }

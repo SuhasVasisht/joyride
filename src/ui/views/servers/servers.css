@@ -1,0 +1,33 @@
+.servers-page { padding: 36px 40px 80px; max-width: 1600px; margin: auto; overflow: auto; height: 100%; }
+.servers-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 28px; }
+.servers-heading h1 { margin: 4px 0 8px; font-family: var(--font-display); font-size: 38px; }
+.server-kicker { color: var(--ink-3); font-size: 12px; }
+.servers-grid, .server-terminals { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-top: 20px; }
+.server-card { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px #1527420a; }
+.server-card header, .server-member-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.server-card h2 { font-size: 20px; margin: 5px 0 10px; }
+.server-card h2 a { color: inherit; text-decoration: none; }
+.server-state { font-size: 12px; border: 1px solid var(--rule); padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.server-state.s-running { background: #e8f0e9; color: #315d46; }
+.server-state.s-failed, .server-state.s-unknown { background: #f6e8df; color: #873e26; }
+.server-change { margin: 4px 0 16px; font-size: 14px; }
+.server-member { padding: 14px 0; border-top: 1px solid var(--rule); }
+.server-member p { margin: 6px 0; font-size: 12px; overflow-wrap: anywhere; }
+.server-member code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; padding: 8px 10px; background: #eaf0f4; border-radius: 4px; margin: 8px 0; }
+.server-controls { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.server-card footer { padding-top: 12px; border-top: 1px solid var(--rule); }
+.server-error, .server-reason, .server-pending { font-size: 13px; color: #873e26; overflow-wrap: anywhere; }
+.server-editor { background: var(--paper); border: 1px solid var(--rule); padding: 24px; margin-bottom: 24px; border-radius: 8px; }
+.server-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.server-fields label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+.server-fields input, .server-fields select { width: 100%; padding: 8px; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; }
+.server-editor fieldset { border: 1px solid var(--rule); margin: 16px 0; padding: 16px; }
+.server-terminal h2 { font-size: 18px; }
+.server-terminal pre { background: #121c33; color: #e6e9f0; padding: 16px; max-height: 400px; overflow: auto; font-size: 12px; white-space: pre-wrap; }
+.servers-empty { margin: 48px auto; max-width: 540px; padding: 32px; border: 1px dashed var(--rule); }
+.server-card.compact { padding: 14px; }
+.server-card.compact h2 { font-size: 17px; }
+.server-card.compact .server-member { padding: 8px 0; }
+.server-url-control { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 100%; }
+.server-url { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; max-width: 100%; }
+@media (max-width: 800px) { .servers-page { padding: 20px; } .servers-grid, .server-terminals, .server-fields { grid-template-columns: 1fr; } }

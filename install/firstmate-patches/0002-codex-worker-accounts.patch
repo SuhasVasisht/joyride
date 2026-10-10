@@ -1,0 +1,1225 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Suhas Vasisht <suhas.vasisht@gmail.com>
+Date: Mon, 5 Oct 2026 00:07:21 -0700
+Subject: [PATCH] feat: select Codex worker accounts and dispatch by account
+
+---
+ .../references/common/dispatch.md             |  2 +-
+ .../references/common/model-and-effort.md     |  2 +-
+ .agents/skills/quota-array-dispatch/SKILL.md  | 13 ++-
+ .../skills/secondmate-provisioning/SKILL.md   |  2 +-
+ bin/fm-bootstrap.sh                           |  4 +
+ bin/fm-control.sh                             |  8 +-
+ bin/fm-dispatch-resolve.sh                    | 90 ++++++++++++-----
+ bin/fm-spawn.sh                               | 52 ++++++++--
+ bin/fm-worker-account-lib.sh                  | 69 ++++++++++++-
+ docs/agent-control.md                         |  2 +-
+ docs/configuration.md                         | 45 +++++++--
+ docs/remote-secondmates.md                    |  2 +-
+ docs/verification/runtime-backends.md         | 15 ++-
+ tests/fm-bootstrap.test.sh                    | 13 +++
+ tests/fm-control-relaunch.test.sh             | 47 +++++++++
+ tests/fm-dispatch-resolve.test.sh             | 65 +++++++++++--
+ tests/fm-worker-account-live-e2e.test.sh      | 29 +++++-
+ tests/fm-worker-account.test.sh               | 97 ++++++++++++++++++-
+ 18 files changed, 485 insertions(+), 72 deletions(-)
+
+diff --git a/.agents/skills/harness-adapters/references/common/dispatch.md b/.agents/skills/harness-adapters/references/common/dispatch.md
+index eda5719..c7c9623 100644
+--- a/.agents/skills/harness-adapters/references/common/dispatch.md
++++ b/.agents/skills/harness-adapters/references/common/dispatch.md
+@@ -5,7 +5,7 @@ Load this with the selected tool reference for dispatch, start, or adapter verif
+ ## Resolution
+ 
+ Use the router's detection and safety sections for static crew and secondmate harness resolution and all explicit overrides.
+-`config/crew-dispatch.json` can override that static default for one crewmate or scout with concrete harness, model, and effort axes.
++`config/crew-dispatch.json` can override that static default for one crewmate or scout with concrete harness, model, effort, and optional Codex account axes.
+ For a profile array, load `quota-array-dispatch` after establishing harness and provider facts here.
+ When the opt-in `bin/fm-dispatch-resolve.sh` is on, its `clear` answer already names the concrete axes; `docs/configuration.md` "Typed dispatch resolution" owns that contract.
+ 
+diff --git a/.agents/skills/harness-adapters/references/common/model-and-effort.md b/.agents/skills/harness-adapters/references/common/model-and-effort.md
+index a89edb3..6df398b 100644
+--- a/.agents/skills/harness-adapters/references/common/model-and-effort.md
++++ b/.agents/skills/harness-adapters/references/common/model-and-effort.md
+@@ -5,7 +5,7 @@ Add `references/common/dispatch.md` for configured profile precedence.
+ 
+ ## Axes and precedence
+ 
+-`../../../bin/fm-spawn.sh` accepts concrete `--harness`, `--model`, and `--effort` values selected at intake; scripts never parse natural-language dispatch rules.
++`../../../bin/fm-spawn.sh` accepts concrete `--harness`, `--model`, `--effort`, and optional Codex `--account` values selected at intake; scripts never parse natural-language dispatch rules.
+ The tool reference records verified flags, accepted values, omission behavior, and discovery.
+ 
+ Effort precedence is a per-task captain instruction, then applicable dispatch profile or secondmate pin, then the fallback below.
+diff --git a/.agents/skills/quota-array-dispatch/SKILL.md b/.agents/skills/quota-array-dispatch/SKILL.md
+index 6ec4a52..961f905 100644
+--- a/.agents/skills/quota-array-dispatch/SKILL.md
++++ b/.agents/skills/quota-array-dispatch/SKILL.md
+@@ -38,7 +38,12 @@ It never removes this skill's authority, and its `ambiguous`, `escalate`, and `e
+ 
+ ## Read the default TOON
+ 
+-Start each intake by running `quota-axi` once with no `--json`, and reuse that TOON for every candidate.
++Start each intake by running `quota-axi` once with no `--json`, and reuse that TOON for every candidate using the ambient account.
++For each distinct explicit Codex `account` id, resolve its root through `fm_worker_codex_account_resolve` in `bin/fm-worker-account-lib.sh`, then read `CODEX_HOME=<root> quota-axi --provider codex --profile-only` once and reuse that account's TOON for its candidates.
++Use the same TOON-then-JSON fallback below within that root, with `CODEX_HOME=<root> quota-axi --provider codex --profile-only --full --json` as the fallback.
++Never apply another root's snapshot to a named account, even when both snapshots use the same `codex-home` account key.
++Malformed or unknown account ids are configuration errors, and the selected concrete profile carries `--account <id>` into spawn.
++The [worker account owner](../../../docs/configuration.md#worker-account-pin-configclaude-account-configpi-account-configcodex-accounts) defines the mapping and launch checks.
+ Post-consolidation quota-axi (the floor owned by `bin/fm-quota-axi-lib.sh`) puts `spendPriority` in the default `quota[]` block beside `effectivePercentRemaining`, `runway`, `confidence`, `limitedBy`, and `resetsAt`.
+ Sparse `exhaustion[]` carries finite-runway seconds only for `projected_exhaustion` and `exhausted_now`.
+ Sparse `attention[]` names auth, stale, and unmeasurable facts.
+@@ -53,7 +58,7 @@ Below-floor is rare: bootstrap enforces `FM_QUOTA_AXI_MIN` and normally reports
+ `--json` is a defensive belt, not a habit; never reach for it because it feels more complete.
+ Read `quota-axi auth --json` only when a candidate's credential surface is in question.
+ 
+-For each candidate, preserve explicit `harness`, `model`, and `provider`; `harness-adapters` owns identity, and model/provider never infer harness.
++For each candidate, preserve explicit `harness`, `model`, `provider`, and optional `account`; `harness-adapters` owns identity, and model/provider never infer harness.
+ 
+ ## Three gates, then spendPriority
+ 
+@@ -71,7 +76,7 @@ A model the catalog does not list is concrete contradictory evidence: block that
+ Apply quota at the granularity the vendor actually supplies.
+ A provider-level or `all_models`/`all_products` scope bounds every model you established in that family within the candidate's matched account, including one with no window of its own.
+ A named-model or named-product scope is an additional bound for that model alone.
+-Match the candidate to its `quota[]` row by that established provider, its `accountKey` when the snapshot is schema 6 (a Pi lane's auth provider id such as `openai-codex-work`, or `codex-home` for native Codex including Pi's `codex-native/` adapter, then the `default` row, else unmeasured; never a row picked by position, never rows summed across accounts), and scope; a stale, auth-required, or unmeasurable scope is named in `attention[]` instead of a fabricated number.
++Match the candidate to its `quota[]` row by that established provider, its `accountKey` when the snapshot is schema 6 (a Pi lane's auth provider id such as `openai-codex-work`, or `codex-home` for native Codex including Pi's `codex-native/` adapter, then the `default` row, else unmeasured; never a row picked by position, never rows summed across accounts), and scope within that candidate's own snapshot; a stale, auth-required, or unmeasurable scope is named in `attention[]` instead of a fabricated number.
+ 
+ A candidate authenticates through its own tuple's surface; another harness's CLI can never gate it, and `harness=pi` with `model=xai/grok-*` is Pi using xAI rather than the standalone Grok CLI.
+ `quota-axi auth --json` lists each provider's credential sources independently, so read the one source the candidate actually uses rather than collapsing a provider to a single status.
+@@ -127,7 +132,7 @@ Do not read `aheadWindowIds`, `behindWindowIds`, `onPaceWindowIds`, `limitingWin
+ 
+ Genuine ties: stop and report every tied candidate for captain choice.
+ Do not select by array order, harness name, or another arbitrary identity ordering.
+-Report duplicate concrete profiles as a configuration error.
++Report duplicate concrete profiles including the account axis as a configuration error.
+ 
+ Account for every candidate visibly before selecting or escalating, naming its catalog evidence, provider relation, applicable quota and authentication facts, remaining uncertainty, fit and reasoning class, `spendPriority`, and runway-versus-horizon result.
+ A blocked credential report must name `harness`, `model`, authentication surface, and concrete failure evidence; never emit a bare `Grok unauthenticated` statement.
+diff --git a/.agents/skills/secondmate-provisioning/SKILL.md b/.agents/skills/secondmate-provisioning/SKILL.md
+index f105b32..5b036bb 100644
+--- a/.agents/skills/secondmate-provisioning/SKILL.md
++++ b/.agents/skills/secondmate-provisioning/SKILL.md
+@@ -118,7 +118,7 @@ Explicit per-spawn `--backend` and `FM_BACKEND` remain stronger than every home'
+ The declared `config/supervision-host-off` opt-out follows the same primary-authoritative propagation: its presence opts secondmate homes out even if they have their own engine setting, and its absence removes their copy at convergence.
+ `config/supervision-host` itself is not inherited; each home selects its own engine.
+ `config/secondmate-harness` is not inherited because it is only the primary's knob for launching secondmate agents.
+-`config/claude-account` and `config/pi-account` are not inherited: a local secondmate agent launches on the launching home's worker account pin, and a secondmate home that should pin its own workers needs its own file ([`docs/configuration.md`](../../../docs/configuration.md) "Worker account pin").
++`config/claude-account`, `config/pi-account`, and `config/codex-accounts` are not inherited: a local secondmate agent launches on the launching home's worker account pin, and a secondmate home that should pin its own workers needs its own file ([`docs/configuration.md`](../../../docs/configuration.md) "Worker account pin").
+ `data/captain-shared.md` is main-authoritative in the primary home and read-only in secondmate homes.
+ Its primary file header must state that the file is main-authoritative, read-only in secondmate homes, must not be edited there, and that new captain-preference discoveries are routed to the main firstmate through marked status or a document pointer.
+ Every propagation point converges the secondmate copy to the primary bytes; when the primary file is absent, any existing secondmate copy is quarantined and removed so absence converges too.
+diff --git a/bin/fm-bootstrap.sh b/bin/fm-bootstrap.sh
+index 77dfde8..6aee93d 100755
+--- a/bin/fm-bootstrap.sh
++++ b/bin/fm-bootstrap.sh
+@@ -1091,6 +1091,9 @@ crew_dispatch_validate() {
+     def configured_profiles:
+       ([(.rules // [])[]? | profiles(.use?)[]?]
+         + (if has("default") then [profiles(.default)[]?] else [] end));
++    def malformed_accounts($items):
++      ($items | map(select(type == "object")) | any(has("account") and (.harness != "codex" or (.account | type) != "string" or (.account | test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") | not))))
++      or ($items | map(select(type == "object")) | any(has("account") and has("provider") and .provider != "codex"));
+     def malformed_optional_fields($items):
+       ($items | any(has("model") and (((.model | type) != "string") or (.model | length) == 0)))
+       or ($items | any(has("effort") and (((.effort | type) != "string") or (.effort | length) == 0)))
+@@ -1124,6 +1127,7 @@ crew_dispatch_validate() {
+     elif [(.rules // [])[]? | select((.use? | type) == "array" and (.use | length) == 0)] | length > 0 then "each rule needs at least one use profile"
+     elif [(.rules // [])[]? | profiles(.use?)[]? | select(type != "object")] | length > 0 then "each use profile must be an object"
+     elif [(.rules // [])[]? | profiles(.use?)[]? | select((.harness? | type) != "string" or (.harness | length) == 0)] | length > 0 then "each use profile needs harness"
++    elif malformed_accounts(configured_profiles) then "profile account must be a Codex account id; provider must be codex when declared"
+     elif malformed_optional_fields([(.rules // [])[]? | profiles(.use?)[]?]) then
+       if $typed then "use profile model and effort must be non-empty strings, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\\z when present"
+       else "use profile model and effort must be non-empty strings when present"
+diff --git a/bin/fm-control.sh b/bin/fm-control.sh
+index aa4c9af..670bc16 100755
+--- a/bin/fm-control.sh
++++ b/bin/fm-control.sh
+@@ -681,6 +681,7 @@ PRIOR_EFFORT=
+ TARGET_HARNESS=$HARNESS
+ TARGET_MODEL=
+ TARGET_EFFORT=
++TARGET_ACCOUNT=
+ 
+ journal_write() {  # <phase> [extra-line]...
+   local phase=$1
+@@ -856,8 +857,13 @@ resolve_relaunch_profile() {
+   # signed out must refuse here, while nothing has changed yet.
+   local account_model=$TARGET_MODEL
+   [ "$account_model" != default ] || account_model=
++  local account_root=
++  if [ "$TARGET_HARNESS" = codex ] && [ "$PRIOR_HARNESS" = codex ]; then
++    TARGET_ACCOUNT=$(fm_meta_get "$META" account)
++    account_root=$(fm_meta_get "$META" account_root)
++  fi
+   fm_worker_account_select "$TARGET_HARNESS" "${FM_CONFIG_OVERRIDE:-$FM_HOME/config}" \
+-    "$account_model" "$TARGET_HARNESS" >/dev/null || return 1
++    "$account_model" "$TARGET_HARNESS" "" "$TARGET_ACCOUNT" "$account_root" >/dev/null || return 1
+ }
+ 
+ # safe_checkpoint: prove, before anything is stopped, that the work a relaunch
+diff --git a/bin/fm-dispatch-resolve.sh b/bin/fm-dispatch-resolve.sh
+index 6de1e89..2c3e92c 100755
+--- a/bin/fm-dispatch-resolve.sh
++++ b/bin/fm-dispatch-resolve.sh
+@@ -29,7 +29,10 @@
+ #   bin/fm-quota-axi-lib.sh, so a Pi lane such as openai-codex-work/...
+ #   reads its own account's row and an expanded provider with no row for the
+ #   candidate is unmeasured, never blocked), and the spendPriority argmax over
+-#   the eligible candidates. The model never sees quota, catalogs, approvals,
++#   the eligible candidates. Named Codex accounts each add one snapshot through
++#   CODEX_HOME=<configured-root> quota-axi --provider codex --profile-only --full --json.
++#   The default snapshot never supplies quota for an explicitly named account.
++#   The model never sees quota, catalogs, approvals,
+ #   confidence floors, `why`, or `use`. With no rules, it returns a non-clear
+ #   result so firstmate keeps using the existing intake.
+ #   docs/configuration.md "Crew dispatch profiles" owns the declared fields and
+@@ -52,7 +55,7 @@
+ #     fallback: <runner-up rule taken when the picked rule missed its own floor>
+ #     reason: <why the status is not clear>
+ #     candidate: <harness>:<model> provider=.. scope=.. remaining=..% spendPriority=.. runway=.. -> eligible | eligible, unranked: <reason> | not eligible: <reason>
+-#     profile: --harness <h> [--model <m>] [--effort <e>]     (status clear only)
++#     profile: --harness <h> [--model <m>] [--effort <e>] [--account <id>] (status clear only)
+ #   clear     -> pass the profile line to fm-spawn.sh unless you state a reason to override
+ #   ambiguous -> confidence below the floor; decide as today from the probabilities
+ #   escalate  -> the rule requires captain approval, no candidate is rankable, or a genuine tie
+@@ -81,6 +84,8 @@ CONFIG="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
+ 
+ # shellcheck source=bin/fm-quota-axi-lib.sh
+ . "$SCRIPT_DIR/fm-quota-axi-lib.sh"
++# shellcheck source=bin/fm-worker-account-lib.sh
++. "$SCRIPT_DIR/fm-worker-account-lib.sh"
+ # shellcheck source=bin/fm-control-lib.sh
+ . "$SCRIPT_DIR/fm-control-lib.sh"
+ # shellcheck source=bin/fm-env-lib.sh
+@@ -170,11 +175,13 @@ rules_err=$(jq -r --argjson verified_harnesses "$VERIFIED_HARNESSES" --arg provi
+     ($p | type) != "object"
+     or (($p.harness | type) != "string") or (($p.harness | length) == 0)
+     or ($p | has("model") and ((.model | type) != "string" or (.model | length) == 0))
++    or ($p | has("account") and (.harness != "codex" or (.account | type) != "string" or (.account | test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") | not)))
++    or ($p | has("account") and has("provider") and .provider != "codex")
+     or ($p | has("effort") and ((.effort | type) != "string" or (.effort | length) == 0))
+     or ($p | has("provider") and (provider_id(.provider) | not))
+     or ($p | has("floor") and floor_bad(.floor; false));
+   def duplicate_profiles($items):
+-    ($items | map([.harness, (.model // null), (.effort // null)] | @json)) as $keys
++    ($items | map([.harness, (.model // null), (.effort // null), (.account // null)] | @json)) as $keys
+     | ($keys | length) != ($keys | unique | length);
+   if type != "object" then "top-level value must be an object"
+   elif has("rules") and (.rules | type) != "array" then "rules must be an array"
+@@ -187,18 +194,33 @@ rules_err=$(jq -r --argjson verified_harnesses "$VERIFIED_HARNESSES" --arg provi
+   elif any((.rules // [])[]; has("select") and .select != "quota-balanced") then
+     "unknown select: " + ([.rules[] | select(has("select") and .select != "quota-balanced") | .select] | unique | join(", "))
+   elif any((.rules // [])[]; has("floor") and floor_bad(.floor; true)) then "rule floor needs scope, min_percent 0..100, and provider matching ^[a-z0-9]+(-[a-z0-9]+)*\\z"
+-  elif any((.rules // [])[] | profiles(.use)[]; profile_bad(.)) then "each use profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\\z when present"
+-  elif any((.rules // [])[]; duplicate_profiles(profiles(.use))) then "each rule use must not contain duplicate harness, model, and effort profiles"
++  elif any((.rules // [])[] | profiles(.use)[]; profile_bad(.)) then "each use profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\\z when present"
++  elif any((.rules // [])[]; duplicate_profiles(profiles(.use))) then "each rule use must not contain duplicate harness, model, effort, and account profiles"
+   elif any((.rules // [])[] | profiles(.use)[]; (verified(.harness) | not)) then "each use profile must name a verified harness"
+   elif any((.rules // [])[] | profiles(.use)[]; (effort_ok(.harness; .model; .effort) | not)) then "each use profile effort must be supported by its harness and model"
+   elif has("default") and (profiles(.default) | length) == 0 then "default must be a profile object or non-empty profile array"
+-  elif has("default") and any(profiles(.default)[]; profile_bad(.)) then "each default profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\\z when present"
+-  elif has("default") and duplicate_profiles(profiles(.default)) then "default must not contain duplicate harness, model, and effort profiles"
++  elif has("default") and any(profiles(.default)[]; profile_bad(.)) then "each default profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\\z when present"
++  elif has("default") and duplicate_profiles(profiles(.default)) then "default must not contain duplicate harness, model, effort, and account profiles"
+   elif has("default") and any(profiles(.default)[]; (verified(.harness) | not)) then "each default profile must name a verified harness"
+   elif has("default") and any(profiles(.default)[]; (effort_ok(.harness; .model; .effort) | not)) then "each default profile effort must be supported by its harness and model"
+   else empty end
+ ' "$RULES" 2>/dev/null) || die "malformed rules file: $RULES_PATH (not JSON)"
+ [ -z "$rules_err" ] || die "malformed rules file: $RULES_PATH - $rules_err"
++# Resolve configured account ids before any API request. This does not probe
++# authentication; fm-spawn owns the vendor sign-in check at launch.
++ACCOUNT_IDS=$(jq -r '
++  def profiles($v): if ($v | type) == "array" then $v elif ($v | type) == "object" then [$v] else [] end;
++  [((.rules // [])[] | profiles(.use)[]), profiles(.default // null)[]]
++  | map(.account // empty) | unique | .[]' "$RULES")
++ACCOUNT_ROOTS='{}'
++while IFS= read -r account_id; do
++  [ -n "$account_id" ] || continue
++  account_selection=$(fm_worker_codex_account_resolve "$CONFIG" "$account_id") || exit 2
++  account_root=${account_selection#*$'\t'}
++  account_root=${account_root%%$'\t'*}
++  ACCOUNT_ROOTS=$(jq --arg id "$account_id" --arg root "$account_root" '. + {($id): $root}' <<< "$ACCOUNT_ROOTS") || die "could not resolve Codex accounts"
++done <<< "$ACCOUNT_IDS"
++
+ 
+ missing_provider=$(jq -r '
+   def profiles($v): if ($v | type) == "array" then $v elif ($v | type) == "object" then [$v] else [] end;
+@@ -349,29 +371,42 @@ jq -e --slurpfile rules "$RULES" '
+ command -v quota-axi >/dev/null 2>&1 || emit_error "quota-axi not installed"
+ quota-axi --json > "$QUOTA" 2>/dev/null || emit_error "quota-axi --json failed"
+ fm_quota_json_valid < "$QUOTA" || emit_error "quota-axi --json returned an invalid snapshot"
++# Each named Codex account has its own snapshot; never reuse another root's
++# default row even when quota-axi calls both rows codex-home.
++ACCOUNT_QUOTAS='{}'
++while IFS= read -r account_id; do
++  [ -n "$account_id" ] || continue
++  account_root=$(jq -r --arg id "$account_id" '.[$id]' <<< "$ACCOUNT_ROOTS")
++  account_quota=$(CODEX_HOME="$account_root" quota-axi --provider codex --profile-only --full --json 2>/dev/null) \
++    || emit_error "quota-axi failed for Codex account $account_id"
++  fm_quota_json_valid <<< "$account_quota" || emit_error "quota-axi returned an invalid snapshot for Codex account $account_id"
++  ACCOUNT_QUOTAS=$(jq --arg id "$account_id" --argjson snapshot "$account_quota" '. + {($id): $snapshot}' <<< "$ACCOUNT_QUOTAS") \
++    || emit_error "could not retain Codex account quota"
++done <<< "$ACCOUNT_IDS"
++
+ 
+ # ---- resolution: declared gates + quota evidence + argmax, all in jq ------------
+ RESULT=$(jq -n --arg floor "$CONFIDENCE_FLOOR" --argjson lat "$LAT_MS" --arg none_criterion "$DEFAULT_WHEN" --argjson pmap "$PMAP" \
+-  --slurpfile resp "$RESP_FILE" --slurpfile rules "$RULES" --slurpfile quota "$QUOTA" "$FM_QUOTA_ROW_JQ"'
++  --argjson account_quotas "$ACCOUNT_QUOTAS" --slurpfile resp "$RESP_FILE" --slurpfile rules "$RULES" --slurpfile quota "$QUOTA" "$FM_QUOTA_ROW_JQ"'
+   ($resp[0]) as $r | ($rules[0]) as $cfg | ($quota[0]) as $q | ($r.answers.rule) as $a |
+   def profiles($v): if ($v | type) == "array" then $v elif ($v | type) == "object" then [$v] else [] end;
+-  def prov($p; $lane): quota_row($q; $p; $lane);
+-  def rows($p; $lane): (prov($p; $lane) | .quotaSemantics.effectiveAvailability // []);
++  def prov($snapshot; $p; $lane): quota_row($snapshot; $p; $lane);
++  def rows($snapshot; $p; $lane): (prov($snapshot; $p; $lane) | .quotaSemantics.effectiveAvailability // []);
+   def bare($m): ($m | split("/") | last);
+   def provider_of($c): ($c.provider // $pmap[$c.harness] // null);
+   def lane_of($c): quota_lane($c.harness; $c.model);
+-  def measured($p; $lane):
+-    (prov($p; $lane) != null and (["known", "partial"] | index(prov($p; $lane).quotaSemantics.status)) != null);
+-  def applicable($p; $lane; $m):
++  def measured($snapshot; $p; $lane):
++    (prov($snapshot; $p; $lane) != null and (["known", "partial"] | index(prov($snapshot; $p; $lane).quotaSemantics.status)) != null);
++  def applicable($snapshot; $p; $lane; $m):
+     (bare($m)) as $bare |
+-    [rows($p; $lane)[] | select(
++    [rows($snapshot; $p; $lane)[] | select(
+       .scope == "all_models" or .scope == "all_products" or
+       ($m != "" and (.scope == ("model:" + $bare) or .scope == ("product:" + $bare)))
+     )];
+-  def floor_state($f; $p; $lane):
++  def floor_state($snapshot; $f; $p; $lane):
+     if $f == null then "none"
+-    elif prov($p; $lane) == null or (measured($p; $lane) | not) then "unknown"
+-    else [rows($p; $lane)[] | select(.scope == $f.scope)] as $matches
++    elif prov($snapshot; $p; $lane) == null or (measured($snapshot; $p; $lane) | not) then "unknown"
++    else [rows($snapshot; $p; $lane)[] | select(.scope == $f.scope)] as $matches
+       | if ($matches | length) == 0 or any($matches[]; .status != "known") then "unknown"
+         elif any($matches[]; .effectivePercentRemaining < $f.min_percent) then "below"
+         else "ok"
+@@ -380,17 +415,18 @@ RESULT=$(jq -n --arg floor "$CONFIDENCE_FLOOR" --argjson lat "$LAT_MS" --arg non
+   def evidence($rows):
+     $rows | map({scope, status, pct: (.effectivePercentRemaining // null), runway: (.runway.status // null), spendPriority: (.selection.spendPriority // null)});
+   def evaluate($c):
++    (if $c.account then $account_quotas[$c.account] else $q end) as $snapshot |
+     (provider_of($c)) as $p | (lane_of($c)) as $lane |
+     if $p == null then {profile: $c, eligible: false, reason: "no provider family for harness \($c.harness); declare provider on the profile"}
+-    elif prov($p; $lane) == null then
++    elif prov($snapshot; $p; $lane) == null then
+       {profile: $c, provider: $p, eligible: true, unranked: true,
+-       reason: (if any($q.providers[]; .provider == $p)
++       reason: (if any($snapshot.providers[]; .provider == $p)
+                 then "provider \($p) has no quota row for account \(if $lane == "" then "default" else $lane end)"
+                 else "provider \($p) not in the quota snapshot" end)}
+     else
+-      (applicable($p; $lane; ($c.model // ""))) as $rows |
++      (applicable($snapshot; $p; $lane; ($c.model // ""))) as $rows |
+       (evidence($rows)) as $bounds |
+-      (floor_state($c.floor; $p; $lane)) as $profile_floor_state |
++      (floor_state($snapshot; $c.floor; $p; $lane)) as $profile_floor_state |
+       if any($rows[]; (.runway.status // "") == "exhausted_now") then
+         ($rows | map(select((.runway.status // "") == "exhausted_now")) | first) as $bad |
+         {profile: $c, provider: $p, bounds: $bounds, scope: $bad.scope, pct: ($bad.effectivePercentRemaining // null), runway: $bad.runway.status, eligible: false, reason: "runway exhausted_now at \($bad.scope)"}
+@@ -398,18 +434,18 @@ RESULT=$(jq -n --arg floor "$CONFIDENCE_FLOOR" --argjson lat "$LAT_MS" --arg non
+         ($rows | map(select(.status == "known" and (.effectivePercentRemaining | type) == "number" and .effectivePercentRemaining <= 0)) | first) as $bad |
+         {profile: $c, provider: $p, bounds: $bounds, scope: $bad.scope, pct: $bad.effectivePercentRemaining, runway: $bad.runway.status, eligible: false, reason: "0% remaining at \($bad.scope)"}
+       elif $profile_floor_state == "below" then
+-        ([rows($p; $lane)[] | select(
++        ([rows($snapshot; $p; $lane)[] | select(
+           .scope == $c.floor.scope and
+           .effectivePercentRemaining < $c.floor.min_percent
+         )] | first) as $floor_row |
+         {profile: $c, provider: $p, bounds: $bounds, scope: ($floor_row.scope // $c.floor.scope), pct: ($floor_row.effectivePercentRemaining // null), runway: ($floor_row.runway.status // null), eligible: false, reason: "profile floor \($c.floor.scope) below \($c.floor.min_percent)%"}
+-      elif (measured($p; $lane) | not) then
++      elif (measured($snapshot; $p; $lane) | not) then
+         ($rows | first) as $row |
+-        {profile: $c, provider: $p, bounds: $bounds, scope: ($row.scope // null), pct: ($row.effectivePercentRemaining // null), runway: ($row.runway.status // null), eligible: true, unranked: true, unknown: true, reason: "provider \($p) unmeasured (\(prov($p; $lane).quotaSemantics.status))"}
++        {profile: $c, provider: $p, bounds: $bounds, scope: ($row.scope // null), pct: ($row.effectivePercentRemaining // null), runway: ($row.runway.status // null), eligible: true, unranked: true, unknown: true, reason: "provider \($p) unmeasured (\(prov($snapshot; $p; $lane).quotaSemantics.status))"}
+       elif ($rows | length) == 0 then
+         {profile: $c, provider: $p, bounds: $bounds, eligible: true, unranked: true, unknown: true, reason: "no applicable quota row for provider \($p)"}
+       elif $profile_floor_state == "unknown" then
+-        ([rows($p; $lane)[] | select(.scope == $c.floor.scope)] | first) as $floor_row |
++        ([rows($snapshot; $p; $lane)[] | select(.scope == $c.floor.scope)] | first) as $floor_row |
+         {profile: $c, provider: $p, bounds: $bounds, scope: $c.floor.scope, pct: ($floor_row.effectivePercentRemaining // null), runway: ($floor_row.runway.status // null), eligible: true, unranked: true, unknown: true, reason: "profile floor \($c.floor.scope) is unverifiable: not rankable"}
+       elif any($rows[]; .status != "known") then
+         ($rows | map(select(.status != "known")) | first) as $bad |
+@@ -449,7 +485,7 @@ RESULT=$(jq -n --arg floor "$CONFIDENCE_FLOOR" --argjson lat "$LAT_MS" --arg non
+    end) as $fb |
+   (if $fb.to then $fb.to else $picked end) as $choice |
+   (rule_at($choice)) as $rule |
+-  (if $rule == null then "none" else floor_state($rule.floor; $rule.floor.provider; "") end) as $rule_floor_state |
++  (if $rule == null then "none" else floor_state($q; $rule.floor; $rule.floor.provider; "") end) as $rule_floor_state |
+   (if $choice != "default" and $rule == null then []
+    elif $rule == null then profiles($cfg.default // null)
+    else profiles($rule.use)
+@@ -509,12 +545,14 @@ TEXT=$(jq -r '
+   (if .note then "  note: \(.note | flat)" else empty end),
+   (if .unranked_note then "  note: \(.unranked_note | flat)" else empty end),
+   (.candidates[]? | "  candidate: \(.profile.harness | flat):\(show(.profile.model))"
++      + (if .profile.account then "  account=\(.profile.account | flat)" else "" end)
+       + (if .provider then "  provider=\(.provider | flat)" else "" end)
+       + (if .scope then "  scope=\(.scope | flat)  remaining=\(show(.pct))%  spendPriority=\(show(.spendPriority))  runway=\(show(.runway))" else "" end)
+       + (if (.bounds // [] | length) > 1 then "  bounds=" + ([.bounds[] | "\(.scope | flat):\(show(.pct))%/\((.runway // .status) | flat)"] | join(",")) else "" end)
+       + "  -> " + (if .unranked then "eligible, unranked: \(.reason | flat): disclosed uncertainty" elif .eligible then "eligible" else "not eligible: \(.reason | flat)" end)),
+   (if .chosen then "  profile: --harness \(.chosen.profile.harness | shell_arg)"
+       + (if .chosen.profile.model then " --model \(.chosen.profile.model | shell_arg)" else "" end)
++      + (if .chosen.profile.account then " --account \(.chosen.profile.account | shell_arg)" else "" end)
+       + (if .chosen.profile.effort then " --effort \(.chosen.profile.effort | shell_arg)" else "" end) else empty end)' <<<"$RESULT") || emit_error "output rendering failed"
+ printf '%s\n' "$TEXT"
+ exit 0
+diff --git a/bin/fm-spawn.sh b/bin/fm-spawn.sh
+index fcee5a1..61d3904 100755
+--- a/bin/fm-spawn.sh
++++ b/bin/fm-spawn.sh
+@@ -1,9 +1,9 @@
+ #!/usr/bin/env bash
+ # Spawn a direct report: a crewmate in a treehouse or Orca worktree, or a
+ # secondmate in its isolated firstmate home.
+-# Usage: fm-spawn.sh <task-id> <project-dir> --mode <no-mistakes|direct-PR|local-only> --yolo <on|off> [--branch-prefix <prefix>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>]
+-#        fm-spawn.sh <task-id> <project-dir> --scout [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>]
+-#        fm-spawn.sh <task-id> [<firstmate-home>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>] --secondmate
++# Usage: fm-spawn.sh <task-id> <project-dir> --mode <no-mistakes|direct-PR|local-only> --yolo <on|off> [--branch-prefix <prefix>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--account <id>] [--backend <name>]
++#        fm-spawn.sh <task-id> <project-dir> --scout [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--account <id>] [--backend <name>]
++#        fm-spawn.sh <task-id> [<firstmate-home>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--account <id>] [--backend <name>] --secondmate
+ #   --mode and --yolo are this task's delivery contract, REQUIRED for every ship
+ #   spawn and refused on --scout and --secondmate spawns. Firstmate resolves both
+ #   per task at intake (AGENTS.md section 7); data/projects.md holds the captain's
+@@ -42,7 +42,7 @@
+ #   first in the private launch-brief overlay, including the exact task-owned
+ #   steering inbox. This never rewrites a project's instruction files or a
+ #   secondmate's charter.
+-#        fm-spawn.sh <task-id> --relaunch [--harness <name>] [--model <name>] [--effort <level>]
++#        fm-spawn.sh <task-id> --relaunch [--harness <name>] [--model <name>] [--effort <level>] [--account <id>]
+ #   --relaunch launches a replacement agent for an EXISTING task into that
+ #   task's own recorded worktree, reusing its recorded endpoint when that
+ #   endpoint still exists, instead of creating either from scratch. It is
+@@ -53,7 +53,7 @@
+ #   backend, kind, project or home, worktree, endpoint - comes from the task's
+ #   validated state/<id>.meta, so --backend, --scout, --secondmate, a project
+ #   positional, and batch pairs are all refused alongside it; only harness,
+-#   model, and effort may change, which is what makes a harness switch one
++#   model, effort, and account may change, which is what makes a harness switch one
+ #   ordinary relaunch. It refuses unless the recorded endpoint is positively
+ #   agent-free on a backend with a recovery-grade agent-state classifier (tmux
+ #   or herdr), and clears the previous harness's per-task wiring before arming
+@@ -268,7 +268,7 @@
+ # Batch dispatch: pass one or more `id=repo` pairs instead of a single <id> <project>, e.g.
+ #     fm-spawn.sh fix-a-k3=projects/foo add-b-q7=projects/bar [--scout]
+ #   Each pair re-execs this script in single-task mode, so the single path stays the only
+-#   source of truth; shared --scout/--harness/--model/--effort/--backend/--mode/--yolo
++#   source of truth; shared --scout/--harness/--model/--effort/--account/--backend/--mode/--yolo
+ #   applies to every pair. A ship batch therefore carries one delivery contract, and each
+ #   pair still checks it against its own brief; a batch spanning modes is two invocations.
+ #   If config/crew-dispatch.json exists, shared --harness is required for crewmate
+@@ -323,7 +323,11 @@
+ #   worktree, or record exists and names the accepted values. The file is read
+ #   on every spawn and relaunch, so a change reaches the next launch without a
+ #   restart, and it is inherited into secondmate homes (bin/fm-config-inherit-lib.sh).
+-# Worker account pin (config/claude-account, config/pi-account):
++# Worker account pin (see docs/configuration.md "Worker account pin"):
++#   --account <id> selects Codex through config/codex-accounts; recorded id and
++#   root survive relaunch and recovery. It refuses on other harnesses or raw
++#   commands. Unselected Codex launches keep their ambient behavior.
++#
+ #   Opt-in. With no file, a Claude or Pi launch is unchanged: Claude still
+ #   receives this process's own CLAUDE_CONFIG_DIR when it is set, and Pi the
+ #   destination pane's ambient account. A present file pins every launch of
+@@ -650,6 +654,9 @@ KIND_SET=0
+ HARNESS_ARG=
+ MODEL=
+ EFFORT=
++ACCOUNT=
++ACCOUNT_ROOT_PRIOR=
++ACCOUNT_SET=0
+ BACKEND_ARG=
+ MODE=
+ YOLO=
+@@ -687,6 +694,10 @@ for a in "$@"; do
+       EFFORT=$a
+       EFFORT_SET=1
+       ;;
++    account)
++      ACCOUNT=$a
++      ACCOUNT_SET=1
++      ;;
+     backend)
+       BACKEND_ARG=$a
+       BACKEND_SET=1
+@@ -740,6 +751,8 @@ for a in "$@"; do
+     EFFORT=${a#--effort=}
+     EFFORT_SET=1
+     ;;
++  --account) want_value=account ;;
++  --account=*) ACCOUNT=${a#--account=}; ACCOUNT_SET=1 ;;
+   --backend) want_value=backend ;;
+   --backend=*)
+     BACKEND_ARG=${a#--backend=}
+@@ -784,6 +797,10 @@ done
+   echo "error: --effort requires a non-empty value" >&2
+   exit 1
+ }
++[ "$ACCOUNT_SET" -eq 0 ] || [ -n "$ACCOUNT" ] || {
++  echo "error: --account requires a non-empty value" >&2
++  exit 1
++}
+ [ "$BACKEND_SET" -eq 0 ] || [ -n "$BACKEND_ARG" ] || {
+   echo "error: --backend requires a non-empty value" >&2
+   exit 1
+@@ -925,6 +942,12 @@ spawn_remote_secondmate() {
+     fm_lock_release "$SPAWN_TASK_LOCK" || true
+     return 3
+   fi
++  if [ "$ACCOUNT_SET" -eq 1 ]; then
++    fm_lock_release "$registry_lock" || true
++    fm_lock_release "$SPAWN_TASK_LOCK" || true
++    echo "error: --account selects a local Codex root and cannot override a remote secondmate's host-local configuration" >&2
++    return 2
++  fi
+   host=$(secondmate_registry_field "$DATA/secondmates.md" "$id" host)
+   root=$(secondmate_registry_field "$DATA/secondmates.md" "$id" root)
+   home=$(secondmate_registry_field "$DATA/secondmates.md" "$id" home)
+@@ -1465,6 +1488,7 @@ if [ "${#POS[@]}" -gt 0 ] && [ "${POS[0]}" != "$idpart" ] && case "$idpart" in *
+   [ -z "$HARNESS_ARG" ] || shared_args+=(--harness "$HARNESS_ARG")
+   [ -z "$MODEL" ] || shared_args+=(--model "$MODEL")
+   [ -z "$EFFORT" ] || shared_args+=(--effort "$EFFORT")
++  [ -z "$ACCOUNT" ] || shared_args+=(--account "$ACCOUNT")
+   [ -z "$BACKEND_ARG" ] || shared_args+=(--backend "$BACKEND_ARG")
+   # One delivery contract applies to every pair in a batch, exactly like the shared
+   # harness. Each pair still re-validates it against its own brief, so a batch
+@@ -2404,7 +2428,13 @@ fi
+ # trust registration below writes the store the worker will actually read.
+ RAW_COMMAND=
+ [ "$RAW_LAUNCH" = 0 ] || RAW_COMMAND=$ARG3
+-WORKER_ACCOUNT=$(fm_worker_account_select "$HARNESS" "$CONFIG" "$MODEL" "${PI_BIN:-$HARNESS}" "$RAW_COMMAND") || exit 1
++# Reuse the recorded Codex identity on recovery, independently of dispatch rules.
++# An explicit account choice replaces it; changing harness drops it.
++if [ "$RELAUNCH" -eq 1 ] && [ "$HARNESS" = codex ] && [ "$RELAUNCH_PRIOR_HARNESS" = codex ] && [ "$ACCOUNT_SET" -eq 0 ]; then
++  ACCOUNT=$(fm_meta_get "$RELAUNCH_META" account)
++  ACCOUNT_ROOT_PRIOR=$(fm_meta_get "$RELAUNCH_META" account_root)
++fi
++WORKER_ACCOUNT=$(fm_worker_account_select "$HARNESS" "$CONFIG" "$MODEL" "${PI_BIN:-$HARNESS}" "$RAW_COMMAND" "$ACCOUNT" "$ACCOUNT_ROOT_PRIOR") || exit 1
+ WORKER_ACCOUNT_DECLARED=${WORKER_ACCOUNT%%$'\t'*}
+ WORKER_ACCOUNT_ROOT=${WORKER_ACCOUNT#*$'\t'}
+ WORKER_ACCOUNT_PROVIDER=${WORKER_ACCOUNT_ROOT#*$'\t'}
+@@ -4890,7 +4920,7 @@ SPAWN_META_PATH=$SPAWN_META_TMP
+ preserve_relaunch_meta() {
+   awk -F= '
+     BEGIN {
+-      split("window endpoint_task_id worktree project harness kind mode yolo branch tasktmp model effort account account_provider busy_gen spawn_gen traceparent backend herdr_session herdr_workspace_id herdr_tab_id herdr_pane_id zellij_session zellij_tab_id zellij_pane_id orca_worktree_id terminal cmux_workspace_id cmux_surface_id home projects control_relaunch_tx", keys, " ")
++      split("window endpoint_task_id worktree project harness kind mode yolo branch tasktmp model effort account account_root account_provider busy_gen spawn_gen traceparent backend herdr_session herdr_workspace_id herdr_tab_id herdr_pane_id zellij_session zellij_tab_id zellij_pane_id orca_worktree_id terminal cmux_workspace_id cmux_surface_id home projects control_relaunch_tx", keys, " ")
+       for (i in keys) owned[keys[i]] = 1
+     }
+     !($1 in owned)
+@@ -4912,6 +4942,7 @@ preserve_relaunch_meta() {
+   # The worker account pin, only when this home declares one, so an unpinned
+   # task record stays byte-identical.
+   [ -z "$WORKER_ACCOUNT" ] || echo "account=$WORKER_ACCOUNT_DECLARED"
++  [ "$HARNESS" != codex ] || [ -z "$WORKER_ACCOUNT" ] || echo "account_root=$WORKER_ACCOUNT_ROOT"
+   [ -z "$WORKER_ACCOUNT_PROVIDER" ] || echo "account_provider=$WORKER_ACCOUNT_PROVIDER"
+   [ -z "${BUSY_GEN:-}" ] || echo "busy_gen=$BUSY_GEN"
+   echo "spawn_gen=$SPAWN_GEN"
+@@ -5143,6 +5174,9 @@ if [ -n "$WORKER_ACCOUNT" ]; then
+       LAUNCH="$(fm_worker_account_claude_shed) -u CLAUDE_CONFIG_DIR $LAUNCH"
+     fi
+     ;;
++  codex)
++    LAUNCH="CODEX_HOME=$(shell_quote "$WORKER_ACCOUNT_ROOT") $LAUNCH"
++    ;;
+   pi | pi-signed)
+     LAUNCH="PI_CODING_AGENT_DIR=$(shell_quote "$WORKER_ACCOUNT_ROOT") $LAUNCH"
+     ;;
+diff --git a/bin/fm-worker-account-lib.sh b/bin/fm-worker-account-lib.sh
+index 5a87b12..50cb08e 100644
+--- a/bin/fm-worker-account-lib.sh
++++ b/bin/fm-worker-account-lib.sh
+@@ -11,6 +11,7 @@
+ # process select:
+ #   claude          CLAUDE_CONFIG_DIR     config/claude-account
+ #   pi, pi-signed   PI_CODING_AGENT_DIR   config/pi-account
++#   codex           CODEX_HOME            config/codex-accounts, explicit --account
+ #
+ # The pin is opt-in: an absent file is no pin, and the launch keeps today's
+ # ambient behavior byte for byte. A present file must resolve, or the launch
+@@ -39,6 +40,7 @@
+ # USER, LOGNAME, and the selected root in its environment, so a credential
+ # variable left in the caller cannot answer for a root that has no login:
+ #   Claude: `claude auth status`, which exits 0 only when signed in.
++#   Codex:  `codex login status`, which exits 0 only when signed in.
+ #   Pi:     `pi auth check --provider <p> --json --no-refresh`; status "ready"
+ #           passes. `pi auth check` loads no extensions, so it answers
+ #           not_ready/provider_not_found for an extension-registered provider,
+@@ -152,6 +154,45 @@ fm_worker_account_resolve() {
+   printf '%s\t%s\t%s\n' "$declared" "$root" "${token#*$'\t'}"
+ }
+ 
++# fm_worker_codex_account_resolve <config-dir> <id> [<recorded-root>]
++# Prints "id<TAB>root<TAB>" for an explicitly selected Codex account.
++# config/codex-accounts contains one id<TAB>absolute CODEX_HOME per line;
++# ids match [A-Za-z0-9][A-Za-z0-9._-]* and must be unique. A final newline
++# is optional. Empty files, blank lines, comments, CRs, and other control
++# bytes refuse. Validate the whole file before selecting a row, never eval it.
++# A recorded root refuses if the id has been remapped since the task launched.
++fm_worker_codex_account_resolve() {
++  local config=$1 id=$2 expected=${3:-} root
++  root=$(perl -e '
++    my ($f, $id) = @ARGV;
++    sub refuse { print STDERR "error: config/codex-accounts $_[0]: $f\n"; exit 1 }
++    $id =~ /\A[A-Za-z0-9][A-Za-z0-9._-]*\z/ or refuse("has invalid account id");
++    (-f $f && -r $f) or refuse("must be a readable regular file");
++    open(my $fh, "<", $f) or refuse("cannot be read");
++    my $body = do { local $/; <$fh> } // "";
++    $body =~ s/\n\z//;
++    length($body) or refuse("must contain at least one account");
++    my %roots;
++    for my $line (split(/\n/, $body, -1)) {
++      $line =~ /\A([A-Za-z0-9][A-Za-z0-9._-]*)\t(\/[^\x00-\x1f\x7f]*)\z/
++        or refuse("needs id<TAB>absolute CODEX_HOME on every line");
++      exists($roots{$1}) and refuse("contains duplicate account id $1");
++      $roots{$1} = $2;
++    }
++    exists($roots{$id}) or refuse("has unknown account id $id");
++    print $roots{$id};
++  ' -- "$config/codex-accounts" "$id") || return 1
++  if [ ! -d "$root" ] || [ ! -r "$root" ] || [ ! -x "$root" ]; then
++    echo "error: config/codex-accounts account '$id' must name a readable, searchable existing directory: $root" >&2
++    return 1
++  fi
++  if [ -n "$expected" ] && [ "$root" != "$expected" ]; then
++    echo "error: config/codex-accounts account '$id' changed root from $expected to $root; refusing to change a recorded task's account" >&2
++    return 1
++  fi
++  printf '%s\t%s\t\n' "$id" "$root"
++}
++
+ # fm_worker_account_pi_provider <model>
+ # Prints the provider an explicit Pi --model <provider>/<id> names. Returns 1,
+ # silently, for anything else, so no caller can fall back to a guess.
+@@ -189,6 +230,15 @@ fm_worker_account_check() {
+     fi
+     return 1
+     ;;
++  codex)
++    clean+=("CODEX_HOME=$root")
++    if fm_run_timed "$FM_WORKER_ACCOUNT_CHECK_SECONDS" "${clean[@]}" \
++      "$executable" login status >/dev/null 2>&1 </dev/null; then
++      return 0
++    fi
++    echo "error: config/codex-accounts account '$declared' at $root is not signed in (codex login status); sign in with CODEX_HOME=$root codex login" >&2
++    return 1
++    ;;
+   pi | pi-signed)
+     clean+=("PI_CODING_AGENT_DIR=$root")
+     out=$(fm_run_timed "$FM_WORKER_ACCOUNT_CHECK_SECONDS" "${clean[@]}" \
+@@ -217,7 +267,7 @@ fm_worker_account_check() {
+   return 0
+ }
+ 
+-# fm_worker_account_select <harness> <config-dir> <model> <executable> [<raw-command>]
++# fm_worker_account_select <harness> <config-dir> <model> <executable> [<raw-command>] [<account-id>] [<recorded-root>]
+ # The whole launch-time decision. Prints nothing for an unpinned runner, so
+ # the caller keeps today's launch unchanged. For a pinned one prints
+ # "declared<TAB>root<TAB>provider", where provider is the Pi launch model's
+@@ -227,7 +277,20 @@ fm_worker_account_check() {
+ # agent.
+ fm_worker_account_select() {
+   local harness=$1 config=$2 model=$3 executable=$4 raw=${5:-} selection declared root providers word provider=
+-  selection=$(fm_worker_account_resolve "$harness" "$config") || return 1
++  local account=${6:-} expected=${7:-}
++  if [ -n "$account" ]; then
++    [ "$harness" = codex ] || {
++      echo "error: --account selects a Codex account, but harness '$harness' is not codex" >&2
++      return 1
++    }
++    [ -z "$raw" ] || {
++      echo "error: --account refuses raw Codex launch commands; use --harness codex so the selected CODEX_HOME cannot be overridden" >&2
++      return 1
++    }
++    selection=$(fm_worker_codex_account_resolve "$config" "$account" "$expected") || return 1
++  else
++    selection=$(fm_worker_account_resolve "$harness" "$config") || return 1
++  fi
+   [ -n "$selection" ] || return 0
+   declared=${selection%%$'\t'*}
+   root=${selection#*$'\t'}
+@@ -247,7 +310,7 @@ fm_worker_account_select() {
+       *) break ;;
+       esac
+     done
+-  else
++  elif [ "$harness" != codex ]; then
+     if [ -n "$raw" ]; then
+       echo "error: config/pi-account pins Pi workers, and a raw Pi launch command runs verbatim, so it cannot carry the pinned --provider; launch with --harness $harness and --model <provider>/<id> instead" >&2
+       return 1
+diff --git a/docs/agent-control.md b/docs/agent-control.md
+index c949a13..df3d164 100644
+--- a/docs/agent-control.md
++++ b/docs/agent-control.md
+@@ -70,7 +70,7 @@ A relaunch does take one session reference when the endpoint's own runtime recor
+    A ship or scout keeps the harness already recorded for it, because that harness comes from firstmate's dispatch-profile judgment at intake and must not be silently re-read from configuration.
+    A recorded raw-command basename that differs from its resolved adapter cannot reproduce the command actually running, so relaunch refuses before the checkpoint unless the caller passes an explicit `--harness` to choose the replacement runtime deliberately.
+    A harness change resets model and effort unless they are named too, because a model chosen for one adapter does not transfer to another.
+-   A Claude or Pi replacement must also pass the home's [worker account pin](configuration.md#worker-account-pin-configclaude-account-configpi-account), so a pin that no longer resolves or is signed out refuses before the old agent stops.
++   A Claude, Pi, or selected Codex replacement must also pass the home's [worker account pin](configuration.md#worker-account-pin-configclaude-account-configpi-account-configcodex-accounts), so a pin that no longer resolves or is signed out refuses before the old agent stops.
+ 2. **Safe checkpoint.**
+    The recorded worktree must exist and be a worktree root; its head and dirty state are recorded.
+    For a `kind=secondmate` task, the home's identity marker must match and its child records must be readable, so a relaunch can never strand child work behind an unreadable home.
+diff --git a/docs/configuration.md b/docs/configuration.md
+index 5538d3e..656f1f8 100644
+--- a/docs/configuration.md
++++ b/docs/configuration.md
+@@ -9,7 +9,7 @@ Start with the directory layout, then use the setting reference for the behavior
+ | --- | --- |
+ | Firstmate's code, private files, or project location | [FM_HOME](#fm_home) and [operational home layout](#operational-home-layout-and-state) |
+ | Task windows and worker tools | [Runtime backend](#runtime-backend-configbackend--fm_backend) and [harness support](#harness-support) |
+-| Worker permissions, accounts, or environment | [Claude permission mode](#claude-permission-mode-configclaude-permission-mode), [worker account pin](#worker-account-pin-configclaude-account-configpi-account), and [worker launch environment](#worker-launch-environment-configlaunch-env-allowlist) |
++| Worker permissions, accounts, or environment | [Claude permission mode](#claude-permission-mode-configclaude-permission-mode), [worker account pin](#worker-account-pin-configclaude-account-configpi-account-configcodex-accounts), and [worker launch environment](#worker-launch-environment-configlaunch-env-allowlist) |
+ | Backlog, preferences, and memory | [Backlog backend](#backlog-backend-taskstoml--configbacklog-backend), [captain preferences](#captain-preferences-datacaptainmd--datacaptain-sharedmd), and [startup memory budget](#startup-memory-budget-configstartup-memory-budget) |
+ | Supervision and presentation | [Pi supervision branch](#pi-supervision-branch), [supervision host](#supervision-host-configsupervision-host), and [Calm preference](#calm-preference-configcalm) |
+ | Persistent secondmates | [Secondmate routes](#secondmate-routes-datasecondmatesmd) |
+@@ -841,17 +841,18 @@ The file is a captain-wide safety preference, so it is inherited into secondmate
+ 
+ The [Claude adapter reference](../.agents/skills/harness-adapters/references/harness/claude.md) records the permission-mode observations and the distinct startup dialogs.
+ 
+-## Worker account pin (config/claude-account, config/pi-account)
++## Worker account pin (config/claude-account, config/pi-account, config/codex-accounts)
+ 
+-A home that mixes accounts for one runner, such as a work login and a personal one, can pin the account its own Claude and Pi workers launch on.
+-The pin is opt-in: with neither file, every launch is unchanged, and Claude workers keep receiving firstmate's own `CLAUDE_CONFIG_DIR` when it is set.
++A home that mixes accounts for one runner, such as a work login and a personal one, can pin the account its own Claude, Pi, and Codex workers launch on.
++The pin is opt-in: without a selected Codex account or a Claude/Pi pin, every launch is unchanged, and Claude workers keep receiving firstmate's own `CLAUDE_CONFIG_DIR` when it is set.
+ 
+-Both files are local and gitignored.
++The account files are local and gitignored.
+ 
+ | Runner | File | Variable the launch receives | `ordinary` means |
+ | --- | --- | --- | --- |
+ | `claude` | `config/claude-account` | `CLAUDE_CONFIG_DIR` | the variable unset, so Claude uses its default login |
+ | `pi`, `pi-signed` | `config/pi-account` | `PI_CODING_AGENT_DIR` | `~/.pi/agent` |
++| `codex` | `config/codex-accounts`, selected with `--account <id>` | `CODEX_HOME` | not used; each id names an absolute root |
+ 
+ ### File format and provider selection
+ 
+@@ -866,6 +867,23 @@ A pinned Pi launch therefore needs `--model <provider>/<id>` naming a declared p
+ 
+ An unqualified model, an undeclared provider, or a raw Pi launch command, which cannot receive that flag, refuses; Firstmate never guesses a provider.
+ 
++`config/codex-accounts` names available Codex roots rather than one home-wide pin, so a dispatch array can choose between accounts.
++Each line contains an id, one literal tab, and an absolute `CODEX_HOME` path.
++Ids match `[A-Za-z0-9][A-Za-z0-9._-]*` and must be unique.
++A final newline is optional; empty files, blank lines, comments, relative paths, duplicate ids, and control characters refuse.
++Paths are literal and may contain spaces or shell punctuation.
++
++For example, create the mapping with `printf`, substituting existing signed-in roots:
++
++```sh
++printf 'personal\t/Users/me/.codex\nwork\t/Users/me/.codex-2\n' > config/codex-accounts
++```
++
++`fm-spawn.sh --harness codex --account work` selects that id for a ship, scout, or local secondmate launch.
++An unknown id, a missing mapping, an unreadable root, another harness, or a raw launch command refuses.
++Without `--account`, Codex keeps its existing ambient account behavior.
++Cursor has one ambient account and accepts no `account` value.
++
+ ### Launch scope and sign-in checks
+ 
+ When a file is present, every launch of that runner from this home uses it: ships, scouts, local secondmate agents, raw Claude launch commands, and relaunches.
+@@ -873,7 +891,7 @@ A raw Claude launch command refuses if its leading assignments set `CLAUDE_CONFI
+ The assignment would override the pin.
+ The refusal names the variable; remove that assignment from the raw command, or change or remove `config/claude-account`.
+ 
+-Before any worker endpoint, local copy, or task record exists, and before a relaunch stops the running worker, Firstmate asks the runner itself whether the pinned account is signed in: `claude auth status` for Claude, and `pi auth check --provider <provider> --json --no-refresh` for Pi, falling back to `pi --list-models <provider>` for a provider an extension registers.
++Before any worker endpoint, local copy, or task record exists, and before a relaunch stops the running worker, Firstmate asks the runner itself whether the pinned account is signed in: `claude auth status` for Claude, and `pi auth check --provider <provider> --json --no-refresh` for Pi, falling back to `pi --list-models <provider>` for a provider an extension registers, and `codex login status` under the selected `CODEX_HOME` for Codex.
+ The check runs with only `HOME`, `PATH`, `TMPDIR`, `USER`, `LOGNAME`, and the pinned root in its environment, so a credential variable in firstmate's own environment cannot answer for an empty root.
+ 
+ A pinned Claude launch also unsets the environment credentials Claude ranks above a stored login, such as `ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, and the Bedrock and Vertex switches ([authentication precedence](https://code.claude.com/docs/en/authentication#authentication-precedence)).
+@@ -885,6 +903,9 @@ A home that authenticates Claude through environment credentials on purpose shou
+ 
+ A malformed file, a root that is not a readable directory, or a signed-out account refuses the launch and names the file to fix; Firstmate never falls back to the ambient account and never changes a global login or copies a credential.
+ The spawn prints the pin as `account=` (plus `account_provider=` for Pi) and records the same fields in the task record, so the session-start digest shows which account each worker launched on.
++A selected Codex task also records `account_root=`.
++Relaunch and recovery reuse the recorded Codex id and refuse before stopping a running worker if its login is signed out, its id is missing, or its mapping now names a different root.
++An explicit `fm-spawn.sh --relaunch --account <id>` deliberately replaces the prior account after the old worker has exited.
+ 
+ Pins are not inherited into secondmate homes: a local secondmate agent launches on the launching home's pin, while the secondmate's own workers read the secondmate home's files.
+ A remote secondmate is launched on its host from its own home's configuration, so create the file in that remote home.
+@@ -1000,7 +1021,7 @@ Per-machine Cursor `cli-config.json` attribution-off is not this contract: it do
+ 
+ `config/crew-dispatch.json` is an optional local, gitignored file containing natural-language rules that firstmate reads before dispatching a crewmate or scout.
+ Firstmate chooses the best matching rule with judgment; shell scripts do not match the natural-language rules.
+-Firstmate resolves the rule's profile object or array under `AGENTS.md` section 4 and `quota-array-dispatch`, then passes only concrete `--harness`, `--model`, and `--effort` flags to `fm-spawn.sh`.
++Firstmate resolves the rule's profile object or array under `AGENTS.md` section 4 and `quota-array-dispatch`, then passes only concrete `--harness`, `--model`, `--effort`, and optional `--account` flags to `fm-spawn.sh`.
+ 
+ **Spawn requirements**
+ 
+@@ -1022,7 +1043,7 @@ This section is the single owner of the canonical schema and its per-field seman
+       "min_confidence": 0.85,
+       "floor": { "scope": "<quota-axi scope>", "min_percent": 20, "provider": "<quota-axi provider>" },
+       "use": [
+-        { "harness": "<adapter>", "model": "<optional model>", "effort": "<low|medium|high|xhigh|max|ultra, optional>", "provider": "<optional quota-axi provider>", "floor": { "scope": "<quota-axi scope>", "min_percent": 50 } }
++        { "harness": "<adapter>", "model": "<optional model>", "effort": "<low|medium|high|xhigh|max|ultra, optional>", "account": "<optional Codex account id>", "provider": "<optional quota-axi provider>", "floor": { "scope": "<quota-axi scope>", "min_percent": 50 } }
+       ],
+       "why": "<optional rationale that helps firstmate choose>"
+     }
+@@ -1042,6 +1063,14 @@ This section is the single owner of the canonical schema and its per-field seman
+ | `use` and optional top-level `default` | Accept one profile object or a non-empty array of profile objects; the single-object form remains fully backward-compatible. |
+ | Profile `harness` | Required in every profile. |
+ | Profile `model` and `effort`; rule `why` | Optional. |
++| Profile `account` | Optional for `harness: "codex"` only; names an id in this home's `config/codex-accounts` and is passed as `--account`. |
++
++Profiles with the same harness, model, and effort but different account ids are distinct candidates.
++A profile with `account` and an explicit `provider` must name `codex` as that provider.
++Account mappings are host-local and are not inherited with dispatch profiles; create matching ids in each home that uses them.
++The [quota-array procedure](../.agents/skills/quota-array-dispatch/SKILL.md#read-the-default-toon) owns per-account quota reads.
++The typed resolver takes one default JSON snapshot and one `CODEX_HOME=<root> quota-axi --provider codex --profile-only --full --json` snapshot per distinct named account, then applies the same gates and `spendPriority` ranking within each snapshot.
++Missing named-account quota stays unmeasured and never borrows the default login's quota.
+ 
+ **Fields applied only by typed resolution**
+ 
+diff --git a/docs/remote-secondmates.md b/docs/remote-secondmates.md
+index e13eeba..62b8457 100644
+--- a/docs/remote-secondmates.md
++++ b/docs/remote-secondmates.md
+@@ -119,7 +119,7 @@ It never touches a worker whose checkout still exists.
+ ### What the remote account must provide
+ 
+ - The remote account must provide the required toolchain, the selected worker runtime, the selected session backend, and credentials that work on that host.
+-- A [worker account pin](configuration.md#worker-account-pin-configclaude-account-configpi-account) for the second mate or its workers lives in the remote home's own configuration on that host.
++- A [worker account pin](configuration.md#worker-account-pin-configclaude-account-configpi-account-configcodex-accounts) for the second mate or its workers lives in the remote home's own configuration on that host.
+ - The origin URL named for each project must be reachable from the remote account, because projects are cloned on that host rather than copied from the primary.
+ 
+ ## Non-interactive tool contract
+diff --git a/docs/verification/runtime-backends.md b/docs/verification/runtime-backends.md
+index 82187a3..210dafd 100644
+--- a/docs/verification/runtime-backends.md
++++ b/docs/verification/runtime-backends.md
+@@ -617,7 +617,7 @@ None of these three runs ever answered its dialog (Escape only, never Enter), so
+ 
+ ## Worker account pin sign-in check
+ 
+-`bin/fm-worker-account-lib.sh` decides whether a pinned account is signed in from vendor output: the exit status of `claude auth status`, the JSON of `pi auth check`, and the provider column of `pi --list-models`.
++`bin/fm-worker-account-lib.sh` decides whether a pinned account is signed in from vendor output: the exit status of `claude auth status` and `codex login status`, the JSON of `pi auth check`, and the provider column of `pi --list-models`.
+ `tests/fm-worker-account-live-e2e.test.sh` asks the real installed runners about synthetic roots that need no login and no network, under a throwaway `HOME`.
+ A Claude root whose `settings.json` names an `apiKeyHelper` reports `loggedIn: true`, a Pi root holding a stored API key reports `ready`, and a provider registered by an extension in the Pi root's `extensions/` answers `pi auth check` with `not_ready`/`provider_not_found` while `pi --list-models` lists it.
+ Each refusal is paired with the divergence it depends on: the same runner, given `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or the extension's key variable, answers signed in for the empty root, so the refusal proves the check's cleared environment.
+@@ -638,6 +638,19 @@ skip-runner: pi-signed is not installed, so its pin check was not exercised
+ 
+ The guard submits no prompt and spends no tokens, so it runs by default wherever a runner is installed; rerun it after every Claude or Pi upgrade.
+ 
++Codex sign-in selection verified 2026-10-05 on macOS arm64 with stock Bash 3.2.57 and codex-cli 0.160.0.
++The isolated synthetic-root guard accepts a stored API login and refuses an empty root despite an ambient `OPENAI_API_KEY`.
++Refresh the synthetic proof with:
++
++```sh
++/bin/bash tests/fm-worker-account-live-e2e.test.sh --codex-only
++```
++
++```text
++ok - codex codex-cli 0.160.0: login status accepts a stored login and refuses an empty root under the clean environment
++# worker account live guard checked: codex
++```
++
+ ## Codex hook trust
+ 
+ Verified 2026-09-16 on codex-cli 0.151.0, macOS arm64, in a fresh linked worktree of this repository.
+diff --git a/tests/fm-bootstrap.test.sh b/tests/fm-bootstrap.test.sh
+index 7fb86ef..95f9830 100755
+--- a/tests/fm-bootstrap.test.sh
++++ b/tests/fm-bootstrap.test.sh
+@@ -21,6 +21,7 @@
+ # one run into its local and network halves, and the one-hop tasks-axi
+ # compatibility handoff that keeps a session start from paying for that verdict
+ # twice.
++# Usage: bash tests/fm-bootstrap.test.sh [--crew-dispatch-only]
+ set -u
+ 
+ # shellcheck source=tests/lib.sh disable=SC1091
+@@ -1163,6 +1164,10 @@ array use without select is accepted^{"rules":[{"when":"big feature","use":[{"ha
+ one-element array use is accepted^{"rules":[{"when":"focused feature","use":[{"harness":"claude"}]}]}^empty^
+ default array is accepted^{"default":[{"harness":"pi","model":"anthropic/claude-sonnet-5"},{"harness":"grok"}]}^empty^
+ provider-less multi-provider profile remains accepted without opt-in^{"rules":[{"when":"cross-provider work","use":{"harness":"opencode","model":"anthropic/claude-sonnet-4-5"}}],"default":{"harness":"pi","model":"anthropic/claude-sonnet-5"}}^empty^
++codex account profiles are accepted^{"default":[{"harness":"codex","account":"one"},{"harness":"codex","account":"two"}]}^empty^
++wrong harness account is refused^{"default":{"harness":"cursor","account":"one"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - profile account must be a Codex account id; provider must be codex when declared
++empty codex account is refused^{"default":{"harness":"codex","account":""}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - profile account must be a Codex account id; provider must be codex when declared
++conflicting codex account provider is refused^{"default":{"harness":"codex","account":"one","provider":"claude"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - profile account must be a Codex account id; provider must be codex when declared
+ one-element default array is accepted^{"default":[{"harness":"codex"}]}^empty^
+ empty array use is flagged^{"rules":[{"when":"big feature","use":[]}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - each rule needs at least one use profile
+ array profile without harness is flagged^{"rules":[{"when":"big feature","use":[{"model":"gpt-5.5"}]}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - each use profile needs harness
+@@ -1244,6 +1249,13 @@ ROWS
+   pass "bootstrap gates resolver fields and additive harnesses on the typed key"
+ }
+ 
++if [ "${1:-}" = --crew-dispatch-only ]; then
++  test_crew_dispatch_active_rules_are_verbose_bootstrap_info
++  test_crew_dispatch_validation
++  echo '# all focused crew dispatch bootstrap tests passed'
++  exit 0
++fi
++
+ test_bootstrap_reporting
+ test_no_mistakes_min_version
+ test_gh_axi_min_version
+@@ -1258,6 +1270,7 @@ test_herdr_install_requires_manual_action
+ test_cmux_bundled_cli_satisfies_dependency
+ test_unknown_backend_reports_invalid_configuration
+ test_json_backends_require_jq_not_tmux
++
+ test_treehouse_lease_check_follows_resolved_backend
+ test_fleet_sync_timeout_scales_with_origin_backed_project_count
+ test_fleet_sync_timeout_floor_preserves_small_fleets
+diff --git a/tests/fm-control-relaunch.test.sh b/tests/fm-control-relaunch.test.sh
+index 1242dc2..7ecfc73 100755
+--- a/tests/fm-control-relaunch.test.sh
++++ b/tests/fm-control-relaunch.test.sh
+@@ -17,6 +17,8 @@
+ #   6. fm-spawn --relaunch refuses on its own: a live agent, a contradicting
+ #      flag, an extra positional, or a backend that cannot prove the previous
+ #      agent exited.
++# Usage: bash tests/fm-control-relaunch.test.sh [--accounts-only]
++# --accounts-only focuses on pin preservation and pre-stop account refusals.
+ set -u
+ 
+ # shellcheck source=tests/lib.sh
+@@ -45,6 +47,7 @@ relaunch_cleanup() {
+   for d in "${TASK_TMPS[@]:-}"; do
+     [ -n "$d" ] && rm -rf "$d"
+   done
++  chmod -R u+w "$TMP_ROOT" 2>/dev/null || true
+   rm -rf "$TMP_ROOT"
+ }
+ trap relaunch_cleanup EXIT
+@@ -814,6 +817,41 @@ test_worker_account_pin_follows_the_relaunch() {
+   pass "fm-control relaunch: the replacement follows the home's current worker account pin"
+ }
+ 
++test_codex_account_survives_relaunch_and_refuses_remapping() {
++  local dir out rc id=rl-codex-account
++  dir=$(new_case codex-account "$id")
++  add_ship_task "$dir" "$id" codex
++  printf codex > "$dir/fake/command"
++  printf codex > "$dir/fake/becomes"
++  mkdir -p "$dir/home/config" "$dir/one" "$dir/two"
++  printf 'one\t%s\ntwo\t%s\n' "$dir/one" "$dir/two" > "$dir/home/config/codex-accounts"
++  printf 'account=one\naccount_root=%s\n' "$dir/one" >> "$dir/home/state/$id.meta"
++  cat > "$dir/fakebin/codex" <<'SH'
++#!/usr/bin/env bash
++if [ "${1:-}" = login ]; then [ -f "$CODEX_HOME/signed-in" ]; else exit 0; fi
++SH
++  chmod +x "$dir/fakebin/codex"
++  cp "$dir/home/state/$id.meta" "$dir/meta-before"
++  out=$(run_control "$dir" "$id" relaunch --note 'account signed out'); rc=$?
++  expect_code 1 "$rc" "a signed-out Codex account must refuse before stop"
++  assert_contains "$out" 'not signed in (codex login status)' "the refusal must name the vendor check"
++  [ "$(cat "$dir/fake/command")" = codex ] || fail "the old Codex must still be running"
++  cmp -s "$dir/meta-before" "$dir/home/state/$id.meta" || fail "the refusal must preserve metadata"
++  : > "$dir/one/signed-in"
++  out=$(run_control "$dir" "$id" relaunch --note 'reuse account'); rc=$?
++  expect_code 0 "$rc" "a signed-in Codex relaunch should succeed: $out"
++  [ "$(meta_field "$dir" "$id" account)" = one ] || fail "relaunch lost the account id"
++  [ "$(meta_field "$dir" "$id" account_root)" = "$dir/one" ] || fail "relaunch lost the account root"
++  assert_contains "$(cat "$dir/fake/literal")" "CODEX_HOME='$dir/one'" "relaunch must use the recorded root"
++  : > "$dir/fake/literal"
++  printf 'one\t%s\n' "$dir/two" > "$dir/home/config/codex-accounts"
++  out=$(run_control "$dir" "$id" relaunch --note 'root remapped'); rc=$?
++  expect_code 1 "$rc" "a remapped account must refuse before stop"
++  assert_contains "$out" 'changed root' "the refusal must explain remapping"
++  [ ! -s "$dir/fake/literal" ] || fail "remapping must refuse before any lifecycle input"
++  pass "Codex relaunch preserves id and root and refuses unsigned or remapped accounts before stop"
++}
++
+ test_explicit_model_wins_over_the_recorded_one() {
+   local dir out rc
+   dir=$(new_case explicit rl7)
+@@ -2386,6 +2424,14 @@ test_relaunch_moves_a_drifted_item_back_in_flight() {
+   pass "relaunch heals an item that drifted out of In flight while the task stayed live"
+ }
+ 
++if [ "${1:-}" = --accounts-only ]; then
++  test_signed_out_worker_account_pin_refuses_before_stop
++  test_worker_account_pin_follows_the_relaunch
++  test_codex_account_survives_relaunch_and_refuses_remapping
++  echo '# all focused worker account relaunch tests passed'
++  exit 0
++fi
++
+ test_same_harness_relaunch_keeps_identity_and_reuses_the_endpoint
+ test_relaunch_refuses_before_exit_when_the_composer_holds_pending_text
+ test_relaunch_refuses_before_exit_when_the_composer_state_is_unproven
+@@ -2403,6 +2449,7 @@ test_same_harness_relaunch_keeps_the_profile_axes
+ test_native_ultra_relaunch_preserves_profile_and_rejects_before_stop
+ test_signed_out_worker_account_pin_refuses_before_stop
+ test_worker_account_pin_follows_the_relaunch
++test_codex_account_survives_relaunch_and_refuses_remapping
+ test_explicit_model_wins_over_the_recorded_one
+ test_relaunch_onto_an_unverified_harness_is_refused
+ test_prior_harness_turnend_registry_entry_is_cleared
+diff --git a/tests/fm-dispatch-resolve.test.sh b/tests/fm-dispatch-resolve.test.sh
+index 198619f..135f2d6 100755
+--- a/tests/fm-dispatch-resolve.test.sh
++++ b/tests/fm-dispatch-resolve.test.sh
+@@ -145,8 +145,14 @@ else
+ fi
+ printf '%s\n' "$*" >> "${QUOTA_AXI_CALLS:?}"
+ [ "${FAKE_QUOTA_FAIL:-0}" = 1 ] && exit 1
+-[ "${1:-}" = --json ] || exit 2
+-cat "${QUOTA_AXI_FIXTURE:?}"
++if [ "${1:-}" = --provider ]; then
++  [ "$*" = '--provider codex --profile-only --full --json' ] || exit 2
++  printf '%s\n' "${CODEX_HOME:?}" >> "${QUOTA_AXI_CALLS:?}.roots"
++  cat "$CODEX_HOME/quota.json"
++else
++  [ "${1:-}" = --json ] || exit 2
++  cat "${QUOTA_AXI_FIXTURE:?}"
++fi
+ SH
+ chmod +x "$FAKEBIN/quota-axi"
+ 
+@@ -970,12 +976,12 @@ for bad in \
+   '{"rules":[{"when":"x","use":{"harness":"claude"},"min_confidence":1.5}]}|min_confidence must be a number from 0 through 1 when present' \
+   '{"rules":[{"when":"x","use":{"harness":"claude"},"floor":{"scope":"model:fable","min_percent":20}}]}|rule floor needs scope, min_percent 0..100, and provider matching ^[a-z0-9]+(-[a-z0-9]+)*\z' \
+   '{"rules":[{"when":"x","use":{"harness":"claude"},"floor":{"scope":"model:fable","min_percent":20,"provider":"CLAUDE"}}]}|rule floor needs scope, min_percent 0..100, and provider matching ^[a-z0-9]+(-[a-z0-9]+)*\z' \
+-  '{"rules":[{"when":"x","use":{"harness":"claude","provider":""}}]}|each use profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
+-  '{"rules":[{"when":"x","use":{"harness":"claude","provider":" claude"}}]}|each use profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
+-  '{"rules":[{"when":"x","use":{"harness":"claude","provider":"claude\n"}}]}|each use profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
+-  '{"rules":[{"when":"x","use":{"harness":"codex","floor":{"scope":"all_models","min_percent":20,"provider":"claude"}}}]}|each use profile needs harness; model, effort, and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
+-  '{"rules":[{"when":"x","use":[{"harness":"codex","model":"gpt-5.5","effort":"high"},{"harness":"codex","model":"gpt-5.5","effort":"high"}]}]}|each rule use must not contain duplicate harness, model, and effort profiles' \
+-  '{"rules":[{"when":"x","use":{"harness":"codex"}}],"default":[{"harness":"claude","model":"opus"},{"harness":"claude","model":"opus"}]}|default must not contain duplicate harness, model, and effort profiles' \
++  '{"rules":[{"when":"x","use":{"harness":"claude","provider":""}}]}|each use profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
++  '{"rules":[{"when":"x","use":{"harness":"claude","provider":" claude"}}]}|each use profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
++  '{"rules":[{"when":"x","use":{"harness":"claude","provider":"claude\n"}}]}|each use profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
++  '{"rules":[{"when":"x","use":{"harness":"codex","floor":{"scope":"all_models","min_percent":20,"provider":"claude"}}}]}|each use profile needs harness; model, effort, account (Codex only), and floor must be well formed, and provider must match ^[a-z0-9]+(-[a-z0-9]+)*\z when present' \
++  '{"rules":[{"when":"x","use":[{"harness":"codex","model":"gpt-5.5","effort":"high"},{"harness":"codex","model":"gpt-5.5","effort":"high"}]}]}|each rule use must not contain duplicate harness, model, effort, and account profiles' \
++  '{"rules":[{"when":"x","use":{"harness":"codex"}}],"default":[{"harness":"claude","model":"opus"},{"harness":"claude","model":"opus"}]}|default must not contain duplicate harness, model, effort, and account profiles' \
+   '{"rules":[{"when":"x","use":{"harness":"spaceship"}}]}|each use profile must name a verified harness' \
+   '{"rules":[{"when":"x","use":{"harness":"grok","effort":"max"}}]}|each use profile effort must be supported by its harness and model' \
+   '{"rules":[{"when":"x","use":{"harness":"opencode","model":"anthropic/claude-sonnet-4-5"}}]}|use profiles whose harness lacks one authoritative provider family require provider: opencode' \
+@@ -1005,4 +1011,45 @@ expect_code 0 "$code" "--help exits 0"
+ assert_contains "$out" 'Usage:' "--help prints usage"
+ pass "configuration errors exit 2 before any network call"
+ 
+-printf '# all fm-dispatch-resolve tests passed\n'
++# Same model and effort, different selected roots: both remain distinct and
++# neither consumes the ambient Codex quota row or the other root's reading.
++cp "$BASE_RULES" "$RULES"
++mkdir -p "$TMP_ROOT/codex-one" "$TMP_ROOT/codex-two"
++printf 'one\t%s\ntwo\t%s\n' "$TMP_ROOT/codex-one" "$TMP_ROOT/codex-two" > "$HOME_DIR/config/codex-accounts"
++jq '.rules[3].use = [{harness:"claude",model:"sonnet"},{harness:"codex",model:"gpt-5.6-sol",account:"one"},{harness:"codex",model:"gpt-5.6-sol",account:"two"},{harness:"cursor",model:"cursor-grok-4.6-medium"}]' "$BASE_RULES" > "$RULES"
++jq '.schemaVersion=6 | .providers |= map(select(.provider=="codex") | .accountKey="codex-home" | .quotaSemantics.effectiveAvailability[0].selection.spendPriority=0.3)' "$QUOTA" > "$TMP_ROOT/codex-one/quota.json"
++jq '.schemaVersion=6 | .providers |= map(select(.provider=="codex") | .accountKey="codex-home" | .quotaSemantics.effectiveAvailability[0].selection.spendPriority=0.95)' "$QUOTA" > "$TMP_ROOT/codex-two/quota.json"
++write_response "$RESPONSE" rule_4 0.96
++reset_log
++TYPESAFE_API_KEY="$KEY" run code out err "$BRIEF"
++expect_code 0 "$code" "account profiles must resolve: $out $err"
++assert_contains "$out" 'status: clear' "account profiles must produce a clear winner"
++assert_contains "$out" "profile: --harness 'codex' --model 'gpt-5.6-sol' --account 'two'" "the highest spendPriority account must win"
++assert_contains "$out" 'account=one' "the other account must appear in evidence"
++assert_contains "$out" 'account=two' "the chosen account must appear in evidence"
++[ "$(wc -l < "$LOG/quota-axi.calls" | tr -d ' ')" = 3 ] || fail "resolver must take one default and one snapshot per named account"
++assert_grep "$TMP_ROOT/codex-one" "$LOG/quota-axi.calls.roots" "quota must read account one's own CODEX_HOME"
++assert_grep "$TMP_ROOT/codex-two" "$LOG/quota-axi.calls.roots" "quota must read account two's own CODEX_HOME"
++pass "profile account axis ranks separate Codex roots beside Claude and Cursor"
++
++# An empty per-account snapshot remains unmeasured, even with healthy ambient quota.
++printf '{"schemaVersion":6,"providers":[]}\n' > "$TMP_ROOT/codex-two/quota.json"
++reset_log
++TYPESAFE_API_KEY="$KEY" run code out err "$BRIEF"
++expect_code 0 "$code" "missing account quota is disclosed uncertainty"
++assert_contains "$out" 'account=two  provider=codex  -> eligible, unranked' "missing named account quota must not borrow the ambient row"
++assert_contains "$out" "profile: --harness 'cursor'" "known viable quota may beat an unmeasured named account"
++pass "unmeasured named Codex accounts never borrow another account's quota"
++
++for profile in '{"harness":"cursor","account":"one"}' '{"harness":"codex","account":""}' '{"harness":"codex","account":2}' '{"harness":"codex","account":"one\n"}' '{"harness":"codex","account":"one","provider":"claude"}' '{"harness":"codex","account":"missing"}'; do
++  jq --argjson profile "$profile" '.rules[3].use=[$profile]' "$BASE_RULES" > "$RULES"
++  reset_log
++  TYPESAFE_API_KEY="$KEY" run code out err "$BRIEF"
++  expect_code 2 "$code" "invalid or unknown account profile must refuse: $profile"
++  assert_absent "$LOG/body" "an invalid account must refuse before a network request"
++done
++pass "invalid, wrong-harness, conflicting-provider, and unknown account profiles refuse before network calls"
++rm "$HOME_DIR/config/codex-accounts"
++
++
++echo "# all fm-dispatch-resolve tests passed"
+diff --git a/tests/fm-worker-account-live-e2e.test.sh b/tests/fm-worker-account-live-e2e.test.sh
+index c341ba3..549ce7f 100755
+--- a/tests/fm-worker-account-live-e2e.test.sh
++++ b/tests/fm-worker-account-live-e2e.test.sh
+@@ -14,9 +14,10 @@
+ # environment at work rather than a root the runner could never accept.
+ #
+ # It submits no prompt and spends no tokens, so the shared live gate runs it by
+-# default wherever a runner is installed. Run it after every Claude or Pi
++# default wherever a runner is installed. Run it after every Claude, Codex, or Pi
+ # upgrade and before trusting the "Worker account pin sign-in check" entry in
+ # docs/verification/runtime-backends.md.
++# Usage: bash tests/fm-worker-account-live-e2e.test.sh [--codex-only]
+ set -u
+ 
+ # shellcheck source=tests/lib.sh
+@@ -111,22 +112,42 @@ pi_live_cases() {
+   CHECKED="$CHECKED $exe"
+ }
+ 
+-for runner in claude pi pi-signed; do
++codex_live_cases() {
++  local version empty stored
++  version=$(codex --version 2>/dev/null | head -1)
++  empty="$TMP_ROOT/codex-empty"
++  stored="$TMP_ROOT/codex-stored"
++  mkdir -p "$empty" "$stored"
++  printf '{"auth_mode":"apikey","OPENAI_API_KEY":"sk-fm-live-synthetic"}\n' > "$stored/auth.json"
++  chmod 600 "$stored/auth.json"
++  fm_worker_account_check codex synthetic "$stored" codex ||
++    fail "codex $version: login status refused a root holding a stored API login"
++  if OPENAI_API_KEY=sk-fm-live-synthetic fm_worker_account_check codex empty "$empty" codex 2>/dev/null; then
++    fail "codex $version: login status accepted an empty root with an ambient API key"
++  fi
++  pass "codex $version: login status accepts a stored login and refuses an empty root under the clean environment"
++  CHECKED="$CHECKED codex"
++}
++
++runners='claude codex pi pi-signed'
++[ "${1:-}" != --codex-only ] || runners=codex
++for runner in $runners; do
+   if ! command -v "$runner" >/dev/null 2>&1; then
+     printf 'skip-runner: %s is not installed, so its pin check was not exercised\n' "$runner"
+     continue
+   fi
+   case "$runner" in
+     claude) claude_live_cases ;;
++    codex) codex_live_cases ;;
+     *) pi_live_cases "$runner" ;;
+   esac
+ done
+ 
+ if [ -z "$CHECKED" ]; then
+   if [ "${FM_WORKER_ACCOUNT_LIVE_E2E:-${FM_LIVE:-}}" = 1 ]; then
+-    fail "the worker account live guard was requested but no supported runner (claude, pi, pi-signed) is installed"
++    fail "the worker account live guard was requested but no supported runner (claude, codex, pi, pi-signed) is installed"
+   fi
+-  echo "skip: live: no supported runner (claude, pi, pi-signed) installed"
++  echo "skip: live: no supported runner (claude, codex, pi, pi-signed) installed"
+   exit 0
+ fi
+ echo "# worker account live guard checked:$CHECKED"
+diff --git a/tests/fm-worker-account.test.sh b/tests/fm-worker-account.test.sh
+index 4c5dd59..71849dc 100755
+--- a/tests/fm-worker-account.test.sh
++++ b/tests/fm-worker-account.test.sh
+@@ -69,7 +69,16 @@ esac
+   printf 'ARGS=%s\n' "\$*"
+ } > '$dir/pi-worker'
+ SH
+-  chmod +x "$fakebin/claude" "$fakebin/pi"
++  cat > "$fakebin/codex" <<SH
++#!/usr/bin/env bash
++if [ "\${1:-}" = login ] && [ "\${2:-}" = status ]; then
++  printf '%s %s\\n' "\${CODEX_HOME-unset}" "\${OPENAI_API_KEY-unset}" >> '$dir/codex-checks'
++  [ -f "\${CODEX_HOME:-\$HOME/.codex}/signed-in" ]
++  exit
++fi
++printf 'CODEX_HOME=%s\\n' "\${CODEX_HOME-unset}" > '$dir/codex-worker'
++SH
++  chmod +x "$fakebin/claude" "$fakebin/pi" "$fakebin/codex"
+ }
+ 
+ # new_case <name> <crew-harness> -> sets CASE HOME_DIR PROJ WT FAKEBIN
+@@ -111,7 +120,7 @@ run_pane() {
+   env -i HOME="$HOME_DIR/user-home" PATH="$FAKEBIN:$PATH" TERM=xterm \
+     CLAUDE_CONFIG_DIR="$CASE/ambient-claude" ANTHROPIC_API_KEY=ambient-pane-key \
+     CLAUDE_CODE_OAUTH_TOKEN=ambient-pane-token CLAUDE_CODE_USE_BEDROCK=1 \
+-    PI_CODING_AGENT_DIR="$CASE/ambient-pi" OPENAI_API_KEY=ambient-pane-openai \
++    CODEX_HOME="$CASE/ambient-codex" PI_CODING_AGENT_DIR="$CASE/ambient-pi" OPENAI_API_KEY=ambient-pane-openai \
+     bash -c "$(cat "$CASE/launch.log")" || fail "the recorded launch failed in the synthetic pane"
+ }
+ 
+@@ -384,6 +393,90 @@ test_local_secondmate_reads_the_launching_home_pin() {
+   pass "a local secondmate reads the launching home's pin and its own home's file is never inherited over"
+ }
+ 
++test_codex_accounts_select_literal_roots_for_ships_and_scouts() {
++  local out rc id=acct-codex kind root
++  for kind in ship scout; do
++    new_case "codex-$kind" codex
++    root="$CASE/work account'one"
++    mkdir -p "$root" "$CASE/second"
++    : > "$root/signed-in"
++    printf 'one\t%s\ntwo\t%s' "$root" "$CASE/second" > "$HOME_DIR/config/codex-accounts"
++    if [ "$kind" = ship ]; then
++      out=$(OPENAI_API_KEY=ambient-key spawn_ship "$id" --account one); rc=$?
++    else
++      fm_test_spawn_brief "$HOME_DIR" "$id" scout
++      out=$(OPENAI_API_KEY=ambient-key FM_FAKE_LAUNCH_LOG="$CASE/launch.log" \
++        fm_test_run_spawn "$HOME_DIR" "$WT" "$FAKEBIN" "$id" "$PROJ" --scout --account=one); rc=$?
++    fi
++    expect_code 0 "$rc" "a signed-in Codex $kind should launch: $out"
++    assert_contains "$out" "account=one" "the spawn must report its selected id"
++    assert_grep 'account=one' "$HOME_DIR/state/$id.meta" "the task must persist the account id"
++    assert_grep "account_root=$root" "$HOME_DIR/state/$id.meta" "the task must persist the literal root"
++    [ "$(cat "$CASE/codex-checks")" = "$root unset" ] || fail "the sign-in check must clear ambient credentials"
++    run_pane
++    [ "$(cat "$CASE/codex-worker")" = "CODEX_HOME=$root" ] || fail "the worker must receive the chosen literal CODEX_HOME"
++  done
++  pass "Codex ships and scouts select and record an account and quote its literal root"
++}
++
++test_codex_accounts_refuse_invalid_choices_before_launch() {
++  local out rc body n=0
++  new_case codex-refusals codex
++  mkdir -p "$CASE/one"
++  printf 'one\t%s\n' "$CASE/one" > "$HOME_DIR/config/codex-accounts"
++  out=$(spawn_ship acct-codex-out --account one); rc=$?
++  expect_code 1 "$rc" "a signed-out Codex account must refuse"
++  assert_refused_before_launch acct-codex-out "$out" "not signed in (codex login status)"
++  out=$(spawn_ship acct-codex-unknown --account two); rc=$?
++  expect_code 1 "$rc" "an unknown id must refuse"
++  assert_refused_before_launch acct-codex-unknown "$out" "unknown account id two"
++  out=$(spawn_ship acct-codex-harness --harness claude --account one); rc=$?
++  expect_code 1 "$rc" "a Codex account on another harness must refuse"
++  assert_refused_before_launch acct-codex-harness "$out" "harness 'claude' is not codex"
++  out=$(spawn_ship acct-codex-raw --harness 'codex --print' --account one); rc=$?
++  expect_code 1 "$rc" "a raw command could override the account and must refuse"
++  assert_refused_before_launch acct-codex-raw "$out" "refuses raw Codex launch commands"
++  for body in '' 'one relative' $'one\trelative' $'one\t/'$'\r' $'one\t/\none\t/' $'one\t/\n\n'; do
++    n=$((n + 1))
++    printf '%s' "$body" > "$HOME_DIR/config/codex-accounts"
++    out=$(spawn_ship "acct-codex-bad-$n" --account one); rc=$?
++    expect_code 1 "$rc" "malformed Codex account mapping must refuse: $out"
++    assert_refused_before_launch "acct-codex-bad-$n" "$out" 'config/codex-accounts'
++  done
++  # printf writes a NUL that Bash variables cannot preserve.
++  printf 'one\t/\000hidden' > "$HOME_DIR/config/codex-accounts"
++  out=$(spawn_ship acct-codex-nul --account one); rc=$?
++  expect_code 1 "$rc" "NUL in a mapping must refuse before shell parsing"
++  assert_refused_before_launch acct-codex-nul "$out" 'config/codex-accounts'
++  rm "$HOME_DIR/config/codex-accounts"
++  out=$(spawn_ship acct-codex-missing --account one); rc=$?
++  expect_code 1 "$rc" "a missing mapping must refuse"
++  assert_refused_before_launch acct-codex-missing "$out" 'readable regular file'
++  out=$(spawn_ship acct-codex-empty --account=); rc=$?
++  expect_code 1 "$rc" "an empty account flag must refuse"
++  assert_refused_before_launch acct-codex-empty "$out" '--account requires a non-empty value'
++  out=$(spawn_ship acct-codex-value --account); rc=$?
++  expect_code 1 "$rc" "a missing account value must refuse"
++  assert_refused_before_launch acct-codex-value "$out" '--account requires a value'
++  pass "Codex account parsing, unknown ids, signed-out roots, raw commands, and wrong harnesses refuse before launch"
++}
++
++test_unselected_codex_keeps_ambient_behavior() {
++  local out rc
++  new_case codex-ambient codex
++  printf 'malformed' > "$HOME_DIR/config/codex-accounts"
++  out=$(spawn_ship acct-codex-ambient); rc=$?
++  expect_code 0 "$rc" "unselected Codex should keep its existing ambient behavior: $out"
++  assert_absent "$CASE/codex-checks" "unselected Codex must not check a login"
++  run_pane
++  assert_grep "CODEX_HOME=$CASE/ambient-codex" "$CASE/codex-worker" "unselected Codex must keep the pane's root"
++  pass "unselected Codex launches preserve ambient behavior"
++}
++
++test_codex_accounts_select_literal_roots_for_ships_and_scouts
++test_codex_accounts_refuse_invalid_choices_before_launch
++test_unselected_codex_keeps_ambient_behavior
++
+ test_absent_pin_keeps_the_launch_unchanged
+ test_claude_pin_selects_the_root_and_sheds_ambient_credentials
+ test_claude_pin_refuses_a_signed_out_root_despite_an_ambient_login

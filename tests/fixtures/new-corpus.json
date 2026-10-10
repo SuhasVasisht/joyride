@@ -1,0 +1,6418 @@
+[
+  {
+    "id": "new-group-1",
+    "item": "new-group",
+    "text": "Create a group called Experiments",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-empty-group",
+          "args": {
+            "title": "Experiments"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "new-group-2",
+    "item": "new-group",
+    "text": "Make an empty group Experiments",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-empty-group",
+          "args": {
+            "title": "Experiments"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "new-group-3",
+    "item": "new-group",
+    "text": "Add a new group named Experiments",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-empty-group",
+          "args": {
+            "title": "Experiments"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-idea-1",
+    "item": "group-with-idea",
+    "text": "Make a group Bets with CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-group",
+          "args": {
+            "title": "Bets",
+            "idea": "csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-idea-2",
+    "item": "group-with-idea",
+    "text": "Create a group Bets containing CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-group",
+          "args": {
+            "title": "Bets",
+            "idea": "csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-idea-3",
+    "item": "group-with-idea",
+    "text": "Add a group Bets holding CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-group",
+          "args": {
+            "title": "Bets",
+            "idea": "csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-session-1",
+    "item": "group-with-session",
+    "text": "Make a group Docs with Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-session-group",
+          "args": {
+            "title": "Docs",
+            "session": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-session-2",
+    "item": "group-with-session",
+    "text": "Create a group Docs holding Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-session-group",
+          "args": {
+            "title": "Docs",
+            "session": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "group-with-session-3",
+    "item": "group-with-session",
+    "text": "New group Docs with Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "new-session-group",
+          "args": {
+            "title": "Docs",
+            "session": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-group-1",
+    "item": "rename-group",
+    "text": "Rename Research to Studies",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-group",
+          "args": {
+            "group": "research",
+            "title": "Studies"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-group-2",
+    "item": "rename-group",
+    "text": "Retitle Research as Studies",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-group",
+          "args": {
+            "group": "research",
+            "title": "Studies"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-group-3",
+    "item": "rename-group",
+    "text": "Please rename group Research to Studies",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-group",
+          "args": {
+            "group": "research",
+            "title": "Studies"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-repo-1",
+    "item": "rename-repo",
+    "text": "Rename alpha to Alpha work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-repo-group",
+          "args": {
+            "repo": "/r/alpha",
+            "title": "Alpha work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-repo-2",
+    "item": "rename-repo",
+    "text": "Retitle alpha as Alpha work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-repo-group",
+          "args": {
+            "repo": "/r/alpha",
+            "title": "Alpha work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-repo-3",
+    "item": "rename-repo",
+    "text": "Rename the alpha group to Alpha work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-repo-group",
+          "args": {
+            "repo": "/r/alpha",
+            "title": "Alpha work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-unfiled-1",
+    "item": "rename-unfiled",
+    "text": "Rename beta to Beta work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-unfiled-group",
+          "args": {
+            "project": "beta",
+            "title": "Beta work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-unfiled-2",
+    "item": "rename-unfiled",
+    "text": "Retitle beta as Beta work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-unfiled-group",
+          "args": {
+            "project": "beta",
+            "title": "Beta work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-unfiled-3",
+    "item": "rename-unfiled",
+    "text": "Rename the beta group to Beta work",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "rename-unfiled-group",
+          "args": {
+            "project": "beta",
+            "title": "Beta work"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "merge-group-1",
+    "item": "merge-group",
+    "text": "Merge Research into Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "merge-group",
+          "args": {
+            "group": "research",
+            "into": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "merge-group-2",
+    "item": "merge-group",
+    "text": "Combine Research with Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "merge-group",
+          "args": {
+            "group": "research",
+            "into": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "merge-group-3",
+    "item": "merge-group",
+    "text": "Fold Research into Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "merge-group",
+          "args": {
+            "group": "research",
+            "into": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "delete-group-1",
+    "item": "delete-group",
+    "text": "Delete group Later",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "delete-group",
+          "args": {
+            "group": "later"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "delete-group-2",
+    "item": "delete-group",
+    "text": "Remove the Later group",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "delete-group",
+          "args": {
+            "group": "later"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "delete-group-3",
+    "item": "delete-group",
+    "text": "Get rid of group Later",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "delete-group",
+          "args": {
+            "group": "later"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-group-1",
+    "item": "move-group",
+    "text": "Move group Core to 1200 0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "x": 1200,
+            "y": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-group-2",
+    "item": "move-group",
+    "text": "Place group Core at 1200, 0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "x": 1200,
+            "y": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-group-3",
+    "item": "move-group",
+    "text": "Please move group Core to 1200 0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "x": 1200,
+            "y": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reset-group-1",
+    "item": "reset-group",
+    "text": "Reset group Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "reset": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reset-group-2",
+    "item": "reset-group",
+    "text": "Reset position of group Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "reset": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reset-group-3",
+    "item": "reset-group",
+    "text": "Please reset group Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-group",
+          "args": {
+            "group": "core",
+            "reset": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-idea-1",
+    "item": "move-idea",
+    "text": "Move CSV export to Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "csv-export",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-idea-2",
+    "item": "move-idea",
+    "text": "Put idea CSV export into group Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "csv-export",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-idea-3",
+    "item": "move-idea",
+    "text": "File CSV export under Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "csv-export",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-home-1",
+    "item": "idea-home",
+    "text": "Move Build Joyride back to its repo group",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "build-joyride",
+            "to_group": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-home-2",
+    "item": "idea-home",
+    "text": "Take Build Joyride out of Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "build-joyride",
+            "to_group": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-home-3",
+    "item": "idea-home",
+    "text": "Put Build Joyride back to home",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-idea",
+          "args": {
+            "idea": "build-joyride",
+            "to_group": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-task-1",
+    "item": "move-task",
+    "text": "Move task jr-12 to Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-task",
+          "args": {
+            "task": "jr-12",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-task-2",
+    "item": "move-task",
+    "text": "Put Export task into Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-task",
+          "args": {
+            "task": "jr-12",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-task-3",
+    "item": "move-task",
+    "text": "File the task Export task under Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-task",
+          "args": {
+            "task": "jr-12",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "file-session-1",
+    "item": "file-session",
+    "text": "File Docs sweep in Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "file-session-2",
+    "item": "file-session",
+    "text": "Move session Docs sweep to Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "file-session-3",
+    "item": "file-session",
+    "text": "Put Docs sweep under idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-group-1",
+    "item": "session-group",
+    "text": "Move Docs sweep to Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-session",
+          "args": {
+            "session": "claude:docs",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-group-2",
+    "item": "session-group",
+    "text": "File session Docs sweep under group Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-session",
+          "args": {
+            "session": "claude:docs",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-group-3",
+    "item": "session-group",
+    "text": "Put Docs sweep into Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-session",
+          "args": {
+            "session": "claude:docs",
+            "to_group": "core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-unfiled-1",
+    "item": "session-unfiled",
+    "text": "Move Docs sweep to Unfiled",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-unfiled-2",
+    "item": "session-unfiled",
+    "text": "File Docs sweep in Unfiled",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "session-unfiled-3",
+    "item": "session-unfiled",
+    "text": "Put Docs sweep back to Unfiled",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "file-session",
+          "args": {
+            "session": "claude:docs",
+            "to_idea": "none"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-1",
+    "item": "hide",
+    "text": "Hide Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "hide",
+          "args": {
+            "key": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-2",
+    "item": "hide",
+    "text": "Set Docs sweep aside",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "hide",
+          "args": {
+            "key": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-3",
+    "item": "hide",
+    "text": "Park Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "hide",
+          "args": {
+            "key": "claude:docs"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unhide-1",
+    "item": "unhide",
+    "text": "Unhide Old spike",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "unhide",
+          "args": {
+            "key": "codex:spike"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unhide-2",
+    "item": "unhide",
+    "text": "Bring back Old spike",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "unhide",
+          "args": {
+            "key": "codex:spike"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unhide-3",
+    "item": "unhide",
+    "text": "Restore Old spike to the map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "unhide",
+          "args": {
+            "key": "codex:spike"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-1",
+    "item": "undo",
+    "text": "Undo",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "undo",
+          "args": {
+            "commit": "abc1234"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-2",
+    "item": "undo",
+    "text": "Revert the last change",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "undo",
+          "args": {
+            "commit": "abc1234"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-3",
+    "item": "undo",
+    "text": "Take back that",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "undo",
+          "args": {
+            "commit": "abc1234"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-1",
+    "item": "note",
+    "text": "Note: staging rotates Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "staging rotates Friday",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-2",
+    "item": "note",
+    "text": "Jot this down: staging rotates Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "staging rotates Friday",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-3",
+    "item": "note",
+    "text": "Add a note: staging rotates Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "staging rotates Friday",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "list-1",
+    "item": "list",
+    "text": "List: build, test and tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "list-2",
+    "item": "list",
+    "text": "Make a list of build, test and tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "list-3",
+    "item": "list",
+    "text": "Checklist: build; test; tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "named-list-1",
+    "item": "named-list",
+    "text": "Make a release list: build, test and tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "title": "Release list",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "named-list-2",
+    "item": "named-list",
+    "text": "Make a list called Release list: build, test and tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "title": "Release list",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "named-list-3",
+    "item": "named-list",
+    "text": "Create a checklist named Release list: build, test and tag",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "build",
+              "test",
+              "tag"
+            ],
+            "title": "Release list",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "mixed-note-1",
+    "item": "mixed-note",
+    "text": "Note: Friday release\n[ ] Review totals\nhttps://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Friday release\n[ ] Review totals\nhttps://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "mixed-note-2",
+    "item": "mixed-note",
+    "text": "Add a note: Friday release\n[ ] Review totals\nhttps://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Friday release\n[ ] Review totals\nhttps://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "mixed-note-3",
+    "item": "mixed-note",
+    "text": "Jot this down: Friday release\n[ ] Review totals\nhttps://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Friday release\n[ ] Review totals\nhttps://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "link-1",
+    "item": "link",
+    "text": "https://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "link-2",
+    "item": "link",
+    "text": "Link: https://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "link-3",
+    "item": "link",
+    "text": "Bookmark https://example.com/spec",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://example.com/spec",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-link-1",
+    "item": "artifact-link",
+    "text": "artifact:rep-launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "artifact:rep-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-link-2",
+    "item": "artifact-link",
+    "text": "Link: artifact:rep-launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "artifact:rep-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-link-3",
+    "item": "artifact-link",
+    "text": "Save this link artifact:rep-launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "artifact:rep-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-markdown-link-1",
+    "item": "scoped-markdown-link",
+    "text": "Link in CSV export: [export spec](https://example.com/spec)",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "[export spec](https://example.com/spec)",
+            "scope": "mission:csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-markdown-link-2",
+    "item": "scoped-markdown-link",
+    "text": "Save a link in CSV export: [export spec](https://example.com/spec)",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "[export spec](https://example.com/spec)",
+            "scope": "mission:csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-markdown-link-3",
+    "item": "scoped-markdown-link",
+    "text": "Add a link on CSV export: [export spec](https://example.com/spec)",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "[export spec](https://example.com/spec)",
+            "scope": "mission:csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "claude-link-1",
+    "item": "claude-link",
+    "text": "https://claude.ai/public/artifacts/abc",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://claude.ai/public/artifacts/abc",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "claude-link-2",
+    "item": "claude-link",
+    "text": "Bookmark https://claude.ai/public/artifacts/abc",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://claude.ai/public/artifacts/abc",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "claude-link-3",
+    "item": "claude-link",
+    "text": "Link: https://claude.ai/public/artifacts/abc",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "https://claude.ai/public/artifacts/abc",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-note-1",
+    "item": "scoped-note",
+    "text": "Note in Core: release Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "release Friday",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-note-2",
+    "item": "scoped-note",
+    "text": "Add a note in Core: release Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "release Friday",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-note-3",
+    "item": "scoped-note",
+    "text": "Make a note on Core: release Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "release Friday",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-note-4",
+    "item": "scoped-note",
+    "text": "Save a note for Core: release Friday",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "release Friday",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-list-1",
+    "item": "scoped-list",
+    "text": "List in Build Joyride: typecheck, build",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "typecheck",
+              "build"
+            ],
+            "scope": "mission:build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-list-2",
+    "item": "scoped-list",
+    "text": "Make a list in Build Joyride: typecheck, build",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "typecheck",
+              "build"
+            ],
+            "scope": "mission:build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-list-3",
+    "item": "scoped-list",
+    "text": "Add a list on Build Joyride: typecheck, build",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "typecheck",
+              "build"
+            ],
+            "scope": "mission:build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "scoped-list-4",
+    "item": "scoped-list",
+    "text": "Create a list for Build Joyride: typecheck, build",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "list",
+          "args": {
+            "items": [
+              "typecheck",
+              "build"
+            ],
+            "scope": "mission:build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-note-1",
+    "item": "edit-note",
+    "text": "Edit note Launch notes: Monday launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-note",
+          "args": {
+            "note": "note-launch",
+            "text": "Monday launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-note-2",
+    "item": "edit-note",
+    "text": "Rewrite Launch notes: Monday launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-note",
+          "args": {
+            "note": "note-launch",
+            "text": "Monday launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-note-3",
+    "item": "edit-note",
+    "text": "Replace note Launch notes: Monday launch",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-note",
+          "args": {
+            "note": "note-launch",
+            "text": "Monday launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-list-1",
+    "item": "edit-list",
+    "text": "Edit list Release list: ship, celebrate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "ship",
+              "celebrate"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-list-2",
+    "item": "edit-list",
+    "text": "Replace list Release list: ship, celebrate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "ship",
+              "celebrate"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "edit-list-3",
+    "item": "edit-list",
+    "text": "Rewrite list Release list: ship, celebrate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "ship",
+              "celebrate"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tick-1",
+    "item": "tick",
+    "text": "Tick build in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[x] build",
+              "[x] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tick-2",
+    "item": "tick",
+    "text": "Check off build on Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[x] build",
+              "[x] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tick-3",
+    "item": "tick",
+    "text": "Complete build in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[x] build",
+              "[x] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "untick-1",
+    "item": "untick",
+    "text": "Untick test in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[ ] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "untick-2",
+    "item": "untick",
+    "text": "Uncheck test on Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[ ] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "untick-3",
+    "item": "untick",
+    "text": "Please untick test in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[ ] test",
+              "[ ] tag"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "add-list-item-1",
+    "item": "add-list-item",
+    "text": "Add item docs to Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test",
+              "[ ] tag",
+              "[ ] docs"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "add-list-item-2",
+    "item": "add-list-item",
+    "text": "Add item docs in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test",
+              "[ ] tag",
+              "[ ] docs"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "add-list-item-3",
+    "item": "add-list-item",
+    "text": "Please add item docs to Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test",
+              "[ ] tag",
+              "[ ] docs"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-list-item-1",
+    "item": "remove-list-item",
+    "text": "Remove item tag from Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-list-item-2",
+    "item": "remove-list-item",
+    "text": "Remove item tag in Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-list-item-3",
+    "item": "remove-list-item",
+    "text": "Please remove item tag from Release list",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "edit-list",
+          "args": {
+            "note": "note-release",
+            "items": [
+              "[ ] build",
+              "[x] test"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-note-1",
+    "item": "archive-note",
+    "text": "Archive note Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "archive-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-note-2",
+    "item": "archive-note",
+    "text": "Delete card Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "archive-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-note-3",
+    "item": "archive-note",
+    "text": "Remove note Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "archive-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "restore-note-1",
+    "item": "restore-note",
+    "text": "Restore note Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "restore-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "restore-note-2",
+    "item": "restore-note",
+    "text": "Unarchive card Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "restore-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "restore-note-3",
+    "item": "restore-note",
+    "text": "Restore link Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "restore-note",
+          "args": {
+            "note": "note-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-note-1",
+    "item": "move-note",
+    "text": "Move note Launch notes to Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-note-2",
+    "item": "move-note",
+    "text": "File card Launch notes in Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "move-note-3",
+    "item": "move-note",
+    "text": "Put note Launch notes on Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "group:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-unfiled-1",
+    "item": "note-unfiled",
+    "text": "Move note Launch notes to Unfiled",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-unfiled-2",
+    "item": "note-unfiled",
+    "text": "File note Launch notes in hub",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-unfiled-3",
+    "item": "note-unfiled",
+    "text": "Put card Launch notes on Unfiled",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "move-note",
+          "args": {
+            "note": "note-launch",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "new-idea-1",
+    "item": "new-idea",
+    "text": "Create an empty idea: Search quality",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "new-idea",
+          "target": "",
+          "payload": {
+            "title": "Search quality",
+            "goal": "Search quality",
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "new-idea-2",
+    "item": "new-idea",
+    "text": "New idea: Search quality",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "new-idea",
+          "target": "",
+          "payload": {
+            "title": "Search quality",
+            "goal": "Search quality",
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "new-idea-3",
+    "item": "new-idea",
+    "text": "Make an idea: Search quality",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "new-idea",
+          "target": "",
+          "payload": {
+            "title": "Search quality",
+            "goal": "Search quality",
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-idea-1",
+    "item": "rename-idea",
+    "text": "Rename idea Build Joyride to Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "title": "Joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-idea-2",
+    "item": "rename-idea",
+    "text": "Retitle idea Build Joyride as Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "title": "Joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rename-idea-3",
+    "item": "rename-idea",
+    "text": "Please rename idea Build Joyride to Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "title": "Joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-goal-1",
+    "item": "idea-goal",
+    "text": "Set Build Joyride goal: Ship New",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "goal": "Ship New"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-goal-2",
+    "item": "idea-goal",
+    "text": "Change Build Joyride description: Ship New",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "goal": "Ship New"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-goal-3",
+    "item": "idea-goal",
+    "text": "Update Build Joyride goal: Ship New",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "goal": "Ship New"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pause-idea-1",
+    "item": "pause-idea",
+    "text": "Pause idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "paused"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pause-idea-2",
+    "item": "pause-idea",
+    "text": "Please pause Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "paused"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pause-idea-3",
+    "item": "pause-idea",
+    "text": "Could you pause idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "paused"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-idea-1",
+    "item": "resume-idea",
+    "text": "Resume idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-idea-2",
+    "item": "resume-idea",
+    "text": "Please resume Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-idea-3",
+    "item": "resume-idea",
+    "text": "Could you resume idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "open"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "drop-idea-1",
+    "item": "drop-idea",
+    "text": "Drop idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "dropped"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "drop-idea-2",
+    "item": "drop-idea",
+    "text": "Please drop Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "dropped"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "drop-idea-3",
+    "item": "drop-idea",
+    "text": "Could you drop idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "state-idea",
+          "target": "build-joyride",
+          "payload": {
+            "state": "dropped"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-idea-1",
+    "item": "archive-idea",
+    "text": "Archive idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-idea-2",
+    "item": "archive-idea",
+    "text": "Please archive Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "archive-idea-3",
+    "item": "archive-idea",
+    "text": "Could you archive idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unarchive-idea-1",
+    "item": "unarchive-idea",
+    "text": "Unarchive idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unarchive-idea-2",
+    "item": "unarchive-idea",
+    "text": "Please unarchive Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unarchive-idea-3",
+    "item": "unarchive-idea",
+    "text": "Could you unarchive idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "edit-idea",
+          "target": "build-joyride",
+          "payload": {
+            "archive": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-map-1",
+    "item": "page-map",
+    "text": "Go to Map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-map-2",
+    "item": "page-map",
+    "text": "Open the Map page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-map-3",
+    "item": "page-map",
+    "text": "Take me to Map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-agents-1",
+    "item": "page-agents",
+    "text": "Go to Agents",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-agents-2",
+    "item": "page-agents",
+    "text": "Open the Agents page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-agents-3",
+    "item": "page-agents",
+    "text": "Take me to Agents",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-board-1",
+    "item": "page-board",
+    "text": "Go to Board",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "board"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-board-2",
+    "item": "page-board",
+    "text": "Open the Board page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "board"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-board-3",
+    "item": "page-board",
+    "text": "Take me to Board",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "board"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-search-1",
+    "item": "page-search",
+    "text": "Go to Search",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-search-2",
+    "item": "page-search",
+    "text": "Open the Search page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-search-3",
+    "item": "page-search",
+    "text": "Take me to Search",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-artifacts-1",
+    "item": "page-artifacts",
+    "text": "Go to Artifacts",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-artifacts-2",
+    "item": "page-artifacts",
+    "text": "Open the Artifacts page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-artifacts-3",
+    "item": "page-artifacts",
+    "text": "Take me to Artifacts",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-settings-1",
+    "item": "page-settings",
+    "text": "Go to Settings",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "settings"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-settings-2",
+    "item": "page-settings",
+    "text": "Open the Settings page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "settings"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-settings-3",
+    "item": "page-settings",
+    "text": "Take me to Settings",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "settings"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-setup-1",
+    "item": "page-setup",
+    "text": "Go to Setup",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "setup"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-setup-2",
+    "item": "page-setup",
+    "text": "Open the Setup page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "setup"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-setup-3",
+    "item": "page-setup",
+    "text": "Take me to Setup",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "setup"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-idea-1",
+    "item": "open-idea",
+    "text": "Open Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "mission/build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-idea-2",
+    "item": "open-idea",
+    "text": "Show idea Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "mission/build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-idea-3",
+    "item": "open-idea",
+    "text": "Go to Build Joyride",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "mission/build-joyride"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-artifact-1",
+    "item": "open-artifact",
+    "text": "Open Launch report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts/rep-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-artifact-2",
+    "item": "open-artifact",
+    "text": "Show artifact Launch report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts/rep-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-artifact-3",
+    "item": "open-artifact",
+    "text": "Go to Launch report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "artifacts/rep-launch"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "focus-group-1",
+    "item": "focus-group",
+    "text": "Focus Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "reveal",
+            "kind": "region",
+            "id": "lens:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "focus-group-2",
+    "item": "focus-group",
+    "text": "Zoom in on Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "reveal",
+            "kind": "region",
+            "id": "lens:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "focus-group-3",
+    "item": "focus-group",
+    "text": "Look at Core",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "reveal",
+            "kind": "region",
+            "id": "lens:core"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-far-1",
+    "item": "zoom-far",
+    "text": "Zoom far",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "far"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-far-2",
+    "item": "zoom-far",
+    "text": "Zoom the map to far",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "far"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-far-3",
+    "item": "zoom-far",
+    "text": "Show map at far",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "far"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-mid-1",
+    "item": "zoom-mid",
+    "text": "Zoom mid",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "mid"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-mid-2",
+    "item": "zoom-mid",
+    "text": "Zoom the map to mid",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "mid"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-mid-3",
+    "item": "zoom-mid",
+    "text": "Show map at mid",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "mid"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-near-1",
+    "item": "zoom-near",
+    "text": "Zoom near",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "near"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-near-2",
+    "item": "zoom-near",
+    "text": "Zoom the map to near",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "near"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-near-3",
+    "item": "zoom-near",
+    "text": "Show map at near",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "near"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-fit-1",
+    "item": "zoom-fit",
+    "text": "Zoom fit",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "fit"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-fit-2",
+    "item": "zoom-fit",
+    "text": "Zoom the map to fit",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "fit"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "zoom-fit-3",
+    "item": "zoom-fit",
+    "text": "Show map at fit",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "zoom",
+            "level": "fit"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unfocus-1",
+    "item": "unfocus",
+    "text": "Clear focus",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unfocus-2",
+    "item": "unfocus",
+    "text": "Unfocus",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "unfocus-3",
+    "item": "unfocus",
+    "text": "Back to the whole map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "show-archive-1",
+    "item": "show-archive",
+    "text": "Show archived ideas",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "show-archive-2",
+    "item": "show-archive",
+    "text": "Show archived ideas on the map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "show-archive-3",
+    "item": "show-archive",
+    "text": "Please show archived ideas",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-archive-1",
+    "item": "hide-archive",
+    "text": "Hide archived ideas",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-archive-2",
+    "item": "hide-archive",
+    "text": "Hide archived ideas on the map",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "hide-archive-3",
+    "item": "hide-archive",
+    "text": "Please hide archived ideas",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "archive",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rail-1",
+    "item": "rail",
+    "text": "Hide the rail",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "rail",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rail-2",
+    "item": "rail",
+    "text": "Close sidebar",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "rail",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "rail-3",
+    "item": "rail",
+    "text": "Hide attention rail",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "rail",
+            "show": false
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "search-1",
+    "item": "search",
+    "text": "Search for exports",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge?q=exports"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "search-2",
+    "item": "search",
+    "text": "Search exports",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge?q=exports"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "search-3",
+    "item": "search",
+    "text": "Find in knowledge exports",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "knowledge?q=exports"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-worker-1",
+    "item": "reply-worker",
+    "text": "Reply to Docs worker: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-worker-2",
+    "item": "reply-worker",
+    "text": "Steer Docs worker: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-worker-3",
+    "item": "reply-worker",
+    "text": "Tell Docs worker: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "steer-task-1",
+    "item": "steer-task",
+    "text": "Steer Export task: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "steer_task",
+          "target": "jr-12",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "steer-task-2",
+    "item": "steer-task",
+    "text": "Reply to task jr-12: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "steer_task",
+          "target": "jr-12",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "steer-task-3",
+    "item": "steer-task",
+    "text": "Message Export task: Continue",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "steer_task",
+          "target": "jr-12",
+          "payload": {
+            "text": "Continue"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "answer-held-1",
+    "item": "answer-held",
+    "text": "Answer Deployment decision: release: Use local",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "answer_ask",
+          "target": "hold:deployment",
+          "payload": {
+            "mode": "release",
+            "answer": "Use local"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "answer-held-2",
+    "item": "answer-held",
+    "text": "Resolve Deployment decision: release: Use local",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "answer_ask",
+          "target": "hold:deployment",
+          "payload": {
+            "mode": "release",
+            "answer": "Use local"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "answer-held-3",
+    "item": "answer-held",
+    "text": "Please answer Deployment decision: release: Use local",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "answer_ask",
+          "target": "hold:deployment",
+          "payload": {
+            "mode": "release",
+            "answer": "Use local"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "ack-1",
+    "item": "ack",
+    "text": "Acknowledge Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "ack-2",
+    "item": "ack",
+    "text": "Got it Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "ack-3",
+    "item": "ack",
+    "text": "Mark seen Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "fleet-exclude-1",
+    "item": "fleet-exclude",
+    "text": "Keep to myself Docs worker",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "exclude",
+          "target": "local:docs",
+          "payload": {
+            "worker": "local:docs",
+            "why": "Requested through New."
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "fleet-exclude-2",
+    "item": "fleet-exclude",
+    "text": "Exclude Docs worker",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "exclude",
+          "target": "local:docs",
+          "payload": {
+            "worker": "local:docs",
+            "why": "Requested through New."
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "fleet-exclude-3",
+    "item": "fleet-exclude",
+    "text": "Please exclude Docs worker",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "exclude",
+          "target": "local:docs",
+          "payload": {
+            "worker": "local:docs",
+            "why": "Requested through New."
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-primary-1",
+    "item": "firstmate-primary",
+    "text": "Switch Firstmate to Codex",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "switch_firstmate",
+          "target": "firstmate",
+          "payload": {
+            "account": "codex-main"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-primary-2",
+    "item": "firstmate-primary",
+    "text": "Change Firstmate primary to Codex",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "switch_firstmate",
+          "target": "firstmate",
+          "payload": {
+            "account": "codex-main"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-primary-3",
+    "item": "firstmate-primary",
+    "text": "Switch the Firstmate primary onto Codex",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "switch_firstmate",
+          "target": "firstmate",
+          "payload": {
+            "account": "codex-main"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-session-1",
+    "item": "resume-session",
+    "text": "Resume Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "launch_session",
+          "target": "/r/joyride",
+          "payload": {
+            "cwd": "/r/joyride",
+            "agent": "claude",
+            "resume": "docs",
+            "label": "Docs sweep"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-session-2",
+    "item": "resume-session",
+    "text": "Restart session Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "launch_session",
+          "target": "/r/joyride",
+          "payload": {
+            "cwd": "/r/joyride",
+            "agent": "claude",
+            "resume": "docs",
+            "label": "Docs sweep"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "resume-session-3",
+    "item": "resume-session",
+    "text": "Please resume session Docs sweep",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "launch_session",
+          "target": "/r/joyride",
+          "payload": {
+            "cwd": "/r/joyride",
+            "agent": "claude",
+            "resume": "docs",
+            "label": "Docs sweep"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-start-1",
+    "item": "firstmate-start",
+    "text": "Start Firstmate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "start_firstmate",
+          "target": "firstmate",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-start-2",
+    "item": "firstmate-start",
+    "text": "Launch Firstmate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "start_firstmate",
+          "target": "firstmate",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-start-3",
+    "item": "firstmate-start",
+    "text": "Please start Firstmate",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "start_firstmate",
+          "target": "firstmate",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tell-note-1",
+    "item": "tell-note",
+    "text": "Tell Firstmate about Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "tell_note",
+          "target": "note-launch",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tell-note-2",
+    "item": "tell-note",
+    "text": "Send note to Firstmate Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "tell_note",
+          "target": "note-launch",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "tell-note-3",
+    "item": "tell-note",
+    "text": "Save and tell Firstmate Launch notes",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "tell_note",
+          "target": "note-launch",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "notifications-1",
+    "item": "notifications",
+    "text": "Disable notifications",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "notifications": {
+              "macos": false
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "notifications-2",
+    "item": "notifications",
+    "text": "Turn off macos notifications",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "notifications": {
+              "macos": false
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "notifications-3",
+    "item": "notifications",
+    "text": "Please disable notifications",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "notifications": {
+              "macos": false
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "set-model-1",
+    "item": "set-model",
+    "text": "Set Jev model jev-1.13.0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "jev": {
+              "model": "jev-1.13.0"
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "set-model-2",
+    "item": "set-model",
+    "text": "Please set Jev model jev-1.13.0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "jev": {
+              "model": "jev-1.13.0"
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "set-model-3",
+    "item": "set-model",
+    "text": "Could you set Jev model jev-1.13.0",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "settings",
+          "target": "",
+          "payload": {
+            "jev": {
+              "model": "jev-1.13.0"
+            }
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-scan-1",
+    "item": "artifact-scan",
+    "text": "Scan artifacts",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "scan-artifacts",
+          "target": "",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-scan-2",
+    "item": "artifact-scan",
+    "text": "Refresh artifacts",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "scan-artifacts",
+          "target": "",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "artifact-scan-3",
+    "item": "artifact-scan",
+    "text": "Find new artifacts",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "scan-artifacts",
+          "target": "",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "register-artifact-1",
+    "item": "register-artifact",
+    "text": "Register artifact: https://example.com/report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "register-artifact",
+          "target": "",
+          "payload": {
+            "url": "https://example.com/report",
+            "title": "https://example.com/report"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "register-artifact-2",
+    "item": "register-artifact",
+    "text": "Add artifact: https://example.com/report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "register-artifact",
+          "target": "",
+          "payload": {
+            "url": "https://example.com/report",
+            "title": "https://example.com/report"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "register-artifact-3",
+    "item": "register-artifact",
+    "text": "Please register artifact: https://example.com/report",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "register-artifact",
+          "target": "",
+          "payload": {
+            "url": "https://example.com/report",
+            "title": "https://example.com/report"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "proposal-1",
+    "item": "proposal",
+    "text": "Accept proposal prop-login",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "accept-proposal",
+          "target": "prop-login",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "proposal-2",
+    "item": "proposal",
+    "text": "Please accept suggestion prop-login",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "accept-proposal",
+          "target": "prop-login",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "proposal-3",
+    "item": "proposal",
+    "text": "Could you accept proposal prop-login",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "accept-proposal",
+          "target": "prop-login",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "sort-agents-1",
+    "item": "sort-agents",
+    "text": "Sort agents by recent",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?order=recent"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "sort-agents-2",
+    "item": "sort-agents",
+    "text": "Sort agents by most recent",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?order=recent"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "sort-agents-3",
+    "item": "sort-agents",
+    "text": "Sort agents by ideas",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?order=ideas"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-filter-1",
+    "item": "idea-filter",
+    "text": "Show agents in CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?idea=csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-filter-2",
+    "item": "idea-filter",
+    "text": "Filter agents for CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?idea=csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "idea-filter-3",
+    "item": "idea-filter",
+    "text": "Please show agents in CSV export",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "agents?idea=csv-export"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pan-1",
+    "item": "pan",
+    "text": "Pan map left 80",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "view",
+            "s": 1,
+            "tx": 80,
+            "ty": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pan-2",
+    "item": "pan",
+    "text": "Pan the map left 80 pixels",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "view",
+            "s": 1,
+            "tx": 80,
+            "ty": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "pan-3",
+    "item": "pan",
+    "text": "Please pan map left 80",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "view",
+            "s": 1,
+            "tx": 80,
+            "ty": 0
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "recheck-ask-1",
+    "item": "recheck-ask",
+    "text": "Recheck ask Deployment decision",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "recheck_ask",
+          "target": "hold:deployment",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "recheck-ask-2",
+    "item": "recheck-ask",
+    "text": "Check whether Deployment decision is still needed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "recheck_ask",
+          "target": "hold:deployment",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "recheck-ask-3",
+    "item": "recheck-ask",
+    "text": "Please recheck Deployment decision",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "recheck_ask",
+          "target": "hold:deployment",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-ack-1",
+    "item": "undo-ack",
+    "text": "Undo acknowledgement Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "undo-ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-ack-2",
+    "item": "undo-ack",
+    "text": "Undo ack Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "undo-ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "undo-ack-3",
+    "item": "undo-ack",
+    "text": "Please undo acknowledgment Build failed",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "undo-ack",
+          "target": "att-build",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "terminal-1",
+    "item": "terminal",
+    "text": "Type in Docs worker: pwd",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/workers/local%3Adocs/input",
+          "body": {
+            "data": "pwd"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "terminal-2",
+    "item": "terminal",
+    "text": "Type in terminal Docs worker: pwd",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/workers/local%3Adocs/input",
+          "body": {
+            "data": "pwd"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "terminal-3",
+    "item": "terminal",
+    "text": "Please type in Docs worker: pwd",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/workers/local%3Adocs/input",
+          "body": {
+            "data": "pwd"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "install-1",
+    "item": "install",
+    "text": "Install hooks",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/install",
+          "body": {
+            "component": "hooks"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "install-2",
+    "item": "install",
+    "text": "Install the hooks",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/install",
+          "body": {
+            "component": "hooks"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "install-3",
+    "item": "install",
+    "text": "Please install hooks",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/install",
+          "body": {
+            "component": "hooks"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-ack-1",
+    "item": "setup-ack",
+    "text": "Mark setup claude-login done",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/ack",
+          "body": {
+            "id": "claude-login",
+            "done": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-ack-2",
+    "item": "setup-ack",
+    "text": "Please mark setup claude-login done",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/ack",
+          "body": {
+            "id": "claude-login",
+            "done": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-ack-3",
+    "item": "setup-ack",
+    "text": "Could you mark setup claude-login done",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/ack",
+          "body": {
+            "id": "claude-login",
+            "done": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-seen-1",
+    "item": "setup-seen",
+    "text": "Dismiss setup hints",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/seen",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-seen-2",
+    "item": "setup-seen",
+    "text": "Please dismiss setup hints",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/seen",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "setup-seen-3",
+    "item": "setup-seen",
+    "text": "Could you dismiss setup hints",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/seen",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "github-login-1",
+    "item": "github-login",
+    "text": "Sign in to GitHub",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/gh-login",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "github-login-2",
+    "item": "github-login",
+    "text": "Start GitHub login",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/gh-login",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "github-login-3",
+    "item": "github-login",
+    "text": "Please start GitHub login",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "POST",
+          "path": "/api/system/setup/gh-login",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-rule-1",
+    "item": "remove-rule",
+    "text": "Remove remembered rule gar-old",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "DELETE",
+          "path": "/api/guard/rules/gar-old",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-rule-2",
+    "item": "remove-rule",
+    "text": "Remove guard rule gar-old",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "DELETE",
+          "path": "/api/guard/rules/gar-old",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "remove-rule-3",
+    "item": "remove-rule",
+    "text": "Please remove rule gar-old",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "api",
+          "method": "DELETE",
+          "path": "/api/guard/rules/gar-old",
+          "body": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-usage-1",
+    "item": "page-usage",
+    "text": "Open Usage",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "usage"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-usage-2",
+    "item": "page-usage",
+    "text": "Go to Usage",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "usage"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-usage-3",
+    "item": "page-usage",
+    "text": "Show the Usage page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "usage"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-evidence-1",
+    "item": "page-evidence",
+    "text": "Open Evidence",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "evidence"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-evidence-2",
+    "item": "page-evidence",
+    "text": "Go to Evidence",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "evidence"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-evidence-3",
+    "item": "page-evidence",
+    "text": "Show the Evidence page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "evidence"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-1",
+    "item": "page-start",
+    "text": "Open Guide",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-2",
+    "item": "page-start",
+    "text": "Go to Guide",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-3",
+    "item": "page-start",
+    "text": "Show the Guide page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-session-1",
+    "item": "page-start-session",
+    "text": "Open Start session",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start-session"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-session-2",
+    "item": "page-start-session",
+    "text": "Go to Start session",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start-session"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "page-start-session-3",
+    "item": "page-start-session",
+    "text": "Show the Start session page",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "start-session"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "worker-tab-chat-1",
+    "item": "worker-tab-chat",
+    "text": "Open chat tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "chat"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-chat-2",
+    "item": "worker-tab-chat",
+    "text": "Show the chat tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "chat"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-chat-3",
+    "item": "worker-tab-chat",
+    "text": "Switch to the chat tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "chat"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-terminal-1",
+    "item": "worker-tab-terminal",
+    "text": "Open terminal tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "terminal"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-terminal-2",
+    "item": "worker-tab-terminal",
+    "text": "Show the terminal tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "terminal"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-terminal-3",
+    "item": "worker-tab-terminal",
+    "text": "Switch to the terminal tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "terminal"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-context-1",
+    "item": "worker-tab-context",
+    "text": "Open context tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "context"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-context-2",
+    "item": "worker-tab-context",
+    "text": "Show the context tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "context"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "worker-tab-context-3",
+    "item": "worker-tab-context",
+    "text": "Switch to the context tab",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "tab",
+            "tab": "context"
+          }
+        }
+      ]
+    },
+    "context": {
+      "route": "worker/local%3Adocs"
+    }
+  },
+  {
+    "id": "palette-1",
+    "item": "palette",
+    "text": "Open command palette",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "palette",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "palette-2",
+    "item": "palette",
+    "text": "Show the palette",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "palette",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "palette-3",
+    "item": "palette",
+    "text": "Please open the command palette",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "palette",
+            "show": true
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "attention-rail-1",
+    "item": "attention-rail",
+    "text": "Show approvals",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "attention"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "attention-rail-2",
+    "item": "attention-rail",
+    "text": "Focus attention rail",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "attention"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "attention-rail-3",
+    "item": "attention-rail",
+    "text": "Scroll to the needs-you rail",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "attention"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "close-sheet-1",
+    "item": "close-sheet",
+    "text": "Close this sheet",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "close-sheet-2",
+    "item": "close-sheet",
+    "text": "Dismiss the current drawer",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "close-sheet-3",
+    "item": "close-sheet",
+    "text": "Close the dialog",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "ui",
+          "command": {
+            "action": "navigate",
+            "path": "map"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-preferences-1",
+    "item": "open-preferences",
+    "text": "Open Firstmate captain.md file",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "open-preferences",
+          "target": "captain.md",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-preferences-2",
+    "item": "open-preferences",
+    "text": "Open Firstmate preferences file",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "open-preferences",
+          "target": "captain.md",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "open-preferences-3",
+    "item": "open-preferences",
+    "text": "Open Firstmate captain file",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "resource",
+          "action": "open-preferences",
+          "target": "captain.md",
+          "payload": {}
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-image-1",
+    "item": "reply-image",
+    "text": "Reply to Docs worker with image /tmp/uploads/2026-10-06/abc123.png: Inspect this",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Inspect this",
+            "images": [
+              "/tmp/uploads/2026-10-06/abc123.png"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-image-2",
+    "item": "reply-image",
+    "text": "Tell Docs worker with image /tmp/uploads/2026-10-06/abc123.png: Inspect this",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Inspect this",
+            "images": [
+              "/tmp/uploads/2026-10-06/abc123.png"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-image-3",
+    "item": "reply-image",
+    "text": "Steer Docs worker with image /tmp/uploads/2026-10-06/abc123.png: Inspect this",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Inspect this",
+            "images": [
+              "/tmp/uploads/2026-10-06/abc123.png"
+            ]
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-punctuation-1",
+    "item": "reply-punctuation",
+    "text": "Reply to Docs worker: Continue!",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue!"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-punctuation-2",
+    "item": "reply-punctuation",
+    "text": "Tell Docs worker: Continue!",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue!"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "reply-punctuation-3",
+    "item": "reply-punctuation",
+    "text": "Please steer Docs worker: Continue!",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "intent",
+          "intent": "reply",
+          "target": "local:docs",
+          "payload": {
+            "text": "Continue!"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-punctuation-1",
+    "item": "note-punctuation",
+    "text": "Note: Release Friday.",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Release Friday.",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-punctuation-2",
+    "item": "note-punctuation",
+    "text": "Jot this down: Release Friday.",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Release Friday.",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "note-punctuation-3",
+    "item": "note-punctuation",
+    "text": "Add a note: Release Friday.",
+    "expected": {
+      "route": "deterministic",
+      "actions": [
+        {
+          "kind": "map",
+          "action": "note",
+          "args": {
+            "text": "Release Friday.",
+            "scope": "global"
+          }
+        }
+      ]
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-1",
+    "item": "firstmate-task",
+    "text": "Task: implement export totals",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-2",
+    "item": "firstmate-task",
+    "text": "Ask Firstmate to fix the login test",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-3",
+    "item": "firstmate-task",
+    "text": "Build a CSV exporter",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-4",
+    "item": "firstmate-task",
+    "text": "Implement a keyboard shortcut",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-5",
+    "item": "firstmate-task",
+    "text": "Refactor the storage layer",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-6",
+    "item": "firstmate-task",
+    "text": "Task: research the artifact format",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-7",
+    "item": "firstmate-task",
+    "text": "New task: link an artifact into the release notes",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-8",
+    "item": "firstmate-task",
+    "text": "Ask Firstmate to investigate the build",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-9",
+    "item": "firstmate-task",
+    "text": "Fix the duplicated rows",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-10",
+    "item": "firstmate-task",
+    "text": "Add a retry limit",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-11",
+    "item": "firstmate-task",
+    "text": "Document the API",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-12",
+    "item": "firstmate-task",
+    "text": "Write a regression test",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-13",
+    "item": "firstmate-task",
+    "text": "Upgrade the dependency",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-14",
+    "item": "firstmate-task",
+    "text": "Task: preserve joyride-mission: build-joyride",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "firstmate-task-15",
+    "item": "firstmate-task",
+    "text": "Firstmate, to implement export totals",
+    "expected": {
+      "route": "firstmate"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-1",
+    "item": "agent-job",
+    "text": "Link the artifact about exports here",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-2",
+    "item": "agent-job",
+    "text": "Find the latest launch report and attach it",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-3",
+    "item": "agent-job",
+    "text": "Research accessible animation patterns",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-4",
+    "item": "agent-job",
+    "text": "Compare these two reports",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-5",
+    "item": "agent-job",
+    "text": "Summarize what these workers found",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-6",
+    "item": "agent-job",
+    "text": "What does this idea mean?",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-7",
+    "item": "agent-job",
+    "text": "Make this view less cluttered",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-8",
+    "item": "agent-job",
+    "text": "Start Codex in this project",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-9",
+    "item": "agent-job",
+    "text": "Resume the saved agent with its old account",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-10",
+    "item": "agent-job",
+    "text": "Refresh my usage",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-11",
+    "item": "agent-job",
+    "text": "Remove expired guard rules",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-12",
+    "item": "agent-job",
+    "text": "Answer the question I was looking at",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-13",
+    "item": "agent-job",
+    "text": "Move the thing into that group",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-14",
+    "item": "agent-job",
+    "text": "Rename an unknown group to Later",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-15",
+    "item": "agent-job",
+    "text": "Make a list",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-16",
+    "item": "agent-job",
+    "text": "Make a note",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-17",
+    "item": "agent-job",
+    "text": "Link the newest Claude artifact here",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-18",
+    "item": "agent-job",
+    "text": "Group related sessions based on their goals",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-19",
+    "item": "agent-job",
+    "text": "Reorder Release list by risk",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-20",
+    "item": "agent-job",
+    "text": "Show the evidence for this task",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-21",
+    "item": "agent-job",
+    "text": "Change the map grouping to health",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-22",
+    "item": "agent-job",
+    "text": "Create a report comparing my model spend",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-23",
+    "item": "agent-job",
+    "text": "I think this looks confusing",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-24",
+    "item": "agent-job",
+    "text": "Summarize suggestion new-context-proposal and refresh its session summary",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-25",
+    "item": "agent-job",
+    "text": "Start Codex with my Codex account in this project and the prompt: audit export totals",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-26",
+    "item": "agent-job",
+    "text": "Triage suggestions new-batch-a and new-batch-b together, accepting both",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-27",
+    "item": "agent-job",
+    "text": "Use Codex with my Codex account for session intention summaries and low effort",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "agent-job-28",
+    "item": "agent-job",
+    "text": "Inspect guard policy and remembered rules, and leave a summary here",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "missing-worker-tab-1",
+    "item": "missing-worker-tab",
+    "text": "Open terminal tab",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  },
+  {
+    "id": "missing-worker-tab-2",
+    "item": "missing-worker-tab",
+    "text": "Switch to context tab",
+    "expected": {
+      "route": "agent"
+    },
+    "context": {}
+  }
+]

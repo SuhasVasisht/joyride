@@ -1,0 +1,45 @@
+.shell { display: grid; grid-template-columns: 1fr; grid-template-rows: 52px 1fr; height: 100vh; }
+.shell.rail-open { grid-template-columns: 1fr var(--rail-w); }
+.topbar { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s4); padding: 0 var(--s4); border-bottom: 1px solid var(--rule); background: var(--paper); position: relative; z-index: 30; }
+.brand { display: flex; align-items: center; gap: var(--s2); text-decoration: none; font-family: var(--font-display); font-size: var(--step-1); font-weight: 500; color: var(--ink); }
+.nav { display: flex; gap: var(--s1); margin-left: var(--s3); }
+.nav a { text-decoration: none; padding: 5px 10px; border-radius: var(--radius-control); color: var(--ink-2); font-weight: 500; font-size: var(--step--1); display: inline-flex; gap: 6px; align-items: center; }
+.nav a:hover { background: var(--paper-sunk); }
+.nav a.active { color: var(--ink); background: var(--paper-sunk); }
+.btn.palette-trigger { color: var(--ink-3); border-color: var(--rule); background: transparent; flex: none; height: var(--s6); white-space: nowrap; justify-content: space-between; font-weight: 400; }
+.palette-trigger-icon { display: none; flex: none; }
+@media (max-width: 1200px) {
+  .palette-trigger-label { display: none; }
+  .palette-trigger-icon { display: block; }
+}
+.conn { font-size: var(--step--1); color: var(--ink-3); display: inline-flex; align-items: center; gap: 6px; }
+.conn::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--review); }
+.conn.off::before { background: var(--signal); }
+/* A newer build is serving; this tab still runs the old one (src/ui/lib/build.ts). Quiet: not a needs-you. */
+.build-update { font: 500 var(--step--1)/1 var(--font-ui); color: var(--ink-2); background: var(--paper-raised); border: 1px solid var(--rule); border-radius: var(--radius-control); padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.build-update::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--working); }
+.build-update b { color: var(--ink); font-weight: 600; }
+.build-update:hover { background: var(--paper-sunk); border-color: var(--rule-strong); }
+.main { overflow: auto; position: relative; min-width: 0; }
+.rail { border-left: 1px solid var(--rule); overflow: auto; background: var(--paper); padding: var(--s4); }
+.rail section + section { margin-top: var(--s5); }
+.rail h3 { font-size: var(--step-1); margin-bottom: var(--s2); display: flex; align-items: baseline; gap: var(--s2); }
+.rail h3 .count { font-family: var(--font-ui); font-size: var(--step--1); color: var(--ink-3); font-weight: 500; }
+.palette-backdrop { position: fixed; inset: 0; background: rgba(20,33,61,.18); display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh; z-index: 50; }
+.palette { width: min(640px, 92vw); overflow: hidden; }
+.palette-input { width: 100%; border: 0; border-bottom: 1px solid var(--rule); padding: var(--s4); font: 400 var(--step-1)/1.3 var(--font-ui); background: transparent; color: var(--ink); outline: none; }
+.palette-list { list-style: none; margin: 0; padding: var(--s2); max-height: 50vh; overflow: auto; }
+.palette-list li { display: flex; justify-content: space-between; gap: var(--s3); padding: 8px 10px; border-radius: var(--radius-control); cursor: pointer; }
+.palette-list li.sel { background: var(--paper-sunk); }
+@media (max-width: 900px) { .shell.rail-open { grid-template-columns: 1fr; } .rail { position: fixed; right: 0; top: 52px; bottom: 0; width: min(var(--rail-w), 92vw); box-shadow: var(--shadow-sheet); } }
+
+/* "More" nav menu: secondary pages. Stays mounted while closed (hidden). */
+.nav-more { position: relative; }
+.nav-more-btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 0; border-radius: var(--radius-control); background: none; color: var(--ink-2); font-weight: 500; font-size: var(--step--1); cursor: pointer; }
+.nav-more-btn:hover, .nav-more-btn[aria-expanded="true"] { background: var(--paper-sunk); }
+.nav-more-btn.active { color: var(--ink); background: var(--paper-sunk); }
+.nav-more-dot { display: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.nav-more:has(.nav-menu .ev-badge, .nav-menu .k-badge, .nav-menu .nav-badge, .nav-menu .hc-badge) .nav-more-dot { display: inline-block; }
+.nav-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 200px; padding: var(--s1); display: grid; gap: 1px; z-index: 40; }
+.nav-menu[hidden] { display: none; }
+.nav-menu a { justify-content: space-between; padding: 7px 10px; }

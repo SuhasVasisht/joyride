@@ -1,0 +1,44 @@
+/* Images on a message: the paperclip, the tray of thumbnails before sending, the drop
+   highlight, and the thumbnails of what went out. */
+.drop-zone { position: relative; min-width: 0; }
+.drop-zone.dragging > :not(.drop-hint) { opacity: .45; }
+.drop-hint {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s2);
+  border: 1.5px dashed var(--working); border-radius: 6px; background: color-mix(in srgb, var(--working-wash) 80%, transparent);
+  color: var(--working); font-size: var(--step--1); font-weight: 600; text-align: center; pointer-events: none;
+}
+.drop-zone.blocked .drop-hint { border-color: var(--ink-3); background: color-mix(in srgb, var(--paper-sunk) 85%, transparent); color: var(--ink-2); font-weight: 500; }
+
+.attach-btn { flex: none; display: inline-grid; place-items: center; width: 34px; min-height: 34px; padding: 0; color: var(--ink-2); }
+.attach-btn:hover { color: var(--ink); }
+.attach-btn[aria-disabled="true"] { color: var(--ink-3); opacity: .6; cursor: not-allowed; }
+
+.attach-tray { margin-bottom: 6px; min-width: 0; }
+.attach-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.attach-item {
+  position: relative; width: 64px; height: 64px; border: 1px solid var(--rule-strong); border-radius: 6px;
+  overflow: hidden; background: var(--paper-sunk);
+}
+.attach-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.attach-item.s-uploading img { opacity: .55; }
+.attach-item.s-failed { border-color: var(--fail); }
+.attach-item.s-failed img { opacity: .4; }
+.attach-badge {
+  position: absolute; left: 3px; bottom: 3px; padding: 0 4px; border-radius: 3px; font-size: 10px; line-height: 16px;
+  background: var(--paper-raised); color: var(--ink-2);
+}
+.attach-badge.bad { color: var(--fail); }
+.attach-remove {
+  position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 75%, transparent); color: var(--paper-raised); font-size: 13px; line-height: 18px; cursor: pointer;
+}
+.attach-remove:hover, .attach-remove:focus-visible { background: var(--ink); }
+.attach-note { margin: 4px 0 0; font-size: 12px; overflow-wrap: anywhere; }
+
+.sent-images { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; padding: 0; list-style: none; }
+.sent-image img {
+  display: block; max-width: 160px; max-height: 120px; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper-sunk);
+}
+.sent-image.chip { padding: 2px 8px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; color: var(--ink-2); max-width: 100%; overflow-wrap: anywhere; }
+.sent-images.small .sent-image img { max-width: 72px; max-height: 54px; }
+.msg-bubble .sent-images { justify-content: flex-end; }

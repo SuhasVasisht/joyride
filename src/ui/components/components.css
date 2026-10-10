@@ -1,0 +1,65 @@
+/* Shared primitives. Tokens only; colour encodes state. */
+.btn.small { padding: 3px 9px; font-size: 12px; }
+.btn.link { border: 0; background: none; padding: 0; color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; font-weight: 500; }
+.btn.link:hover { color: var(--ink); text-decoration-color: var(--ink); }
+.btn.danger { color: var(--fail); }
+.btn.signal:hover { filter: brightness(.96); }
+.btn.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 86%, var(--paper)); }
+
+.md-code { font-family: var(--font-code); font-size: .82em; background: var(--paper-sunk); padding: 1px 5px; border-radius: 3px; color: var(--ink); white-space: pre-wrap; }
+.time-ago { color: inherit; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.level-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 18px; padding: 0 5px; border-radius: 4px;
+  font: 500 11px/1 var(--font-code); letter-spacing: .02em; border: 1px solid var(--rule-strong); color: var(--ink-2); background: var(--paper-raised); }
+.level-badge.signal { background: var(--signal); border-color: var(--signal); color: #fff; }
+.level-badge.review { color: var(--review); border-color: color-mix(in srgb, var(--review) 45%, transparent); }
+
+.empty-state { padding: var(--s3) 0 var(--s2); }
+.empty-state .empty-title { margin: 0; font-family: var(--font-display); font-style: italic; font-size: var(--step-1); color: var(--ink-2); line-height: 1.35; }
+.empty-state .empty-body { margin-top: 4px; color: var(--ink-3); font-size: var(--step--1); max-width: 46ch; }
+.empty-state .empty-body p { margin: 0; }
+.empty-state .empty-action { margin-top: var(--s3); }
+
+.inline-error { margin: var(--s2) 0 0; padding: 8px 10px; border-left: 2px solid var(--fail); background: color-mix(in srgb, var(--fail) 7%, var(--paper-raised)); color: var(--ink); font-size: var(--step--1); border-radius: 0 4px 4px 0; max-width: 70ch; }
+
+.mark { flex: none; display: inline-block; vertical-align: -2px; }
+
+/* ---------- sheet over the map ---------- */
+.sheet-layer { position: absolute; inset: 0; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; }
+.sheet-scrim { position: absolute; inset: 0; background: rgba(20, 33, 61, .07); pointer-events: auto; }
+.pane-sheet { position: relative; pointer-events: auto; width: min(860px, calc(100% - 160px)); height: 100%; overflow: auto; background: var(--paper-raised);
+  border-left: 1px solid var(--rule-strong); box-shadow: -18px 0 40px -28px rgba(20, 33, 61, .45); padding: var(--s6) var(--s7) var(--s8); outline: none; }
+.pane-sheet.wide { width: min(1040px, calc(100% - 120px)); }
+.sheet-header { display: flex; justify-content: flex-end; margin-bottom: var(--s3); }
+.sheet-close { flex: none; color: var(--ink-2); font-weight: 400; white-space: nowrap; }
+.sheet-close kbd { font-size: 11px; }
+@media (max-width: 1100px) { .pane-sheet { width: calc(100% - 48px); padding: var(--s5); } }
+
+/* ---------- reply ---------- */
+.reply-box { margin-top: var(--s2); }
+.reply-row { display: flex; gap: var(--s2); align-items: flex-end; }
+.reply-input { resize: vertical; min-height: 34px; line-height: 1.4; font-size: var(--step--1); }
+.reply-input::placeholder { color: var(--ink-3); }
+.reply-input:focus { border-color: var(--ink-3); outline: none; box-shadow: 0 0 0 3px var(--working-wash); }
+.intent-status { margin-top: 6px; font-size: 12px; color: var(--ink-3); }
+.intent-status.s-acked { color: var(--review); }
+.intent-status.s-failed { color: var(--ink); border-left: 2px solid var(--fail); padding: 6px 10px; background: color-mix(in srgb, var(--fail) 6%, var(--paper-raised)); border-radius: 0 4px 4px 0; }
+.resume-cmd { display: flex; gap: var(--s2); align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.resume-cmd code { background: var(--paper-sunk); padding: 3px 7px; border-radius: 4px; font-size: 12px; word-break: break-all; }
+
+/* ---------- answer a terminal prompt ---------- */
+.prompt-answer { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+.pa-screen { margin: 0; padding: 8px 10px; font: 12px/1.45 var(--font-code); color: var(--ink-2); background: var(--paper-sunk); border-radius: 4px;
+  white-space: pre-wrap; word-break: break-word; max-height: 18em; overflow: auto; border-left: 2px solid var(--signal); }
+.pa-screen .pa-sel { color: var(--ink); font-weight: 600; }
+.prompt-answer.compact .pa-screen { font-size: 11.5px; max-height: 12.5em; }
+.pa-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pa-always { max-width: 100%; min-width: 0; }
+.pa-always span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.prompt-answer.compact .pa-always { flex: 1 1 100%; justify-content: flex-start; order: 3; }
+.pa-keys-toggle { font-size: 12px; margin-left: 4px; }
+.pa-keys { display: flex; gap: var(--s2); }
+.pa-keys .input { flex: 1; min-width: 0; font-size: var(--step--1); padding: 5px 8px; }
+.pa-note { display: grid; gap: 3px; font-size: 12px; color: var(--ink-3); }
+.pa-note .input { font-size: var(--step--1); padding: 6px 9px; }
+.pa-nomenu { margin: 0; font-size: 12px; }

@@ -1,0 +1,67 @@
+# Example Joyride configuration. Copy it to your data home as joyride.config.yaml (see README).
+# Joyride configuration. Heavy-LLM backend, model and effort are configurable per task type:
+#   backend: codex (codex exec --ephemeral, hooks off) | claude (claude -p --safe-mode)
+port: 4317
+backfill_days: 30
+llm:
+  # Per-task models and reasoning effort (low|medium|high|xhigh|max). Luna for high-volume or
+  # low-stakes work; gpt-6.1-sol for missions and evidence.
+  # Task keys are listed in src/shared/llm-tasks.ts; an unknown key logs a warning at load.
+  default: { backend: codex, model: gpt-6-luna, effort: medium }
+  tasks:
+    session_intent:       { backend: codex, model: gpt-6-luna,  effort: low }
+    mission_naming:       { backend: codex, model: gpt-6-luna,  effort: medium }
+    proposal_brief:       { backend: codex, model: gpt-6.1-sol, effort: medium }
+    screenshot_caption:   { backend: codex, model: gpt-6.1-sol, effort: medium }
+    ask_options:          { backend: codex, model: gpt-6-luna,  effort: low }
+    # Idea housekeeping runs on Joyride's own Codex login (account ids come from usage.accounts),
+    # keeping Codex 2 free for workers.
+    idea_naming:          { backend: codex, model: gpt-6.1-sol, effort: medium, account: codex }
+    idea_brief:           { backend: codex, model: gpt-6.1-sol, effort: low,    account: codex }
+# Idea placement files Firstmate tasks into ideas (Jev, then idea_naming).
+# Every run is one commit with undo; the captain's own moves always win.
+housekeeping:
+  auto: true
+jev:
+  model: jev-latest
+notifications:
+  macos: true
+  min_level: L3
+machines:
+  - { label: local }
+firstmate:
+  enabled: true
+  pane_label: firstmate
+  # Account ids from usage.accounts, in priority order. Omit to follow the usage screen.
+  primaries:
+    - { account: claude-code }
+    - { account: codex, model: gpt-6.1-sol }
+    - { account: codex-2, model: gpt-6.1-sol }
+    - { account: cursor }
+workers:
+  permission_mode: bypassPermissions
+usage:
+  # One usage card per account, and the accounts Joyride can start Claude and Codex sessions on.
+  # home is the account's login folder (CODEX_HOME for Codex, CLAUDE_CONFIG_DIR for Claude);
+  # leave it out for the default login. Cursor reads its one signed-in login and takes no home.
+  accounts:
+    - { provider: claude, label: Claude Code }
+    - { provider: codex, label: Codex, home: ~/.codex }
+    # A second Codex login: sign it in with `mkdir -p ~/.codex-2 && CODEX_HOME=~/.codex-2 codex login`.
+    - { provider: codex, label: Codex 2, home: ~/.codex-2 }
+    - { provider: cursor, label: Cursor }
+
+# Knowledge admission. Only owned forge links enter automatically; hiring stays private.
+knowledge:
+  # Freeze knowledge generation. Set on and restart to resume; source cards and authored data stay.
+  pipeline: off
+  owned_orgs:
+    - github.com/your-org
+  owned_repos:
+    - github.com/your-org/your-repo
+  private_paths:
+    - ~/Documents/private-notes
+  private_sessions: []
+  tombstones: []
+daemon:
+  prevent_sleep: true

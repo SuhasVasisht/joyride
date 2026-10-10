@@ -1,0 +1,85 @@
+/* Set up Joyride: an editorial checklist on chart paper. Hairlines between items,
+   a ruler of ticks for progress, signal orange only for "Firstmate is waiting for you". */
+.su-page { padding: var(--s6) var(--s6) var(--s8); max-width: 1060px; }
+.su-head h1 { font-size: var(--step-3); }
+.su-lede { color: var(--ink-2); margin: var(--s2) 0 0; max-width: 70ch; }
+.su-page code { font-size: 0.82em; background: var(--paper-sunk); padding: 1px 5px; border-radius: 3px; }
+
+.su-progress { display: grid; grid-template-columns: auto minmax(160px, 1fr) auto auto; align-items: center; gap: var(--s2) var(--s5); margin-top: var(--s5); padding: var(--s4) 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.su-count { margin: 0; color: var(--ink-2); font-size: var(--step--1); white-space: nowrap; }
+.su-num { font-family: var(--font-display); font-size: var(--step-3); color: var(--ink); line-height: 1; margin-right: 6px; font-variant-numeric: tabular-nums; vertical-align: -4px; }
+.su-ticks { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; align-items: end; height: 22px; }
+.su-ticks li { flex: 1; max-width: 34px; height: 12px; border: 1px solid var(--rule-strong); border-radius: 2px; background: transparent; }
+.su-ticks li.t-ok { background: var(--ink); border-color: var(--ink); height: 22px; }
+.su-ticks li.t-needs_you { background: var(--signal); border-color: var(--signal); height: 22px; }
+.su-ticks li.t-warn { border-color: var(--ink-2); height: 16px; }
+.su-ticks li.t-unknown { border-style: dashed; }
+.su-side { margin: 0; white-space: nowrap; }
+.su-ready { display: flex; align-items: center; gap: var(--s4); margin-top: var(--s4); padding: var(--s3) var(--s4); background: var(--review-wash); border-radius: var(--radius-control); }
+.su-ready p { margin: 0; color: var(--ink); }
+@media (max-width: 900px) { .su-progress { grid-template-columns: 1fr; } .su-side { white-space: normal; } }
+
+.su-group { margin-top: var(--s7); }
+.su-group-head { display: flex; align-items: baseline; gap: var(--s3); }
+.su-group-head h2 { font-size: var(--step-2); }
+.su-group-lede { color: var(--ink-3); font-size: var(--step--1); margin: var(--s1) 0 var(--s3); }
+.su-items { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule-strong); }
+
+.su-item { display: grid; grid-template-columns: 20px minmax(0, 1fr) minmax(210px, 300px); gap: var(--s2) var(--s4); padding: var(--s4) 0; border-bottom: 1px solid var(--rule); align-items: start; }
+.su-main { min-width: 0; }
+.su-title-row { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.su-title-row h3 { font-family: var(--font-ui); font-size: var(--step-0); font-weight: 600; letter-spacing: 0; }
+.su-state { font-size: 12px; color: var(--ink-3); }
+.su-detail { color: var(--ink-2); font-size: var(--step--1); margin: var(--s1) 0 0; max-width: 64ch; }
+.su-item.s-ok .su-title-row h3 { font-weight: 500; color: var(--ink-2); }
+.su-item.s-ok .su-detail { color: var(--ink-3); }
+.su-item.s-needs_you .su-state { color: var(--signal); font-weight: 600; }
+.su-item.s-needs_you { box-shadow: inset 2px 0 0 var(--signal); padding-left: var(--s3); margin-left: calc(-1 * var(--s3)); }
+
+.su-mark { margin-top: 1px; flex: none; }
+.su-mark circle { fill: none; stroke: var(--rule-strong); stroke-width: 1.5; }
+.su-mark path { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.su-mark.m-ok circle { fill: var(--review); stroke: none; }
+.su-mark.m-ok path { stroke: var(--paper-raised); }
+.su-mark.m-needs_you circle { fill: var(--signal); stroke: none; }
+.su-mark.m-needs_you path { stroke: #fff; }
+.su-mark.m-warn circle { stroke: var(--ink-2); }
+.su-mark.m-warn path { stroke: var(--ink-2); }
+.su-mark.m-unknown circle { stroke-dasharray: 2.6 2.4; stroke: var(--ink-3); }
+.su-mark.m-unknown path { stroke: var(--ink-3); stroke-width: 1.5; }
+
+.su-fix { display: grid; gap: 6px; justify-items: start; align-content: start; min-width: 0; }
+.su-fix .btn { white-space: nowrap; }
+.su-runs, .su-why { margin: 0; font-size: 12px; color: var(--ink-3); max-width: 100%; }
+.su-runs code { font-size: 11px !important; word-break: break-all; background: none !important; padding: 0 !important; color: var(--ink-2); }
+.su-cmd-label { font-size: 12px; color: var(--ink-3); }
+.su-cmd { display: flex; align-items: center; gap: var(--s2); width: 100%; min-width: 0; }
+.su-cmd code { flex: 1; min-width: 0; display: block; padding: 5px 8px !important; border-radius: var(--radius-control) !important; background: var(--paper-sunk); font-size: 12px !important; overflow-x: auto; white-space: nowrap; }
+.su-ack { padding-left: 0; color: var(--ink-2); }
+
+.su-job { margin-top: var(--s3); }
+.su-job-line { margin: 0 0 var(--s1); font-size: var(--step--1); color: var(--ink-2); }
+.su-job.j-ok .su-job-line { color: var(--review); }
+.su-job.j-failed .su-job-line { color: var(--fail); }
+.su-out { margin: 0; max-height: 220px; overflow: auto; font-size: 11.5px; line-height: 1.5; background: var(--paper-sunk); color: var(--ink-2); }
+.su-fallback { margin-top: var(--s3); display: grid; gap: var(--s1); max-width: 520px; }
+.su-fallback p { margin: 0; }
+
+.su-gh { margin-top: var(--s3); padding: var(--s3) var(--s4); border-left: 2px solid var(--working); background: var(--working-wash); border-radius: 0 var(--radius-control) var(--radius-control) 0; max-width: 620px; }
+.su-gh p { font-size: var(--step--1); margin: var(--s2) 0 0; }
+.su-gh-code .row { margin-top: 4px; }
+.su-code { font-family: var(--font-code); font-size: var(--step-2) !important; letter-spacing: 0.08em; background: var(--paper-raised) !important; padding: 2px 10px !important; color: var(--ink); }
+.su-gh-q p:first-child { margin-top: 0; }
+.su-gh-q .row { margin-top: var(--s2); }
+.su-gh-tools { margin-top: var(--s3); flex-wrap: wrap; align-items: start; }
+.su-gh-tools .btn.ghost { padding-left: 0; }
+.su-gh-screen summary { cursor: pointer; font-size: 12px; color: var(--ink-2); padding: 3px 0; }
+.su-gh-screen pre { margin-top: var(--s1); }
+.su-gh-done { margin: 0 !important; color: var(--review); font-weight: 500; }
+
+@media (max-width: 820px) {
+  .su-page { padding: var(--s5) var(--s4) var(--s7); }
+  .su-item { grid-template-columns: 20px minmax(0, 1fr); }
+  .su-fix { grid-column: 2; }
+}
+.su-fix a.btn { text-decoration: none; }

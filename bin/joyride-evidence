@@ -1,0 +1,13 @@
+#!/bin/sh
+# joyride-evidence: record attested verification evidence for Joyride.
+# Runs src/cli/evidence.ts with bun (falls back to the repo's tsx).
+SELF="$0"
+while [ -h "$SELF" ]; do
+  LINK="$(readlink "$SELF")"
+  case "$LINK" in /*) SELF="$LINK" ;; *) SELF="$(dirname "$SELF")/$LINK" ;; esac
+done
+ROOT="$(cd "$(dirname "$SELF")/.." && pwd -P)"
+BUN="${JOYRIDE_BUN:-$HOME/.bun/bin/bun}"
+if [ -x "$BUN" ]; then exec "$BUN" "$ROOT/src/cli/evidence.ts" "$@"; fi
+if command -v bun >/dev/null 2>&1; then exec bun "$ROOT/src/cli/evidence.ts" "$@"; fi
+exec "$ROOT/node_modules/.bin/tsx" "$ROOT/src/cli/evidence.ts" "$@"

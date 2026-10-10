@@ -1,0 +1,59 @@
+# Joyride blast-radius guard. Only actions with real-world reach are held for
+# human approval; everything else runs instantly. Gated actions fail CLOSED
+# (deny) when the daemon is unreachable or nobody answers before the timeout.
+# Set JOYRIDE_GUARD=off in a shell to bypass entirely.
+timeout_seconds: 300
+
+rules:
+  - id: git-push
+    title: git push to a remote
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}git(\s+-C\s+\S+)?(\s+-c\s+\S+)*\s+push\b']
+  - id: jira-confluence-write
+    title: Jira / Confluence write
+    tools: ["mcp__*Atlassian*", "mcp__*atlassian*", "mcp__*jira*", "mcp__*confluence*"]
+    match: ['(create|edit|update|transition|add|delete)[A-Za-z]*(Jira|Confluence|Issue|Page|Comment|Worklog|Compass)']
+  - id: chat-email-write
+    title: Slack / Teams / email / SharePoint write
+    tools: ["mcp__*Slack*", "mcp__*slack*", "mcp__*Microsoft_365*", "mcp__*outlook*", "mcp__*gmail*"]
+    match: ['(?i)(send|post|reply|schedule|create_draft|update|delete|forward|share|upload|move|rename|trash|create_event|create_chat|set_vacation)']
+  - id: cloud-infra
+    title: cloud / infrastructure change
+    tools: [Bash, shell, exec_command, local_shell]
+    match:
+      - '{{CMD}}gcloud\s+(?!.*\b(list|describe|get|info|config\s+list|auth\s+list|help)\b)'
+      - '{{CMD}}aws\s+\S+\s+(create|delete|put|update|run|start|stop|terminate|deploy|apply|invoke|cp|rm|sync|mv)'
+      - '{{CMD}}kubectl\s+(apply|delete|create|replace|patch|scale|rollout|drain|cordon|exec)\b'
+      - '{{CMD}}terraform\s+(apply|destroy|import)\b'
+      - '{{CMD}}docker\s+push\b'
+      - '{{CMD}}helm\s+(install|upgrade|uninstall|rollback)\b'
+  - id: remote-shell
+    title: ssh / scp / rsync to a remote host
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}(ssh|scp|sftp)\s+\S', '{{CMD}}rsync\b[^\n]*\s\S+:\S*']
+    unless: ['^\s*ssh-keygen', 'ssh\s+-V\b']
+  - id: rm-outside
+    title: recursive delete outside the working repo
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}rm\s+(-[a-zA-Z]*r[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*r|-r\s+-f|-f\s+-r|--recursive)\s+(?:[^;&|\n]*\s)?"?(~|\$HOME|\.\.|/(?!tmp/|private/tmp/|var/folders/))']
+  - id: pr-release
+    title: pull request / release / repo change on a forge
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}(gh|glab|bb)\s+(pr|mr|release|repo)\s+(create|merge|edit|delete|close)\b']
+  - id: publish
+    title: package publish
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}(npm|pnpm|yarn|bun)\s+publish\b', '{{CMD}}twine\s+upload\b', '{{CMD}}cargo\s+publish\b', '{{CMD}}gem\s+push\b', '{{CMD}}poetry\s+publish\b']
+  - id: http-write
+    title: HTTP write to a non-local host
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}(curl|wget|http|https|xh)\b[^\n]*(-X\s*(POST|PUT|PATCH|DELETE)|--request\s+(POST|PUT|PATCH|DELETE)|\s(-d|--data|--data-raw|--data-binary|-F|--form|--json)\s)']
+    unless: ['(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])']
+  - id: deploy-scripts
+    title: script that may deploy or release
+    level: ambiguous
+    tools: [Bash, shell, exec_command, local_shell]
+    match: ['{{CMD}}(\S*/)?[\w.-]*(deploy|release|publish|push)[\w.-]*\.(sh|py|js|ts)\b', '{{CMD}}(make|just|npm\s+run|bun\s+run|yarn)\s+[\w:-]*(deploy|release|publish|ship)']
+
+# Extension point: classes of gated action Jev may auto-approve later.
+auto_approve: []

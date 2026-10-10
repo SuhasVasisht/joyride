@@ -1,0 +1,411 @@
+{
+  "about": "Text patches that adapt the canonical Cursor pstack (vendor/cursor-plugins/pstack) for Claude Code and Codex. Applied by `joyride install pstack` into .joyride/pstack/skills/<name>; the vendored clone is never edited. Replacements run in order on every .md file (and on the code files a patch names). Template variables: {{MODELS_NOTE}} (absolute path of the Joyride-managed models note), {{CLAUDE_AGENTS}} (Claude Code agents dir), {{CLAUDE_SKILLS}} (Claude Code skills dir).",
+  "pin": "e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a",
+  "skip": {
+    "swarm": "Firstmate owns fan-out and delegation",
+    "recall": "Joyride memory owns recall",
+    "correct": "Joyride memory owns corrections",
+    "reflect": "hill-climbing owns reflection",
+    "make-bot-ui": "built on Cursor-only agent tools (update_state routines, SendToUser, api2.cursor.sh webhooks); nothing to adapt"
+  },
+  "frontmatter_strip": [
+    "mode",
+    "icon",
+    "color",
+    "reminder"
+  ],
+  "frontmatter_set": {
+    "poteto-mode": {
+      "name": "poteto-mode"
+    }
+  },
+  "replace_files": {
+    "setup-pstack/SKILL.md": "setup-pstack.SKILL.md"
+  },
+  "models_note_template": "pstack-models.md",
+  "preamble": {
+    "when": "subagent",
+    "text": "> **Joyride adaptation for Claude Code and Codex.** A subagent means your harness's subagent tool. In Claude Code that is the Agent tool, with `subagent_type: general-purpose` unless this skill names an agent, and `model: opus`. Codex has no subagent tool, so run each role sequentially yourself. Per-role models live in `{{MODELS_NOTE}}`.",
+    "extra": {
+      "poteto-mode": "> **Joyride adaptation.** There are no cloud agents here: run workers as local subagents, or hand durable multi-step work to Firstmate. Pushes and PRs need the human's approval (Joyride's guard holds them); in Joyride projects, ship as a local branch merge."
+    }
+  },
+  "replacements": [
+    {
+      "id": "models-note-path",
+      "find": "~/.cursor/rules/pstack-models.mdc",
+      "replace": "{{MODELS_NOTE}}"
+    },
+    {
+      "id": "models-note-rule",
+      "find": "the `pstack-models.mdc` rule",
+      "replace": "the pstack models note (`{{MODELS_NOTE}}`)"
+    },
+    {
+      "id": "models-note-missing",
+      "regex": true,
+      "find": "the rule or (that|the) line",
+      "replace": "the note or $1 line"
+    },
+    {
+      "id": "task-tool-launch",
+      "find": "using the Task tool.",
+      "replace": "using your harness's subagent tool (Claude Code: the Agent tool; Codex has none, so run each one sequentially yourself)."
+    },
+    {
+      "id": "task-tool-rejects",
+      "find": "If the Task tool rejects",
+      "replace": "If the subagent tool rejects"
+    },
+    {
+      "id": "task-tool-error",
+      "find": "the Task tool's error message",
+      "replace": "the subagent tool's error message"
+    },
+    {
+      "id": "task-subagent",
+      "regex": true,
+      "find": "([Ss])pawn one Task subagent",
+      "replace": "$1pawn one subagent"
+    },
+    {
+      "id": "task-defaults",
+      "find": "Defaults for every `Task` call.",
+      "replace": "Defaults for every subagent call."
+    },
+    {
+      "id": "task-multiple",
+      "find": "Multiple `Task` calls",
+      "replace": "Multiple subagent calls"
+    },
+    {
+      "id": "task-omit-model",
+      "find": "(omit Task `model`)",
+      "replace": "(omit the subagent `model`)"
+    },
+    {
+      "id": "comment-sicko-spawn",
+      "find": "Spawn `Task` with `subagent_type: \"Comment Sicko\"`.",
+      "replace": "Spawn a subagent with `subagent_type: \"comment-sicko\"` (installed in `{{CLAUDE_AGENTS}}/comment-sicko.md`; in Codex, read that file and follow it yourself)."
+    },
+    {
+      "id": "agent-mode-mcp",
+      "find": "agent mode (readonly strips MCP)",
+      "replace": "full tool access (MCP included)"
+    },
+    {
+      "id": "readonly-investigators",
+      "find": "- `readonly`: `false` (agent mode). **Do not use readonly/Ask mode.** It strips MCP access, which disables MCP-backed investigators entirely. Investigators still shouldn't write anything.",
+      "replace": "- Full tool access, MCP included, so MCP-backed investigators work. Investigators still shouldn't write anything."
+    },
+    {
+      "id": "readonly-synthesizer",
+      "find": "- `readonly`: `false` (agent mode). The synthesizer's quality check spot-verifies citations, which can require MCP access. Readonly/Ask mode strips MCPs and defeats that.",
+      "replace": "- Full tool access, MCP included: the synthesizer's quality check spot-verifies citations, which can require MCP access."
+    },
+    {
+      "id": "readonly-true",
+      "find": "- `readonly`: `true`",
+      "replace": "- Read-only: tell it not to edit files"
+    },
+    {
+      "id": "general-purpose",
+      "regex": true,
+      "find": "\\bgeneralPurpose\\b",
+      "replace": "general-purpose"
+    },
+    {
+      "id": "model-families",
+      "find": "Families go by prefix: `claude-*`, `gpt-*`, and `grok-*`.",
+      "replace": "Claude Code accepts `opus`, `sonnet` or `haiku` as `model`; every role defaults to `opus`."
+    },
+    {
+      "id": "model-slugs",
+      "regex": true,
+      "find": "\\b(?:claude-(?:opus|sonnet|haiku|fable)|gpt|grok)-[0-9][0-9a-z.]*(?:-[0-9a-z.]+)*\\b",
+      "replace": "opus"
+    },
+    {
+      "id": "create-skill-poteto",
+      "find": "the **create-skill** skill (Cursor's built-in for authoring SKILL.md files)",
+      "replace": "the **skill-creator** skill when it is installed (otherwise write SKILL.md by hand: YAML frontmatter with `name` and `description`, then the body)"
+    },
+    {
+      "id": "create-skill-automate-intro",
+      "find": "Cursor's built-in `create-skill` (authoring)",
+      "replace": "the `skill-creator` skill (authoring)"
+    },
+    {
+      "id": "create-skill-automate-draft",
+      "find": "Use Cursor's built-in `create-skill` skill to author the skill.",
+      "replace": "Use the `skill-creator` skill, when it is installed, to author the skill."
+    },
+    {
+      "id": "create-skill-yaml",
+      "find": "follow `create-skill`'s YAML rules",
+      "replace": "follow the SKILL.md YAML rules"
+    },
+    {
+      "id": "deslop-skill",
+      "find": "the `deslop` skill from the `cursor-team-kit` plugin (`/deslop`)",
+      "replace": "the **unslop** skill (`/unslop`)"
+    },
+    {
+      "id": "deslop-pr",
+      "find": "Run `/deslop` from `cursor-team-kit` over the diff before commit.",
+      "replace": "Run `/unslop` over the diff before commit."
+    },
+    {
+      "id": "deslop-command",
+      "regex": true,
+      "find": "/deslop\\b",
+      "replace": "/unslop"
+    },
+    {
+      "id": "control-shipping",
+      "find": "the matching control skill. `cursor-team-kit` publishes `control-cli` (CLIs and TUIs) and `control-ui` (browser / Electron / web UIs).",
+      "replace": "verification on the real surface (Playwright for web UIs, run the CLI), recorded with the **joyride-evidence** skill."
+    },
+    {
+      "id": "control-plan",
+      "find": "Browser, Electron, and web UIs use `control-ui` from `cursor-team-kit`. CLIs and TUIs use `control-cli` from `cursor-team-kit`.",
+      "replace": "Verify on the real surface (Playwright for web UIs, run the CLI) and record it with the **joyride-evidence** skill."
+    },
+    {
+      "id": "control-lane",
+      "find": "Drive through `control-ui` or `control-cli` from `cursor-team-kit`.",
+      "replace": "Verify on the real surface (Playwright for web UIs, run the CLI) and record it with the **joyride-evidence** skill."
+    },
+    {
+      "id": "control-orchestrate",
+      "find": "`control-ui` or `control-cli` runtime verification (from `cursor-team-kit`)",
+      "replace": "runtime verification on the real surface (Playwright for web UIs, run the CLI), recorded with the **joyride-evidence** skill"
+    },
+    {
+      "id": "control-shipping-lanes",
+      "find": "each a Cursor cloud agent, each exercising the real surface with the matching control skill (such as `control-ui` or `control-cli` from `cursor-team-kit`) against parent versus head.",
+      "replace": "each its own subagent (or Firstmate crewmate), each verifying on the real surface (Playwright for web UIs, run the CLI; record it with the **joyride-evidence** skill) against parent versus head."
+    },
+    {
+      "id": "control-fallback",
+      "regex": true,
+      "find": "`control-(?:ui|cli)`(?: from `cursor-team-kit`)?",
+      "replace": "real-surface verification (Playwright for web UIs, run the CLI; record it with the **joyride-evidence** skill)"
+    },
+    {
+      "id": "transcripts-dir",
+      "find": "the active workspace's `agent-transcripts/` directory",
+      "replace": "this project's transcript directory (Claude Code: `~/.claude/projects/<cwd with / and . replaced by ->/`; Codex: `~/.codex/sessions/`, matched by cwd)"
+    },
+    {
+      "id": "transcripts-system-prompt-a",
+      "find": " (the system prompt names the path)",
+      "replace": ""
+    },
+    {
+      "id": "transcripts-system-prompt-b",
+      "find": " (the system prompt names this path)",
+      "replace": ""
+    },
+    {
+      "id": "transcripts-system-prompt-c",
+      "find": "(the system prompt names the path. Do not glob",
+      "replace": "(do not glob"
+    },
+    {
+      "id": "transcripts-automate",
+      "find": "The system prompt names the workspace's `agent-transcripts/` directory. Use only that path.",
+      "replace": "Use only this project's transcript directory (Claude Code: `~/.claude/projects/<cwd with / and . replaced by ->/`; Codex: `~/.codex/sessions/`, matched by cwd)."
+    },
+    {
+      "id": "transcripts-local",
+      "find": "Reading local transcripts under `agent-transcripts/`.",
+      "replace": "Reading local transcripts under `~/.claude/projects/` or `~/.codex/sessions/`."
+    },
+    {
+      "id": "transcripts-glob",
+      "find": "~/.cursor/projects/*/",
+      "replace": "~/.claude/projects/*/"
+    },
+    {
+      "id": "home-skills",
+      "find": "~/.cursor/skills/",
+      "replace": "~/.claude/skills/"
+    },
+    {
+      "id": "project-skills",
+      "find": ".cursor/skills/",
+      "replace": ".claude/skills/"
+    },
+    {
+      "id": "worktrees",
+      "find": "`.cursor/worktrees/myrepo/x`",
+      "replace": "`.claude/worktrees/x`"
+    },
+    {
+      "id": "ask-question",
+      "regex": true,
+      "find": "\\bAskQuestion\\b",
+      "replace": "AskUserQuestion"
+    },
+    {
+      "id": "babysit-route",
+      "find": "and not Cursor's built-in babysit skill, whose description matches the same words.",
+      "replace": "and not any other babysit skill whose description matches the same words."
+    },
+    {
+      "id": "babysit-playbook",
+      "find": "This playbook replaces Cursor's built-in babysit skill for these requests, so do not route there even though its description matches the same words.",
+      "replace": "This playbook handles these requests; do not route to any other babysit skill even if its description matches the same words."
+    },
+    {
+      "id": "loop",
+      "find": "Pick the wake mechanism using Cursor's `/loop` command (a built-in, not a pstack skill).",
+      "replace": "Pick the wake mechanism: the harness's `/loop` command where it exists (Claude Code), otherwise a watcher subagent or a polling shell loop."
+    },
+    {
+      "id": "restart-after",
+      "find": "After a Cursor restart:",
+      "replace": "After an agent restart:"
+    },
+    {
+      "id": "restart",
+      "find": "a Cursor restart",
+      "replace": "an agent restart"
+    },
+    {
+      "id": "dashboard",
+      "find": "the cloud agent's status in the Cursor dashboard",
+      "replace": "the worker's status in Firstmate or Herdr"
+    },
+    {
+      "id": "mcp-discovery",
+      "find": "list the available MCPs from the Cursor environment. Use the available-tools map when present. Otherwise inspect the `mcps/` directory Cursor exposes for enabled MCP servers.",
+      "replace": "list the MCP servers available in this session (Claude Code: the `mcp__<server>__*` tools you can call, or `claude mcp list`; Codex: `codex mcp list`)."
+    },
+    {
+      "id": "cloud-agent-owner",
+      "find": "One Cursor cloud agent per PR",
+      "replace": "One subagent per PR (a Firstmate crewmate when Firstmate runs the program)"
+    },
+    {
+      "id": "loop-hunt",
+      "find": "Drive a long or stubborn hunt with Cursor's `/loop` command.",
+      "replace": "Drive a long or stubborn hunt with the harness's `/loop` command where it exists (Claude Code), otherwise a polling shell loop."
+    },
+    {
+      "id": "editor-app-data",
+      "find": "`~/Library/Application Support/Cursor` (`state.vscdb.backup`, and `snapshots/roots/<root>` where a `<root>` named for a folder you opened as a workspace balloons)",
+      "replace": "your editor's app data under `~/Library/Application Support/` (workspace snapshots and state backups balloon)"
+    },
+    {
+      "id": "task-generic",
+      "regex": true,
+      "find": "\\bTask (tool|schema)\\b",
+      "replace": "subagent $1"
+    },
+    {
+      "id": "audit-transcripts-comment",
+      "files": [
+        "poteto-mode/scripts/worktree-audit.sh"
+      ],
+      "find": "# Transcripts dir: ~/.cursor/projects/<slugified-repo-path>/agent-transcripts.",
+      "replace": "# Transcripts dir: ~/.claude/projects/<repo path with / and . replaced by ->."
+    },
+    {
+      "id": "audit-transcripts-slug",
+      "files": [
+        "poteto-mode/scripts/worktree-audit.sh"
+      ],
+      "find": "sed 's#^/##; s#/#-#g'",
+      "replace": "sed 's#[/.]#-#g'"
+    },
+    {
+      "id": "audit-transcripts-dir",
+      "files": [
+        "poteto-mode/scripts/worktree-audit.sh"
+      ],
+      "find": "transcripts=\"$HOME/.cursor/projects/$slug/agent-transcripts\"",
+      "replace": "transcripts=\"$HOME/.claude/projects/$slug\""
+    },
+    {
+      "id": "package-name",
+      "files": [
+        "poteto-mode/scripts/package.json",
+        "poteto-mode/scripts/bun.lock"
+      ],
+      "find": "@cursor-skill/poteto-mode-tools",
+      "replace": "@joyride-pstack/poteto-mode-tools"
+    }
+  ],
+  "agents": {
+    "poteto-agent.md": {
+      "name": "poteto-agent",
+      "description": "Routing target for /poteto-mode and any request for poteto's style. Spawn a fresh poteto-agent for each new task; resume one only in the strict cases poteto-mode's Subagents section names. Reads the poteto-mode skill's SKILL.md in full before any work.",
+      "model": "opus",
+      "tools": null,
+      "body_replacements": [
+        {
+          "find": "Read the `poteto-mode` skill's `SKILL.md` in full",
+          "replace": "Read the `poteto-mode` skill's `SKILL.md` (`{{CLAUDE_SKILLS}}/poteto-mode/SKILL.md`) in full"
+        }
+      ]
+    },
+    "comment-sicko.md": {
+      "name": "comment-sicko",
+      "description": "A deranged comment-hater that savors deletion and condemns workaround code. Spawned by the no-comments skill with a scope (files or a diff).",
+      "model": "opus",
+      "tools": "Read, Grep, Glob, Bash, Edit, MultiEdit, Skill",
+      "body_replacements": []
+    }
+  },
+  "verify": {
+    "forbid": [
+      {
+        "id": "cursor-path",
+        "regex": "~/\\.cursor\\b|\\.cursor/"
+      },
+      {
+        "id": "models-mdc",
+        "regex": "pstack-models\\.mdc|alwaysApply"
+      },
+      {
+        "id": "cursor-product",
+        "regex": "\\bCursor\\b"
+      },
+      {
+        "id": "cursor-plugin",
+        "regex": "cursor-team-kit|cursor\\.sh|@cursor-skill"
+      },
+      {
+        "id": "model-slug",
+        "regex": "\\b(?:claude-(?:opus|sonnet|haiku|fable)|gpt|grok)-[0-9]"
+      },
+      {
+        "id": "model-family",
+        "regex": "`(?:claude|gpt|grok)-\\*`"
+      },
+      {
+        "id": "task-tool",
+        "regex": "\\bTask tool\\b|`Task`|\\bTask subagent\\b|generalPurpose"
+      },
+      {
+        "id": "deslop",
+        "regex": "\\bdeslop\\b"
+      },
+      {
+        "id": "control-skill",
+        "regex": "\\bcontrol-(?:ui|cli)\\b"
+      },
+      {
+        "id": "cursor-tools",
+        "regex": "\\bAskQuestion\\b|agent-transcripts"
+      },
+      {
+        "id": "frontmatter",
+        "regex": "^(?:mode|icon|color|reminder):",
+        "scope": "frontmatter"
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+.artifact-window { position: fixed; inset: 0; z-index: 30; }
+.artifact-reader { height: 100%; display: flex; flex-direction: column; background: var(--paper-raised); color: var(--ink); }
+.artifact-reader-toolbar { display: flex; align-items: center; gap: var(--s4); padding: var(--s3) var(--s5); border-bottom: 1px solid var(--rule); }
+.artifact-reader-toolbar h2 { flex: 1; min-width: 0; margin: 0; font-size: var(--step-0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.artifact-reader-toolbar .btn { flex: none; }
+.artifact-reader-actions { display: flex; gap: var(--s2); }
+.artifact-reading-content { flex: 1; min-height: 0; display: flex; }
+.artifact-reading-content > iframe { flex: 1; min-width: 0; width: 100%; height: 100%; border: 0; background: white; }
+.artifact-markdown-scroll, .artifact-image-scroll { flex: 1; min-width: 0; overflow: auto; overscroll-behavior: contain; }
+.artifact-image-scroll { text-align: center; padding: var(--s5); }
+.artifact-image-scroll img { max-width: 100%; height: auto; }
+.artifact-markdown { max-width: 960px; margin: auto; padding: clamp(24px, 5vw, 64px); }
+.artifact-markdown .k-md.doc { font-size: 18px; line-height: 1.75; overflow-wrap: anywhere; }
+.artifact-markdown .k-md pre { max-height: none; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+.artifact-markdown .k-table-wrap { overflow: visible; }
+.artifact-markdown .k-table { table-layout: fixed; width: 100%; }
+.artifact-reading-state { flex: 1; overflow: auto; padding: clamp(24px, 6vw, 72px); max-width: 900px; margin: 0 auto; line-height: 1.6; }
+.artifact-fallback-summary { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--rule); }
+.artifact-window > .sheet-layer { z-index: 1; }
+@media (max-width: 600px) {
+  .artifact-reader-toolbar { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
+  .artifact-reader-toolbar h2 { order: -1; flex-basis: 100%; font-size: 16px; }
+  .artifact-reader-actions { margin-left: auto; }
+  .artifact-reader-actions .btn { font-size: 12px; }
+  .artifact-markdown { padding: 24px 18px; }
+  .artifact-markdown .k-md.doc { font-size: 16px; }
+}

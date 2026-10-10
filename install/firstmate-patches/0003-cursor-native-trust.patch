@@ -1,0 +1,785 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Suhas Vasisht <suhas.vasisht@gmail.com>
+Date: Mon, 5 Oct 2026 20:22:03 -0700
+Subject: [PATCH] fix(cursor): approve native workspace trust for interactive
+ workers
+
+---
+ .../references/common/control-and-recovery.md |  2 +-
+ .../references/harness/cursor.md              | 14 +--
+ README.md                                     |  3 +-
+ bin/fm-cursor-lib.sh                          | 57 +++++++++++-
+ bin/fm-spawn.sh                               | 24 ++++-
+ bin/fm-test-run.sh                            |  2 +-
+ docs/arm-pretool-check.md                     |  2 +-
+ docs/configuration.md                         |  2 +-
+ docs/supervision-protocols/cursor.md          |  2 +-
+ docs/turnend-guard.md                         |  2 +-
+ docs/verification/runtime-backends.md         | 51 ++++++++++-
+ tests/fm-cursor-harness.test.sh               | 41 +++++++++
+ tests/fm-cursor-primary-live-e2e.test.sh      | 17 +++-
+ tests/fm-cursor-trust-live-e2e.test.sh        | 88 ++++++++++++++++++
+ ...fm-harness-liveness-drift-live-e2e.test.sh |  7 +-
+ tests/fm-secondmate-harness.test.sh           | 14 +--
+ tests/fm-spawn-dispatch-profile.test.sh       | 89 ++++++++++++++++++-
+ 17 files changed, 383 insertions(+), 34 deletions(-)
+ create mode 100755 tests/fm-cursor-trust-live-e2e.test.sh
+
+diff --git a/.agents/skills/harness-adapters/references/common/control-and-recovery.md b/.agents/skills/harness-adapters/references/common/control-and-recovery.md
+index 2967f31..3e23c1a 100644
+--- a/.agents/skills/harness-adapters/references/common/control-and-recovery.md
++++ b/.agents/skills/harness-adapters/references/common/control-and-recovery.md
+@@ -19,7 +19,7 @@ No observed dialog proves only that launch.
+ Each supported harness handles its folder-trust gate differently, and the tool reference owns the detail.
+ For Claude, load `references/harness/claude.md`; its workspace-trust section owns the non-key-answerable gate and spawn-time pre-registration for every spawn kind.
+ agy gates every fresh worktree too; the spawn pre-registers it in agy's own store the same way, and a strict post-launch gate answers any dialog that still renders before the spawn reports success.
+-Cursor suppresses its dialog with launch-time `--trust`, and Muse suppresses its own with `--yolo`.
++`references/harness/cursor.md` owns Cursor's native workspace approval; Muse suppresses its dialog with `--yolo`.
+ Grok renders a folder-trust gate in a linked worktree, and `references/harness/grok.md` owns how to verify the worker's real location, answer it, and where the decision persists; the project picker is a separate dialog that stays absent when the spawn starts in a git root.
+ Pi gates the fresh-worktree case too, but unlike Claude its dialog is answered with Enter, and `references/harness/pi.md` owns that recipe and where the decision persists.
+ Codex shows a directory-trust dialog on the first run for a repository root.
+diff --git a/.agents/skills/harness-adapters/references/harness/cursor.md b/.agents/skills/harness-adapters/references/harness/cursor.md
+index 0df472a..d7da982 100644
+--- a/.agents/skills/harness-adapters/references/harness/cursor.md
++++ b/.agents/skills/harness-adapters/references/harness/cursor.md
+@@ -1,6 +1,7 @@
+ # Cursor Agent
+ 
+ Verified for crew and scout work on tmux on 2026-08-11 and Herdr on 2026-08-12, and for secondmate and primary work on 2026-08-13, with Cursor Agent CLI 2026.08.11-e8db854.
++Interactive native trust and Grok 4.7 brief delivery were refreshed on tmux on 2026-10-05 with CLI 2026.07.17-3e2a980 and 2026.10.01-e373342; `../../../docs/verification/runtime-backends.md` owns the dated results and refresh command.
+ Cross-harness provider and credential identity is owned by `references/common/model-and-effort.md`.
+ 
+ ## Operating facts
+@@ -8,16 +9,16 @@ Cross-harness provider and credential identity is owned by `references/common/mo
+ | Fact | Value |
+ |---|---|
+ | Binary | `fm_cursor_resolve_binary` in `../../../bin/fm-cursor-lib.sh` resolves stable launcher `cursor-agent` or legacy `agent`, never `cursor`; both symlink into `~/.local/share/cursor-agent/versions/<version>/cursor-agent`, whose target auto-update replaces. |
+-| Launch | Positional instructions with `--trust`, `--yolo`, optional `--model <model>`, and `--workspace <absolute-task-worktree>`, after clearing foreign primary markers. |
++| Launch | Positional instructions with `--yolo`, optional `--model <model>`, and `--workspace <absolute-task-worktree>`, after clearing foreign primary markers. |
+ | Attribution | Cursor can append a Co-authored-by trailer after the typed message. Unless the home sets `config/keep-ai-trailers` (`../../../../../docs/configuration.md` "Commit attribution"), every fleet launch installs the pane-scoped commit-msg strip in `../../../bin/fm-git-strip-ai-trailers.sh`, which removes known AI trailers and leaves human co-authors and the author identity untouched. |
+-| Models | Use current-account `cursor-agent --list-models` or legacy `agent --list-models`; the drifting observed list had only `cursor-grok-4.5-high` and `cursor-grok-4.5-high-fast` for Grok plus several `xhigh` ids, so choose a returned reasoning id and never assume low or medium Grok. |
++| Models | Use current-account `cursor-agent --list-models` or legacy `agent --list-models`; the current catalog includes `grok-4.7-{low,medium,high,xhigh}` and their `-fast` variants, plus `cursor-grok-4.5-high` and `cursor-grok-4.5-high-fast`; select an id returned for the current account. |
+ | Busy state | `../../../bin/fm-busy-lib.sh` folds the per-conversation transcript as `cursor-transcript`: `role:user` opens and typed `turn_ended` closes success or abort, covering manual interrupt; nothing is armed or seeded, and this backend-agnostic source was identical on tmux and Herdr. |
+ | Exit command | `/exit`. |
+ | Interrupt | Single Escape returns the placeholder with no clear key; control makes no cancellation claim because an aborted transcript close appeared within seconds in some runs and not within twenty in others. |
+ | Skill invocation | `/<skill>`, for example `/no-mistakes`; Cursor discovers Firstmate's user skills. |
+ | Resume | No verified native pane resume; use deterministic relaunch. |
+ | Autonomy | `--yolo`, documented alias for `--force`; footer `Run Everything`. |
+-| Trust | `--trust` suppresses the dialog; `--yolo` does not, and every task has a fresh path. |
++| Trust | `--trust` is print/headless-only; interactive spawn and relaunch use the native named action through `../../../bin/fm-cursor-lib.sh`, preferring workspace-only `[w]` when MCP approval is offered. |
+ | Marker | `CURSOR_INVOKED_AS=cursor-agent` on agent and children, plus `CURSOR_AGENT=1` on child or tool processes; other `CURSOR_*` variables are not identity markers. |
+ | Effort | No verified flag; `references/common/model-and-effort.md` owns unsupported-value handling. |
+ | Composer | Bare borderless row with `→` (U+2192); de-emphasized placeholders `Plan, search, build anything` when fresh and `Add a follow-up` later. |
+@@ -64,11 +65,14 @@ Refresh with `FM_HARNESS_LIVENESS_DRIFT=1 ../../../bin/fm-test-run.sh ../../../t
+ Firstmate enters its acquired worktree and passes the same absolute path through `--workspace`.
+ Never pass Cursor `-w` or `--worktree`, which allocates a second copy under `~/.cursor/worktrees` and breaks isolation.
+ The CLI supports repeatable `--add-dir`, but the adapter adds none; positional instructions need no grant to their private directory.
+-Example: `../../../bin/fm-spawn.sh <task-id> <project> --scout --harness cursor --model cursor-grok-4.5-high`.
++Native trust requires a verified viewport capture; `../../../bin/fm-spawn.sh` refuses Cursor on cmux and Orca until that capability exists.
++Example: `../../../bin/fm-spawn.sh <task-id> <project> --scout --harness cursor --model grok-4.7-xhigh`.
+ 
+ ## Primary integration
+ 
+-Primary supervision is the stop-hook park in `../../../docs/supervision-protocols/cursor.md` through tracked `.cursor/hooks.json`; primary and secondmate launches require `--trust` or hooks do not load.
++Primary supervision is the stop-hook park in `../../../docs/supervision-protocols/cursor.md` through tracked `.cursor/hooks.json`.
++Interactive primary and secondmate launches require workspace approval for project hooks to load.
++`--trust` is reserved for headless launches.
+ In a home with `config/supervision-host` and no `config/supervision-host-off` the park runs the supervision host instead of `../../../bin/fm-watch-arm.sh`, with Claude's print mode as its headless engine; [`supervision-host.md`](../../../../../docs/supervision-host.md) owns the host.
+ Cursor exposes 20 project events plus a Claude-Code compatibility map that loads `.claude/settings.json`.
+ Tracked hooks register `stop`, `sessionStart`, and two `preToolUse` seatbelts through `$CURSOR_PROJECT_DIR`; Claude entries stand down on Cursor payloads under `../../../docs/turnend-guard.md`.
+diff --git a/README.md b/README.md
+index 85e9afb..71813e1 100644
+--- a/README.md
++++ b/README.md
+@@ -75,7 +75,8 @@ Pick whichever one matches your subscription and workflow.
+ Oh My Pi (`omp`), a Pi fork, is verified as a primary with the same extension-owned watcher model as Pi and a stronger turn-end guard: its blocking `session_stop` hook compels a continuation instead of requesting one.
+ Codex and OpenCode are also verified and supported as primary harnesses; Codex uses bounded foreground checkpoints, and OpenCode uses a TUI plugin, so both carry more harness-specific supervision tradeoffs than the three co-primaries.
+ Cursor Agent CLI is verified as a primary too, using a tracked project-scope `.cursor/hooks.json` whose `stop` hook parks on the watcher between turns, closest in shape to Claude Code's.
+-Launch it with `--trust`, or none of its project hooks load; it also has no turn-end hook in headless `cursor-agent -p`, so run the primary session interactively.
++Approve its native workspace-trust dialog so project hooks load; `--trust` is headless-only.
++Cursor has no turn-end hook in headless `cursor-agent -p`, so run the primary session interactively.
+ 
+ ### Install and launch
+ 
+diff --git a/bin/fm-cursor-lib.sh b/bin/fm-cursor-lib.sh
+index a3f0620..6e0e56e 100755
+--- a/bin/fm-cursor-lib.sh
++++ b/bin/fm-cursor-lib.sh
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env bash
+-# Cursor executable resolution and Cursor process identity.
++# Cursor executable resolution, process identity, and native workspace trust.
+ # Sourced by bin/fm-spawn.sh, bin/fm-harness.sh, bin/fm-busy-lib.sh, and
+ # bin/backends/tmux.sh. This file is sourced by scripts and has no side effects
+ # on source.
+@@ -143,6 +143,60 @@ fm_cursor_catalog_has_model() {  # <model>
+   '
+ }
+ 
++# Native interactive workspace trust uses the displayed [a]/[w] action, never
++# Enter. --trust remains valid only for print/headless launches. Reads must be
++# viewport-only so a scrolled-away dialog cannot authorize another key.
++fm_cursor_workspace_trust_visible() {  # <plain-viewport>
++  # Cursor retains the completed trust card above its conversation. Its
++  # pending message replaces navigation when approval has already started.
++  case "$1" in
++    *'Use arrow keys to navigate'*) ;;
++    *'Trusting workspace...'*|*'Trusting workspace and applying MCP approvals...'*) return 1 ;;
++  esac
++  case "$1" in
++    *'Workspace Trust Required'*|*'Do you trust the contents of this directory?'*) return 0 ;;
++    *) return 1 ;;
++  esac
++}
++
++fm_cursor_workspace_trust_key() {  # <plain-viewport>
++  local pane=$1
++  fm_cursor_workspace_trust_visible "$pane" || return 1
++  if printf '%s\n' "$pane" | grep -Eq "\[w\][[:space:]]+Trust this workspace, but"; then
++    printf 'w\n'
++  elif printf '%s\n' "$pane" | grep -Eq '\[a\][[:space:]]+Trust this workspace' &&
++    ! printf '%s\n' "$pane" | grep -Eq 'MCP servers|enable all'; then
++    printf 'a\n'
++  else
++    return 1
++  fi
++}
++
++# Wait for this launch to process its positional brief, including relaunches.
++# Answer at most once, and require a cleared viewport plus the running footer
++# or this task's new conversation transcript. Capture errors fail closed.
++# The caller reports failure with the installed Cursor version and cleans up.
++fm_cursor_wait_for_working() {  # <backend> <target> <id> <state-dir> [label]
++  local backend=$1 target=$2 id=$3 state=$4 label=${5:-}
++  local pane key answered=0 verdict i=0 max=${FM_CURSOR_READY_POLLS:-60} interval=${FM_CURSOR_POLL_INTERVAL:-0.5}
++  while [ "$i" -lt "$max" ]; do
++    pane=$(fm_backend_visible_capture "$backend" "$target" "$label") || return 1
++    if fm_cursor_workspace_trust_visible "$pane"; then
++      if [ "$answered" -eq 0 ] && key=$(fm_cursor_workspace_trust_key "$pane"); then
++        fm_backend_send_key "$backend" "$target" "$key" "$label" || return 1
++        answered=1
++      fi
++    elif [ -n "$pane" ]; then
++      case "$pane" in *'ctrl+c to stop'*) return 0 ;; esac
++      verdict=$(fm_busy_classify "$backend" "$target" cursor "$id" "$state" "$pane")
++      case "$verdict" in 'busy cursor-transcript'|'idle cursor-transcript') return 0 ;; esac
++    fi
++    i=$((i + 1))
++    [ "$i" -ge "$max" ] || sleep "$interval"
++  done
++  return 1
++}
++
+ # Print the stable absolute launcher path for the Cursor executable, or return 1
+ # with a diagnostic on stderr.
+ #
+@@ -240,4 +294,3 @@ fm_cursor_process_matches() {  # <comm> <args> [argv0]
+   case "$comm" in */*) fm_cursor_path_is_cursor "$comm" && return 0 ;; esac
+   return 1
+ }
+-
+diff --git a/bin/fm-spawn.sh b/bin/fm-spawn.sh
+index 61d3904..e2c96d0 100755
+--- a/bin/fm-spawn.sh
++++ b/bin/fm-spawn.sh
+@@ -411,6 +411,11 @@
+ # busy turn - answering the dialog first if it renders anyway - before
+ # reporting success (the rovo/kimi launch-then-confirm shape). Its busy state
+ # is a screen-scrape fallback like grok and rovo, and it is crewmate/scout only.
++# Cursor interactive launches omit the headless-only --trust flag. Fresh paths
++# are approved once with the native dialog's named action key (workspace-only
++# when MCP servers are offered), using viewport-only capture. Spawn and relaunch
++# require processing proof before success and fail closed on unsupported
++# viewport backends (cmux, orca) or unreadable dialogs.
+ # cursor installs no per-task hook either: it writes state/<id>.cursor-session to
+ # bind the pane to cursor's own conversation transcript (projects root, the exact
+ # workspace path cursor records in .workspace-trusted, and the conversations that
+@@ -2133,9 +2138,8 @@ launch_template() {
+   # launch command - it is a Stop-event hook installed below (global hook +
+   # per-task pointer), so the template is identical for ship/scout/secondmate.
+   grok) printf '%s' 'grok --always-approve __MODELFLAG____EFFORTFLAG__"$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
+-  # Cursor Agent CLI. --trust suppresses the workspace-trust prompt, which
+-  # --yolo does NOT cover and which would otherwise block every spawn, since
+-  # each task gets a fresh worktree path cursor has never seen. --yolo is the
++  # Cursor Agent CLI. The native workspace trust gate below handles fresh
++  # paths; --trust is headless-only in 2026.07.17. --yolo is the
+   # --force alias whose TUI label is "Run Everything". --workspace pins the
+   # exact worktree. -w/--worktree is deliberately never passed: it allocates a
+   # SECOND worktree under ~/.cursor/worktrees and would break firstmate's
+@@ -2145,7 +2149,7 @@ launch_template() {
+   # inherited CLAUDECODE cannot outrank cursor's own marker in a process that
+   # only reads the environment. Cursor exposes no effort flag, so the shared
+   # effort axis is deliberately omitted and stays in task metadata only.
+-  cursor) printf '%s' 'env -u CLAUDECODE -u PI_CODING_AGENT -u GROK_AGENT -u FM_PI_HARNESS -u GEMINI_CLI -u CURSOR_INVOKED_AS __CURSORBIN__ --trust --yolo __MODELFLAG__--workspace __WORKTREE__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
++  cursor) printf '%s' 'env -u CLAUDECODE -u PI_CODING_AGENT -u GROK_AGENT -u FM_PI_HARNESS -u GEMINI_CLI -u CURSOR_INVOKED_AS __CURSORBIN__ --yolo __MODELFLAG__--workspace __WORKTREE__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
+   # gemini (Google Gemini CLI): a positional query starts the supervised
+   # interactive session and auto-submits it, so the brief rides the launch
+   # command exactly as it does for claude and grok (verified: a multi-line
+@@ -2358,6 +2362,10 @@ cursor)
+   # missing install a loud spawn refusal instead of a pane that dies with a
+   # command-not-found the supervisor would read as a wedged worker.
+   CURSOR_BIN=$(fm_cursor_resolve_binary) || exit 1
++  fm_backend_visible_capture_supported "$BACKEND" || {
++    echo "error: refusing Cursor spawn because backend '$BACKEND' has no verified viewport-bounded capture for native workspace trust" >&2
++    exit 1
++  }
+   if [ -n "$MODEL" ] && [ "$MODEL" != default ]; then
+     if CURSOR_MODELS=$(fm_cursor_list_models "$CURSOR_BIN"); then
+       if ! printf '%s\n' "$CURSOR_MODELS" | fm_cursor_catalog_has_model "$MODEL"; then
+@@ -5403,6 +5411,14 @@ if [ "${HERDR_PROJECTED:-0}" -eq 1 ]; then
+   spawn_herdr_presentation_order_lock_release
+ fi
+ spawn_send_key "$T" Enter
++if [ "$HARNESS" = cursor ] && ! fm_cursor_wait_for_working "$BACKEND" "$T" "$ID" "$STATE" "$W"; then
++  cursor_version=$(fm_run_timed 10 "$CURSOR_BIN" --version 2>/dev/null || true)
++  cursor_failure="Cursor ${cursor_version:-unknown version} did not confirm brief processing after native workspace trust in window $T"
++  printf '%s\n' "$(status_stamp_line "failed: $cursor_failure")" >>"$STATE/$ID.status"
++  echo "error: $cursor_failure; inspect the workspace trust dialog" >&2
++  rovo_endpoint_cleanup
++  exit 1
++fi
+ if [ "$HARNESS" = kimi ]; then
+   if ! kimi_wait_for_ready; then
+     kimi_spawn_fail "$KIMI_READY_FAILURE_DETAIL"
+diff --git a/bin/fm-test-run.sh b/bin/fm-test-run.sh
+index 2b7044d..5664188 100755
+--- a/bin/fm-test-run.sh
++++ b/bin/fm-test-run.sh
+@@ -359,7 +359,7 @@ family_for_basename() {
+     fm-composer-codex-idle-live-e2e.test.sh|\
+     fm-codex-continuity-live-e2e.test.sh|fm-codex-hook-layer-live-e2e.test.sh|\
+     fm-grok-continuity-live-e2e.test.sh|\
+-    fm-cursor-primary-live-e2e.test.sh|\
++    fm-cursor-primary-live-e2e.test.sh|fm-cursor-trust-live-e2e.test.sh|\
+     fm-grok-stop-live-e2e.test.sh|fm-harness-adapter-instructions-live-e2e.test.sh|\
+     fm-harness-liveness-drift-live-e2e.test.sh|\
+     fm-devin-signals-live-e2e.test.sh|fm-muse-signals-live-e2e.test.sh|fm-rovo-signals-live-e2e.test.sh|fm-agy-signals-live-e2e.test.sh|\
+diff --git a/docs/arm-pretool-check.md b/docs/arm-pretool-check.md
+index 0bbd76e..3af0314 100644
+--- a/docs/arm-pretool-check.md
++++ b/docs/arm-pretool-check.md
+@@ -171,7 +171,7 @@ Prose may improve without changing adapter behavior.
+ Cursor also loads `<project>/.claude/settings.json`, so the tracked Claude entry receives the same event. Without `--cursor` a Cursor-delivered payload is that duplicate and allows without re-classifying, decided from the payload's own `cursor_version` by `bin/fm-hook-host-lib.sh`; [`turnend-guard.md`](turnend-guard.md#harness-integrations) owns why that predicate reads the payload rather than the environment.
+ 
+ Grok project hooks require folder trust.
+-Cursor project hooks require the workspace to be launched with `--trust`.
++Cursor project hooks require native workspace approval; the [Cursor harness reference](../.agents/skills/harness-adapters/references/harness/cursor.md) owns the current trust procedure.
+ Every shell variable reference in a Grok hook command must carry an inline default such as `${GROK_WORKSPACE_ROOT:-}` because Grok expands the raw hook command before `bash -lc` runs it.
+ The tracked Grok adapter therefore references `${GROK_WORKSPACE_ROOT:-}` directly instead of assigning and later reading a shell-local `$root` variable.
+ 
+diff --git a/docs/configuration.md b/docs/configuration.md
+index 656f1f8..7f6a913 100644
+--- a/docs/configuration.md
++++ b/docs/configuration.md
+@@ -728,7 +728,7 @@ claude, codex, opencode, pi, pi-signed, grok, kimi, cursor, and omp are empirica
+ ### Harness restrictions and credentials
+ 
+ `fm-spawn.sh` refuses kimi on cmux and Orca at preflight, because answering Kimi's folder-trust dialog needs a verified viewport-only capture those backends lack; [its adapter reference](../.agents/skills/harness-adapters/references/harness/kimi.md#readiness-gated-start) owns the trust-dialog handling.
+-A cursor secondmate or primary runs the tracked project-scope `.cursor/hooks.json` in its own home and must be launched with `--trust`, or no project hook loads; [`docs/supervision-protocols/cursor.md`](supervision-protocols/cursor.md) owns its supervision protocol.
++A cursor secondmate or primary runs the tracked project-scope `.cursor/hooks.json` in its own approved workspace; [its harness reference](../.agents/skills/harness-adapters/references/harness/cursor.md) owns native trust, and [`docs/supervision-protocols/cursor.md`](supervision-protocols/cursor.md) owns supervision.
+ 
+ Cursor typed-submit confirmation is verified on tmux and Herdr only.
+ On Zellij, cmux, and Orca a typed-plane Cursor send (a harness-native invocation or an explicit backend target; ordinary text steers ride the durable inbox and exit 0 at enqueue) lands, but `fm-send` reports delivery unconfirmed and exits non-zero because their shared submit core does not consult the busy footer; [runtime backend verification](verification/runtime-backends.md#cursor-agent-cli) owns the evidence and transcript-state boundary.
+diff --git a/docs/supervision-protocols/cursor.md b/docs/supervision-protocols/cursor.md
+index ed44de9..00e0a88 100644
+--- a/docs/supervision-protocols/cursor.md
++++ b/docs/supervision-protocols/cursor.md
+@@ -27,5 +27,5 @@ Re-arm attaches to an existing healthy cycle when one is already present and fol
+ See [`watcher-continuity.md`](../watcher-continuity.md) for the arm-layer successor and clean-close failure contract.
+ 
+ Exit status 2 is a silent no-op on Cursor's `stop` step, so this adapter never blocks a turn end and instead forces one bounded follow-up, which [`turnend-guard.md`](../turnend-guard.md) accepts as an equal alternative.
+-That document owns the double loop bound, the supersession contract, the Pi-host stand-down, and the compatibility limits, including that a Cursor primary must be launched with `--trust` for its project hooks to load at all.
++That document owns the double loop bound, the supersession contract, the Pi-host stand-down, and the compatibility limits, including Cursor's interactive workspace-approval requirement for project hooks; the harness reference owns its current trust procedure.
+ The registered `beforeSubmitPrompt` dialog-mirror hook does not invalidate the park baton; [turnend-guard.md](../turnend-guard.md) owns that deferred boundary.
+diff --git a/docs/turnend-guard.md b/docs/turnend-guard.md
+index 23af69a..91a39a1 100644
+--- a/docs/turnend-guard.md
++++ b/docs/turnend-guard.md
+@@ -524,7 +524,7 @@ That warning uses `bin/fm-supervision-instructions.sh --repair-line`, so it alwa
+ - The blocking and bounded-follow-up mechanisms are limited to the primary integrations listed above.
+ - OpenCode headless mode and untrusted Grok project hooks remain fail-open at the host boundary.
+ - Cursor's `stop` step does not fire in headless `cursor-agent -p`, the same class of limit as OpenCode headless; firstmate primaries run interactive.
+-- A Cursor primary must be launched with `--trust`, or its project hooks never load and the whole integration is inert.
++- A Cursor primary requires native workspace approval for project hooks to load; the [Cursor harness reference](../.agents/skills/harness-adapters/references/harness/cursor.md) owns the current procedure.
+ - Cursor's `preCompact` step is deliberately unregistered.
+   Its response can return only `user_message` and it is absent from Cursor's `additional_context` step set, so a post-compaction re-emit needs its own design and is deferred to a follow-up ([`sessionstart-nudge.md`](sessionstart-nudge.md) owns that uncovered surface).
+ - Kimi Code CLI 0.29.1 exposes only global `[[hooks]]` configuration in `~/.kimi-code/config.toml`, including a `Stop` event with snake_case payload fields `hook_event_name`, `session_id`, `cwd`, and `stop_hook_active`.
+diff --git a/docs/verification/runtime-backends.md b/docs/verification/runtime-backends.md
+index 210dafd..ef9eedd 100644
+--- a/docs/verification/runtime-backends.md
++++ b/docs/verification/runtime-backends.md
+@@ -2005,6 +2005,55 @@ The evidence below was produced on 2026-08-11 against the installed signed CLI o
+ 
+ Resolution prints the STABLE launcher rather than the canonical target, because the canonical path carries a version the CLI replaces on its own auto-update.
+ 
++### Native workspace trust (2026-10-05)
++
++Refreshed on macOS 26.3 arm64 with tmux, Cursor CLI `2026.07.17-3e2a980` retained in its versioned installation, and stable launcher `2026.10.01-e373342`.
++These versions restrict `--trust` to print/headless mode, superseding the older interactive launch-flag observation below.
++Interactive spawn and relaunch omit that flag and use the native workspace action implemented in `bin/fm-cursor-lib.sh`.
++The live guard starts Cursor in fresh scratch repositories on a private tmux socket, proves real `comm cursor` process ancestry, answers the displayed action, and requires a worker to read its positional brief and append the exact status it specifies.
++It exercises both a plain workspace and a workspace carrying an unapproved local MCP configuration.
++Both installed versions displayed only `[a] Trust this workspace` in those launches; neither offered `[w]`, so workspace-only MCP approval remains portable-regression coverage rather than a live claim for these versions.
++No fixture MCP server ran.
++
++Refresh with the retained version and then the stable launcher:
++
++```sh
++FM_CURSOR_TRUST_LIVE=1 \
++  FM_CURSOR_BIN="$HOME/.local/share/cursor-agent/versions/2026.07.17-3e2a980/cursor-agent" \
++  FM_CURSOR_TRUST_LAB_ROOT="$PWD/config" \
++  bash bin/fm-test-run.sh tests/fm-cursor-trust-live-e2e.test.sh
++FM_CURSOR_TRUST_LIVE=1 FM_CURSOR_TRUST_LAB_ROOT="$PWD/config" \
++  bash bin/fm-test-run.sh tests/fm-cursor-trust-live-e2e.test.sh
++```
++
++The retained-version output was:
++
++```text
++# Cursor 2026.07.17-3e2a980
++ok - Cursor 2026.07.17-3e2a980: real process ancestry identifies comm cursor (plain)
++ok - Cursor 2026.07.17-3e2a980: plain [a] approval reached positional brief and status append
++# Cursor 2026.07.17-3e2a980: MCP-configured launch did not offer [w]; exercising its displayed [a] dialog instead
++ok - Cursor 2026.07.17-3e2a980: real process ancestry identifies comm cursor (mcp)
++ok - Cursor 2026.07.17-3e2a980: mcp [a] approval reached positional brief and status append
++# all Cursor native trust live checks passed (2)
++```
++
++The stable-launcher run also exited 0 and ended with:
++
++```text
++ok - Cursor 2026.10.01-e373342: real process ancestry identifies comm cursor (mcp)
++ok - Cursor 2026.10.01-e373342: mcp [a] approval reached positional brief and status append
++# all Cursor native trust live checks passed (2)
++```
++
++The displayed trust dialog has two independent identifying lines, `Workspace Trust Required` and `Do you trust the contents of this directory?`, and a named `[a]` action.
++After approval, Cursor can retain the completed card above its conversation with `Trusting workspace...` replacing its navigation hint.
++The readiness gate distinguishes that completed card from an unanswered dialog and requires the processing footer or this task's new conversation transcript.
++It reads only the viewport and fails with the installed Cursor version if capture or processing confirmation fails.
++Backends without a verified viewport primitive, currently cmux and Orca, are refused before launch.
++Portable coverage in `tests/fm-cursor-harness.test.sh` and `tests/fm-spawn-dispatch-profile.test.sh` pins independent dialog identifiers, named actions, workspace-only MCP selection, completed cards, task-bound transcripts, stale scrollback, unreadable captures, and stalled endpoints.
++On macOS installations that cannot execute copied system Bash, the portable ancestry construction reports an explicit skip; the real Cursor ancestry guard above supplies its positive counterpart.
++
+ ### Process identity
+ 
+ `#{pane_current_command}` and `ps -o comm=` disagree for cursor, which is why identity reads both:
+@@ -2091,7 +2140,7 @@ This row is a delivery guard for submit acknowledgement only; recorded worker st
+ 
+ | Fact | Observed |
+ | --- | --- |
+-| Workspace trust | `--trust` suppressed the prompt; `--yolo` alone did NOT, and the prompt blocks a fresh worktree |
++| Workspace trust | Current native approval and headless-only `--trust` behavior are recorded in [Native workspace trust](#native-workspace-trust-2026-10-05). |
+ | Autonomy | `--yolo` (alias of `--force`); the footer renders `Run Everything` |
+ | Worktree | `-w/--worktree` allocates a SECOND worktree under `~/.cursor/worktrees` and is never passed |
+ | Effort | no effort flag exists; requested effort stays in task metadata |
+diff --git a/tests/fm-cursor-harness.test.sh b/tests/fm-cursor-harness.test.sh
+index 4c59d1f..5fab174 100755
+--- a/tests/fm-cursor-harness.test.sh
++++ b/tests/fm-cursor-harness.test.sh
+@@ -212,6 +212,15 @@ test_cursor_marker_outranks_inherited_claudecode() {
+   mkdir -p "$tree_dir"
+   cp "$(command -v bash)" "$tree_dir/cursor-agent"
+   cp "$(command -v bash)" "$tree_dir/claude"
++  # Some macOS installations kill renamed copies of platform-signed Bash.
++  # Skip only this real-ancestor construction when its binaries cannot run;
++  # the marker assertions above and all other portable cases still execute.
++  if [ "$(uname -s)" = Darwin ] &&
++    { ! "$tree_dir/cursor-agent" -c : >/dev/null 2>&1 || ! "$tree_dir/claude" -c : >/dev/null 2>&1; }; then
++    printf '# skip: macOS cannot execute copied system Bash ancestry fixtures; real Cursor ancestry is checked by fm-cursor-trust-live-e2e.test.sh\n'
++    pass "fm-harness.sh: cursor marker ordering with silent ancestry"
++    return 0
++  fi
+   out=$(env -u CLAUDECODE "$tree_dir/cursor-agent" -c \
+     "r=\$(CURSOR_AGENT=1 \"$HARNESS\"); printf '%s' \"\$r\"")
+   [ "$out" = cursor ] || fail "a real cursor-agent ancestor must detect cursor, got '$out'"
+@@ -415,6 +424,38 @@ test_transcript_fold_excludes_prior_conversations() {
+   pass "cursor transcript fold: a prior conversation is excluded so a relaunch folds its own turn"
+ }
+ 
++test_native_workspace_trust_keys() {
++  local title='Workspace Trust Required' question='Do you trust the contents of this directory?' choice='[a] Trust this workspace'
++  [ "$(fm_cursor_workspace_trust_key "$title"$'\n'"$choice")" = a ] || fail "title and named choice must approve"
++  [ "$(fm_cursor_workspace_trust_key "$question"$'\n'"$choice")" = a ] || fail "question and named choice must approve without title"
++  [ "$(fm_cursor_workspace_trust_key "$title"$'\n'"$choice"$'\n'"[w] Trust this workspace, but don't enable all MCP servers")" = w ] \
++    || fail "workspace-only approval must win when MCP approval is offered"
++  ! fm_cursor_workspace_trust_key "$choice" >/dev/null || fail "an action label alone must not trigger a key"
++  ! fm_cursor_workspace_trust_key "$title" >/dev/null || fail "a title without a named action must not guess"
++  ! fm_cursor_workspace_trust_key "$title"$'\n'"$choice"$'\nThis will also enable the MCP servers' >/dev/null \
++    || fail "missing workspace-only MCP choice must not auto-approve MCPs"
++  ! fm_cursor_workspace_trust_key "$title"$'\nTrust this workspace' >/dev/null || fail "a label without its named key must not approve"
++  ! fm_cursor_workspace_trust_key "$title"$'\n[b] Trust this workspace' >/dev/null || fail "a changed action key must refuse"
++  pass "Cursor native workspace approval uses named keys and avoids blanket MCP approval"
++}
++
++test_native_workspace_readiness() {
++  local state
++  state=$(make_cursor_binding native-ready ready $'{"role":"user","content":"brief"}\n{"type":"turn_ended"}')
++  (
++    fm_backend_visible_capture() { printf 'idle composer\n'; }
++    fm_backend_send_key() { fail "transcript proof must not send a trust key"; }
++    FM_CURSOR_READY_POLLS=1 fm_cursor_wait_for_working tmux target task "$state" || fail "settled task-bound transcript must prove processing without footer"
++  ) || exit 1
++  ! fm_cursor_workspace_trust_visible $'Workspace Trust Required\n[a] Trust this workspace\nTrusting workspace...' || fail "completed card must not count as active"
++  ! fm_cursor_workspace_trust_key $'Workspace Trust Required\n[a] Trust this workspace\nTrusting workspace...' || fail "completed card must not receive another approval"
++  fm_cursor_workspace_trust_visible $'Workspace Trust Required\n[a] Trust this workspace\nUse arrow keys to navigate\nTrusting workspace...' || fail "active navigation must outrank pending-message remnants"
++  pass "Cursor readiness accepts its task transcript and distinguishes completed trust cards"
++}
++
++test_native_workspace_trust_keys
++test_native_workspace_readiness
++[ "${1:-}" != --trust-only ] || exit 0
+ test_identity_accepts_cursor_shapes_rejects_lookalikes
+ test_identity_signals_diverge
+ test_verify_executable_refuses_unrelated_agent
+diff --git a/tests/fm-cursor-primary-live-e2e.test.sh b/tests/fm-cursor-primary-live-e2e.test.sh
+index 159dee1..0a0de8d 100755
+--- a/tests/fm-cursor-primary-live-e2e.test.sh
++++ b/tests/fm-cursor-primary-live-e2e.test.sh
+@@ -84,7 +84,7 @@ EOF
+ printf 'blocked: fixture needs a decision\n' > "$HOME_DIR/state/probe.status"
+ 
+ "$REAL_TMUX" -L "$SOCKET" new-session -d -s primary -x 220 -y 60 -c "$HOME_DIR" \
+-  "cd '$HOME_DIR' && FM_HOME='$HOME_DIR' FM_HEARTBEAT=30 FM_HEARTBEAT_MAX=30 exec '$CURSOR_BIN' --trust --yolo --workspace '$HOME_DIR'" \
++  "cd '$HOME_DIR' && FM_HOME='$HOME_DIR' FM_HEARTBEAT=30 FM_HEARTBEAT_MAX=30 exec '$CURSOR_BIN' --yolo --workspace '$HOME_DIR'" \
+   || harness_fail "could not start the private tmux server"
+ 
+ pane_text() {
+@@ -118,6 +118,21 @@ submit() {  # <text>
+   "$REAL_TMUX" -L "$SOCKET" send-keys -t primary Enter
+ }
+ 
++# Fresh interactive paths use Cursor's native named action, never --trust.
++# shellcheck source=bin/fm-cursor-lib.sh
++. "$ROOT/bin/fm-cursor-lib.sh"
++TRUST_ANSWERED=0
++for ((i=0; i<120; i++)); do
++  [ ! -e "$HOME_DIR/state/.lock" ] || break
++  if TRUST_KEY=$(fm_cursor_workspace_trust_key "$(pane_text)"); then
++    "$REAL_TMUX" -L "$SOCKET" send-keys -t primary "$TRUST_KEY" || harness_fail "native workspace approval failed"
++    TRUST_ANSWERED=1
++    break
++  fi
++  sleep 0.5
++done
++[ "$TRUST_ANSWERED" = 1 ] || [ -e "$HOME_DIR/state/.lock" ] || harness_fail "no native workspace approval or session-start lock appeared"
++
+ # --- 1. run-tier session start ----------------------------------------------
+ 
+ wait_for_file "$HOME_DIR/state/.lock" 180 "the fleet session lock"
+diff --git a/tests/fm-cursor-trust-live-e2e.test.sh b/tests/fm-cursor-trust-live-e2e.test.sh
+new file mode 100755
+index 0000000..b365907
+--- /dev/null
++++ b/tests/fm-cursor-trust-live-e2e.test.sh
+@@ -0,0 +1,88 @@
++#!/usr/bin/env bash
++# Real Cursor native workspace trust and positional brief delivery. Submits
++# prompts, so opt-in. Uses an isolated tmux socket and fresh scratch repos, not
++# the fleet or its worktree pool. Cursor's own per-workspace records remain in
++# ~/.cursor; no credential or global config is changed. FM_CURSOR_BIN may pin a
++# retained installed version; FM_CURSOR_TRUST_LAB_ROOT selects the scratch root.
++set -u
++# shellcheck source=tests/lib.sh
++. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
++fm_live_gate opt-in FM_CURSOR_TRUST_LIVE tmux jq
++# shellcheck source=bin/fm-backend.sh
++. "$ROOT/bin/fm-backend.sh"
++# shellcheck source=bin/fm-busy-lib.sh
++. "$ROOT/bin/fm-busy-lib.sh"
++# shellcheck source=bin/fm-cursor-lib.sh
++. "$ROOT/bin/fm-cursor-lib.sh"
++CURSOR_BIN=${FM_CURSOR_BIN:-$(fm_cursor_resolve_binary)}
++[ -x "$CURSOR_BIN" ] || fail "cursor missing: $CURSOR_BIN"
++VERSION=$("$CURSOR_BIN" --version) || fail "cursor version probe failed"
++printf '# Cursor %s\n' "$VERSION"
++REAL_TMUX=$(command -v tmux)
++SOCKET="fm-cursor-trust-live-$$"
++LAB=$(mktemp -d "${FM_CURSOR_TRUST_LAB_ROOT:-${TMPDIR:-/tmp}}/fm-cursor-trust.XXXXXX")
++cleanup() {
++  "$REAL_TMUX" -L "$SOCKET" kill-server >/dev/null 2>&1 || true
++  rm -rf "$LAB"
++}
++trap cleanup EXIT
++# Only this private socket is reachable through the production tmux adapter.
++tmux() { "$REAL_TMUX" -L "$SOCKET" "$@"; }
++fm_backend_source tmux || fail "Cursor $VERSION: could not load tmux adapter"
++harness_fail() {
++  tmux capture-pane -p -t "${TARGET:-probe}" -S -0 2>/dev/null || true
++  fail "Cursor $VERSION: $1"
++}
++quote() { printf "'%s'" "${1//\'/\'\\\'\'}"; }
++MODEL=${FM_CURSOR_TRUST_MODEL:-grok-4.7-xhigh}
++for variant in plain mcp; do
++  WORKSPACE="$LAB/$variant"
++  mkdir -p "$WORKSPACE/state"
++  git init -q "$WORKSPACE"
++  if [ "$variant" = mcp ]; then
++    mkdir -p "$WORKSPACE/.cursor"
++    # A configured, harmless server; it must never run because only the workspace
++    # is approved. The sentinel detects accidental blanket MCP approval.
++    printf '#!/usr/bin/env bash\nprintf started > %s\ncat\n' "$(quote "$WORKSPACE/mcp-started")" > "$WORKSPACE/server.sh"
++    jq -n --arg script "$WORKSPACE/server.sh" '{mcpServers:{"trust-guard":{command:"bash",args:[$script]}}}' > "$WORKSPACE/.cursor/mcp.json"
++  fi
++  printf 'Use a shell tool to append exactly "done: %s brief read" followed by a newline to worker.status in this workspace. Then stop. Do not change any other files.\n' "$variant" > "$WORKSPACE/brief.md"
++  TARGET="$variant:worker"
++  LAUNCH="env -u CLAUDECODE -u PI_CODING_AGENT -u GROK_AGENT -u CURSOR_INVOKED_AS $(quote "$CURSOR_BIN") --yolo --model $(quote "$MODEL") --workspace $(quote "$WORKSPACE") 'Read brief.md and follow it exactly.'"
++  tmux new-session -d -s "$variant" -n worker -x 160 -y 50 -c "$WORKSPACE" "$LAUNCH" || harness_fail "launch failed ($variant)"
++  PANE=
++  for ((i=0; i<120; i++)); do
++    PANE=$(fm_backend_visible_capture tmux "$TARGET") || harness_fail "viewport read failed"
++    if KEY=$(fm_cursor_workspace_trust_key "$PANE"); then break; fi
++    sleep 0.25
++  done
++  EXPECT=a
++  if [ "$variant" = mcp ]; then
++    if [ "${KEY:-}" = w ]; then
++      EXPECT=w
++    else
++      printf '# Cursor %s: MCP-configured launch did not offer [w]; exercising its displayed [a] dialog instead\n' "$VERSION"
++    fi
++  fi
++  [ "${KEY:-}" = "$EXPECT" ] || harness_fail "fresh $variant workspace did not show named [$EXPECT] trust action"
++  PANE_PID=$(tmux display-message -p -t "$TARGET" '#{pane_pid}')
++  ANCESTRY=$(bash "$ROOT/bin/fm-harness.sh" ancestry-descent "$PANE_PID")
++  [ "$ANCESTRY" = 'comm cursor' ] || harness_fail "real Cursor process ancestry returned '$ANCESTRY' ($variant)"
++  pass "Cursor $VERSION: real process ancestry identifies comm cursor ($variant)"
++  printf '# %s dialog action [%s]\n' "$variant" "$KEY"
++  printf '%s\n' "$PANE"
++  # Production spawn and recovery call exactly this same readiness gate.
++  fm_cursor_wait_for_working tmux "$TARGET" "$variant" "$WORKSPACE/state" || harness_fail "native trust did not reach brief processing ($variant)"
++  for ((i=0; i<480; i++)); do
++    [ ! -e "$WORKSPACE/mcp-started" ] || harness_fail "workspace-only trust started an MCP server"
++    if [ -f "$WORKSPACE/worker.status" ] && grep -Fxq "done: $variant brief read" "$WORKSPACE/worker.status"; then break; fi
++    sleep 0.25
++  done
++  if [ ! -f "$WORKSPACE/worker.status" ] || ! grep -Fxq "done: $variant brief read" "$WORKSPACE/worker.status"; then
++    harness_fail "worker never appended its brief's status ($variant)"
++  fi
++  [ ! -e "$WORKSPACE/mcp-started" ] || harness_fail "workspace-only trust started an MCP server"
++  pass "Cursor $VERSION: $variant [$EXPECT] approval reached positional brief and status append"
++  tmux kill-session -t "$variant"
++done
++printf '# all Cursor native trust live checks passed (2)\n'
+diff --git a/tests/fm-harness-liveness-drift-live-e2e.test.sh b/tests/fm-harness-liveness-drift-live-e2e.test.sh
+index ce93335..a2c052e 100755
+--- a/tests/fm-harness-liveness-drift-live-e2e.test.sh
++++ b/tests/fm-harness-liveness-drift-live-e2e.test.sh
+@@ -122,11 +122,10 @@ for harness in claude codex opencode pi pi-signed grok kimi cursor muse; do
+   [ -n "$version" ] || version="unknown"
+ 
+   target="$SESSION:$harness"
+-  # cursor blocks on a workspace-trust prompt in a directory it has never seen,
+-  # which would hang this probe rather than classify anything; --trust is the
+-  # same flag fm-spawn passes for the same reason.
++  # Cursor's native trust dialog still exposes its live process identity.
++  # Do not pass the headless-only --trust flag to this interactive probe;
++  # fm-cursor-trust-live-e2e.test.sh separately proves approval and processing.
+   launch_args=""
+-  [ "$harness" = cursor ] && launch_args="--trust"
+   # shellcheck disable=SC2086  # deliberate: an empty value must add no argument
+   "$REAL_TMUX" -L "$SOCKET" new-window -d -t "$SESSION:" -n "$harness" -c "$LAB/wt" -- "$bin_path" $launch_args \
+     || fail "$harness ($version): could not launch a window for the liveness probe"
+diff --git a/tests/fm-secondmate-harness.test.sh b/tests/fm-secondmate-harness.test.sh
+index ddacc09..409866b 100755
+--- a/tests/fm-secondmate-harness.test.sh
++++ b/tests/fm-secondmate-harness.test.sh
+@@ -639,25 +639,24 @@ test_spawn_cursor_secondmate_launches_with_its_primary_contract() {
+   printf 'cursor\n' > "$w/home/config/secondmate-harness"
+   make_seeded_home "$sm" sm
+   fakebin=$(make_launch_capturing_tmux "$w/tmux")
++  fm_fake_exit0 "$fakebin" cursor-agent
+   : > "$launchlog"
+   rc=0
+   PATH="$fakebin:$BASE_PATH" TMUX='' CLAUDECODE=1 \
+     FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$w/home" HOME="$w/home/user-home" CLAUDE_CONFIG_DIR='' \
+     FM_STATE_OVERRIDE="$w/home/state" FM_DATA_OVERRIDE="$w/home/data" \
+     FM_PROJECTS_OVERRIDE="$w/home/projects" FM_CONFIG_OVERRIDE="$w/home/config" \
++    FM_FAKE_CURSOR_READY=1 FM_CURSOR_READY_POLLS=3 FM_CURSOR_POLL_INTERVAL=0 \
+     FM_SPAWN_NO_GUARD=1 FM_FAKE_LAUNCH_LOG="$launchlog" FM_FAKE_PANE_PATH="$sm" \
+     "$ROOT/bin/fm-spawn.sh" sm "$sm" --secondmate >/dev/null 2>&1 || rc=$?
+ 
+-  [ "$rc" -eq 0 ] || {
+-    echo "skip: cursor executable not resolvable in this environment, so the launch could not be built"
+-    return
+-  }
++  [ "$rc" -eq 0 ] || fail "Cursor secondmate fixture must reach confirmed processing (exit $rc)"
+   meta="$w/home/state/sm.meta"
+   [ "$(meta_field "$meta" harness)" = cursor ] || fail "a cursor secondmate must record its own harness"
+   [ "$(meta_field "$meta" kind)" = secondmate ] || fail "a cursor secondmate must record kind=secondmate"
+   launch=$(cat "$launchlog")
+-  assert_contains "$launch" "--trust" \
+-    "a cursor secondmate must launch with --trust, or none of its project hooks load and its home has no supervision at all"
++  assert_not_contains "$launch" "--trust" \
++    "an interactive Cursor secondmate must use native approval, not the headless-only trust flag"
+   assert_contains "$launch" "--workspace" \
+     "a cursor secondmate must be pinned to its own home as the workspace"
+   assert_contains "$launch" "FM_SUPERVISION_MODEL=autoarm" \
+@@ -688,6 +687,9 @@ case "$*" in
+   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
+ esac
+ case "${1:-}" in
++  capture-pane)
++    [ "${FM_FAKE_CURSOR_READY:-0}" != 1 ] || printf 'ctrl+c to stop\n'
++    exit 0 ;;
+   display-message) printf 'firstmate\n'; exit 0 ;;
+   list-windows) exit 0 ;;
+   has-session|new-session|new-window|kill-window) exit 0 ;;
+diff --git a/tests/fm-spawn-dispatch-profile.test.sh b/tests/fm-spawn-dispatch-profile.test.sh
+index 4ab76df..7db204b 100755
+--- a/tests/fm-spawn-dispatch-profile.test.sh
++++ b/tests/fm-spawn-dispatch-profile.test.sh
+@@ -37,6 +37,44 @@ SH
+ make_spawn_fakebin() {
+   local dir=$1 fakebin
+   fakebin=$(fm_test_make_spawn_fakebin "$dir")
++  mv "$fakebin/tmux" "$fakebin/tmux-base"
++  cat > "$fakebin/tmux" <<'SH'
++#!/usr/bin/env bash
++set -u
++case "${1:-}" in
++  capture-pane)
++    case "${FM_FAKE_CURSOR_GATE:-}" in
++      busy) printf 'ctrl+c to stop\n'; exit 0 ;;
++      stalled) printf 'loading\n'; exit 0 ;;
++      unreadable) exit 1 ;;
++      stale-footer)
++        case "$*" in *'-S -0'*) printf 'loading\n' ;; *) printf 'ctrl+c to stop\n' ;; esac
++        exit 0 ;;
++      unknown-action) printf 'Workspace Trust Required\n[b] Trust this workspace\nctrl+c to stop\n'; exit 0 ;;
++      mcp-missing) printf 'Workspace Trust Required\n[a] Trust this workspace\nThis will also enable the MCP servers\nctrl+c to stop\n'; exit 0 ;;
++      trust|mcp|trust-stalled|trust-card)
++        if [ -e "$FM_FAKE_CURSOR_GATE_LOG.answered" ] && [ "$FM_FAKE_CURSOR_GATE" != trust-stalled ]; then
++          [ "$FM_FAKE_CURSOR_GATE" != trust-card ] || printf 'Workspace Trust Required\n[a] Trust this workspace\nTrusting workspace...\n'
++          printf 'ctrl+c to stop\n'
++        else
++          printf 'Workspace Trust Required\nDo you trust the contents of this directory?\n[a] Trust this workspace\n'
++          [ "$FM_FAKE_CURSOR_GATE" != mcp ] || printf "[w] Trust this workspace, but don't enable all MCP servers\n"
++        fi
++        exit 0
++        ;;
++    esac
++    ;;
++  send-keys)
++    case "${!#}" in
++      a|w) printf '%s\n' "${!#}" >> "$FM_FAKE_CURSOR_GATE_LOG"; touch "$FM_FAKE_CURSOR_GATE_LOG.answered" ;;
++    esac
++    ;;
++  kill-window)
++    [ -z "${FM_FAKE_CURSOR_GATE_LOG:-}" ] || printf 'kill-window\n' >> "$FM_FAKE_CURSOR_GATE_LOG"
++    ;;
++esac
++exec "$(dirname "$0")/tmux-base" "$@"
++SH
+   cat > "$fakebin/timeout" <<'SH'
+ #!/usr/bin/env bash
+ shift
+@@ -50,7 +88,7 @@ if [ "${1:-}" = --list-models ]; then
+ fi
+ exit 0
+ SH
+-  chmod +x "$fakebin/timeout" "$fakebin/cursor-agent"
++  chmod +x "$fakebin/timeout" "$fakebin/cursor-agent" "$fakebin/tmux"
+   make_spawn_pi_probe "$fakebin" pi
+   make_spawn_pi_probe "$fakebin" pi-signed
+   printf '%s\n' "$fakebin"
+@@ -102,9 +140,10 @@ ai_trailer_hooks_prefix() {  # <home> <id>
+ }
+ 
+ run_spawn() {
+-  local home=$1 wt=$2 fakebin=$3 launchlog=$4
++  local home=$1 wt=$2 fakebin=$3 launchlog=$4 gate=
+   shift 4
+   : > "$launchlog"
++  [ "$(cat "$home/config/crew-harness" 2>/dev/null)" != cursor ] || gate=${FM_TEST_CURSOR_GATE:-busy}
+   # CLAUDE_CONFIG_DIR is forwarded onto claude launches by fm-spawn, so pin it
+   # explicitly (empty by default) instead of leaking the invoking shell's value,
+   # which would make launch assertions depend on the developer's environment.
+@@ -114,6 +153,8 @@ run_spawn() {
+     FM_FAKE_PI_VERSION="${FM_TEST_PI_VERSION:-0.84.0}" \
+     FM_FAKE_CURSOR_MODELS="${FM_TEST_CURSOR_MODELS:-}" \
+     FM_FAKE_CURSOR_LIST_STATUS="${FM_TEST_CURSOR_LIST_STATUS:-0}" \
++    FM_FAKE_CURSOR_GATE="$gate" FM_FAKE_CURSOR_GATE_LOG="$home/cursor-gate.log" \
++    FM_CURSOR_READY_POLLS=3 FM_CURSOR_POLL_INTERVAL=0 \
+     GROK_HOME="$home/grok-home" \
+     fm_test_run_spawn "$home" "$wt" "$fakebin" "$@"
+ }
+@@ -687,8 +728,9 @@ test_cursor_threads_model_workspace_and_omits_effort_axis() {
+   expect_code 0 "$status" "cursor spawn with a model-qualified reasoning class should succeed"
+   assert_meta_profile "$HOME_DIR/state/$id.meta" cursor cursor-grok-4.5-high high
+   launch=$(cat "$LAUNCH_LOG")
+-  assert_contains "$launch" "--trust --yolo --model 'cursor-grok-4.5-high' --workspace '$WT_DIR'" \
+-    "cursor launch did not carry trust, autonomy, model, and exact workspace flags"
++  assert_contains "$launch" "--yolo --model 'cursor-grok-4.5-high' --workspace '$WT_DIR'" \
++    "cursor launch did not carry autonomy, model, and exact workspace flags"
++  assert_not_contains "$launch" "--trust" "interactive Cursor must not receive the headless-only trust flag"
+   # The executable is RESOLVED, never named: `cursor` is not the CLI, so a
+   # literal `cursor agent` command cannot run on a machine that has only the
+   # real installed names.
+@@ -745,6 +787,34 @@ test_cursor_failed_catalog_probe_does_not_block_spawn() {
+   pass "cursor preserves the requested model when its live catalog is unreachable"
+ }
+ 
++test_cursor_native_trust_gate() {
++  local gate rec id out status key
++  for gate in trust mcp trust-card stalled trust-stalled stale-footer unreadable unknown-action mcp-missing; do
++    id="cursor-gate-$gate"
++    rec=$(make_spawn_case "$id" cursor "$id")
++    read_case_record "$rec"
++    out=$(FM_TEST_CURSOR_GATE="$gate" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout --harness cursor)
++    status=$?
++    case "$gate" in
++      trust|mcp|trust-card)
++        expect_code 0 "$status" "native trust must reach brief processing: $out"
++        key=a; [ "$gate" != mcp ] || key=w
++        [ "$(cat "$HOME_DIR/cursor-gate.log")" = "$key" ] || fail "native trust must send its named key once"
++        ;;
++      stalled|trust-stalled|stale-footer|unreadable|unknown-action|mcp-missing)
++        expect_code 1 "$status" "no processing proof must refuse: $out"
++        assert_contains "$out" 'did not confirm brief processing' "refusal must name the failed readiness gate"
++        assert_not_contains "$out" "spawned $id" "a stalled Cursor cannot report success"
++        assert_grep 'kill-window' "$HOME_DIR/cursor-gate.log" "failed Cursor endpoint must be closed"
++        if [ "$gate" = trust-stalled ]; then
++          [ "$(grep -c '^a$' "$HOME_DIR/cursor-gate.log")" = 1 ] || fail "an unanswered repeated dialog must get only one key"
++        fi
++        ;;
++    esac
++  done
++  pass "Cursor native trust reaches processing or closes the failed endpoint without repeating approval"
++}
++
+ test_opencode_threads_model_and_effort_variant() {
+   local rec id out status launch
+   id=profile-opencode-z7
+@@ -1625,6 +1695,15 @@ SH
+   done
+ }
+ 
++if [ "${1:-}" = --cursor-only ]; then
++  test_cursor_threads_model_workspace_and_omits_effort_axis
++  test_cursor_refuses_model_absent_from_live_catalog
++  test_cursor_failed_catalog_probe_does_not_block_spawn
++  test_cursor_native_trust_gate
++  printf '# all focused Cursor spawn tests passed\n'
++  exit 0
++fi
++
+ test_launch_environment_allowlist
+ test_launch_environment_invalid_config_refuses
+ test_launch_environment_inaccessible_config_refuses
+@@ -1885,6 +1964,7 @@ test_non_claude_harness_ignores_claude_permission_mode() {
+   pass "config/claude-permission-mode changes claude launches only"
+ }
+ 
++
+ test_worker_launch_delivers_role_scope
+ test_no_profile_keeps_claude_profile_defaults
+ test_claude_launch_brief_publishes_record_doorbell
+@@ -1913,6 +1993,7 @@ test_grok_omits_invalid_xhigh_reasoning_effort
+ test_cursor_threads_model_workspace_and_omits_effort_axis
+ test_cursor_refuses_model_absent_from_live_catalog
+ test_cursor_failed_catalog_probe_does_not_block_spawn
++test_cursor_native_trust_gate
+ test_opencode_threads_model_and_effort_variant
+ test_opencode_without_effort_keeps_launch_config_unchanged
+ test_opencode_emits_variant_for_openai_family_effort

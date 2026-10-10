@@ -1,0 +1,28 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1; classes = {}; objectVersion = 56;
+ objects = {
+ A00000000000000000000001 = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {A00000000000000000000010 = {CreatedOnToolsVersion = 26.6; }; }; }; buildConfigurationList = A00000000000000000000050; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; knownRegions = (en, Base); mainGroup = A00000000000000000000002; productRefGroup = A00000000000000000000003; projectDirPath = ""; projectRoot = ""; targets = (A00000000000000000000010); };
+ A00000000000000000000002 = {isa = PBXGroup; children = (A00000000000000000000020, A00000000000000000000021, A00000000000000000000022, A00000000000000000000023, A00000000000000000000003); sourceTree = "<group>"; };
+ A00000000000000000000003 = {isa = PBXGroup; name = Products; children = (A00000000000000000000024); sourceTree = "<group>"; };
+ A00000000000000000000010 = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000051; buildPhases = (A00000000000000000000030, A00000000000000000000031, A00000000000000000000032); buildRules = (); dependencies = (); name = JoyrideMac; productName = JoyrideMac; productReference = A00000000000000000000024; productType = "com.apple.product-type.application"; };
+ A00000000000000000000020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/JoyrideMac/Configuration.swift; sourceTree = "<group>"; };
+ A00000000000000000000021 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/JoyrideMac/JoyrideMac.swift; sourceTree = "<group>"; };
+ A00000000000000000000022 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/JoyrideMac/BackgroundTests.swift; sourceTree = "<group>"; };
+ A00000000000000000000029 = {isa = PBXBuildFile; fileRef = A00000000000000000000022; };
+ A00000000000000000000023 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+ A00000000000000000000024 = {isa = PBXFileReference; explicitFileType = wrapper.application; path = JoyrideMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+ A00000000000000000000026 = {isa = PBXBuildFile; fileRef = A00000000000000000000020; };
+ A00000000000000000000027 = {isa = PBXBuildFile; fileRef = A00000000000000000000021; };
+ A00000000000000000000030 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000026, A00000000000000000000027, A00000000000000000000029); runOnlyForDeploymentPostprocessing = 0; };
+ A00000000000000000000031 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+ A00000000000000000000032 = {isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); name = "Native shell resources"; outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/repository.txt", "$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Joyride.icns"); runOnlyForDeploymentPostprocessing = 0; shellPath = /bin/sh; shellScript = "set -eu\nROOT=\"$(cd \"$SRCROOT/../..\" && pwd -P)\"\nRES=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$RES\"\nprintf '%s\\n' \"$ROOT\" > \"$RES/repository.txt\"\nswift \"$SRCROOT/icon.swift\" \"$RES/Joyride.icns\"\n"; };
+ A00000000000000000000050 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000060, A00000000000000000000061); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+ A00000000000000000000051 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000062, A00000000000000000000063); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+ A00000000000000000000060 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {SDKROOT = macosx; MACOSX_DEPLOYMENT_TARGET = 13.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; DEBUG_INFORMATION_FORMAT = dwarf; CODE_SIGN_IDENTITY = "-"; ENABLE_USER_SCRIPT_SANDBOXING = NO; }; };
+ A00000000000000000000061 = {isa = XCBuildConfiguration; name = Release; buildSettings = {SDKROOT = macosx; MACOSX_DEPLOYMENT_TARGET = 13.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; CODE_SIGN_IDENTITY = "-"; ENABLE_USER_SCRIPT_SANDBOXING = NO; }; };
+ A00000000000000000000062 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = local.joyride.mac; INFOPLIST_FILE = Info.plist; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = NO; }; };
+ A00000000000000000000063 = {isa = XCBuildConfiguration; name = Release; buildSettings = {PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = local.joyride.mac; INFOPLIST_FILE = Info.plist; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = NO; }; };
+ };
+ rootObject = A00000000000000000000001;
+}

@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Suhas Vasisht <suhas.vasisht@gmail.com>
+Date: Tue, 6 Oct 2026 10:50:36 -0700
+Subject: [PATCH] fix(inbox): validate large note bodies in linear time
+
+---
+ bin/fm-inbox.sh        |  4 +++-
+ tests/fm-inbox.test.sh | 52 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/bin/fm-inbox.sh b/bin/fm-inbox.sh
+index 1e128a6..945b634 100755
+--- a/bin/fm-inbox.sh
++++ b/bin/fm-inbox.sh
+@@ -428,7 +428,9 @@ queue_note() {
+   if [ -n "$request_id" ] || [ "$json" -eq 1 ]; then
+     strict=1
+   fi
+-  [ -n "${body//[[:space:]]/}" ] || die "refusing to queue an empty note"
++  # Search once: Bash's global substitution copies the remainder for every
++  # whitespace match, making large handoff bodies quadratic to validate.
++  [[ "$body" =~ [^[:space:]] ]] || die "refusing to queue an empty note"
+   mkdir -p "$INBOX"
+ 
+   local tmp id summary staging_name reserved
+diff --git a/tests/fm-inbox.test.sh b/tests/fm-inbox.test.sh
+index 4898eef..22e6bbd 100644
+--- a/tests/fm-inbox.test.sh
++++ b/tests/fm-inbox.test.sh
+@@ -58,6 +58,58 @@ count_wakes() {
+   fi
+ }
+ 
++# --- large handoff bodies stay below the caller's capture deadline ----------
++
++home=$(make_home large-body)
++FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" FM_DATA_OVERRIDE="$home/data" \
++  FM_CONFIG_OVERRIDE="$home/config" python3 - "$INBOX_BIN" <<'PY'
++import json
++import os
++from pathlib import Path
++import signal
++import subprocess
++import sys
++import time
++
++# Include whitespace, UTF-8, shell metacharacters and trailing blank lines.
++body = ('  handoff\t"asks": ${literal} \\ café\r\n' * 4096 + '\n\n').encode()
++assert len(body) >= 100 * 1024
++
++def capture(payload, request_id):
++    started = time.monotonic()
++    proc = subprocess.Popen(
++        ['bash', sys.argv[1], 'note', '--request-id', request_id, '--json', '-'],
++        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++        start_new_session=True,
++    )
++    try:
++        out, err = proc.communicate(payload, timeout=10)
++    except subprocess.TimeoutExpired:
++        os.killpg(proc.pid, signal.SIGKILL)
++        proc.communicate()
++        raise AssertionError('large-body capture exceeded the generous 10s bound')
++    elapsed = time.monotonic() - started
++    print(f'capture {len(payload)} bytes: {elapsed:.3f}s, exit {proc.returncode}')
++    return proc.returncode, out, err
++
++code, out, err = capture(body, 'large-handoff')
++assert code == 0, err
++first = json.loads(out)
++assert first['outcome'] == 'created' and first['announced'] is True
++saved = Path(first['path']).read_bytes()
++assert saved.split(b'\n--\n', 1)[1] == body, 'body must round-trip byte-identically'
++code, out, err = capture(body, 'large-handoff')
++assert code == 0, err
++second = json.loads(out)
++assert second['outcome'] == 'replay' and second['id'] == first['id']
++assert Path(first['path']).read_bytes() == saved
++code, out, err = capture(b' \t\r\n\v\f' * 20000, 'large-empty')
++assert code == 1 and b'empty note' in err
++PY
++assert_equals "1" "$(count_notes "$home")" "large-body replay writes only one note"
++assert_equals "1" "$(count_wakes "$home")" "large-body replay announces only once"
++pass "100 KB+ bodies capture within 10s, round-trip exactly, and replay without duplication"
++
+ # --- human note path is unchanged without the new flags ---------------------
+ 
+ home=$(make_home human)

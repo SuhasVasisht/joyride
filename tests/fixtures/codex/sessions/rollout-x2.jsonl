@@ -1,0 +1,15 @@
+{"timestamp":"{{T-2d}}","type":"session_meta","payload":{"id":"019a0000-0000-7000-8000-000000000002","cwd":"/tmp/joyride-fixture-repos/beta","source":"cli"}}
+{"timestamp":"{{T-2d}}","type":"turn_context","payload":{"cwd":"/tmp/joyride-fixture-repos/beta","model":"gpt-5-codex"}}
+{"timestamp":"{{T-2d}}","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"<environment_context>\n  <cwd>/x</cwd>\n</environment_context>"}]}}
+{"timestamp":"{{T-2d}}","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Make the sync job idempotent"}]}}
+{"timestamp":"{{T-2d}}","type":"event_msg","payload":{"type":"user_message","message":"Make the sync job idempotent","images":[]}}
+{"timestamp":"{{T-2879m}}","type":"response_item","payload":{"type":"reasoning","summary":[],"encrypted_content":"x"}}
+{"timestamp":"{{T-2879m}}","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{\"command\":[\"bash\",\"-lc\",\"cat sync/job.py\"]}","call_id":"call_a"}}
+{"timestamp":"{{T-2878m}}","type":"response_item","payload":{"type":"function_call_output","call_id":"call_a","output":"def run(): ..."}}
+{"timestamp":"{{T-2877m}}","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"The job re-inserts rows on retry. It now upserts by order id."}]}}
+{"timestamp":"{{T-2877m}}","type":"event_msg","payload":{"type":"agent_message","message":"The job re-inserts rows on retry. It now upserts by order id."}}
+{"timestamp":"{{T-2870m}}","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Run the tests"}]}}
+{"timestamp":"{{T-2870m}}","type":"event_msg","payload":{"type":"user_message","message":"Run the tests","images":[]}}
+{"timestamp":"{{T-2869m}}","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{\"command\":[\"bash\",\"-lc\",\"pytest -q\"]}","call_id":"call_b"}}
+{"timestamp":"{{T-2868m}}","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"All 14 tests pass."}]}}
+{"timestamp":"{{T-2868m}}","type":"event_msg","payload":{"type":"agent_message","message":"All 14 tests pass."}}

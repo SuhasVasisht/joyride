@@ -1,0 +1,52 @@
+/* Crew: Firstmate state, task cards, create form. Colour encodes state; signal orange only for needs-you. */
+.fm-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px var(--s3); padding: 10px 14px; border: 1px solid var(--rule); border-radius: var(--radius-sheet); background: var(--paper-raised); }
+.fm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--idle); flex: none; }
+.fm-bar.on .fm-dot { background: var(--review); }
+.fm-text { margin: 0; font-size: var(--step--1); color: var(--ink-2); }
+.fm-text a { color: var(--ink); }
+.fm-primary { min-width: 0; }
+.fm-primary p, .fm-account { margin: 4px 0; overflow-wrap: anywhere; }
+.fm-primary select { display: block; width: 100%; margin-top: 4px; }
+.fm-bar .fm-primary { flex-basis: 100%; }
+.fm-hint { flex-basis: 100%; margin: 0; font-size: 12.5px; color: var(--ink-3); }
+.fm-setup { flex-basis: 100%; font-size: 12.5px; color: var(--ink-2); }
+.fm-setup summary { cursor: pointer; color: var(--ink-3); }
+.fm-setup ul { margin: 6px 0; padding-left: 18px; }
+.fm-setup li { margin: 2px 0; max-width: 72ch; }
+
+.mission-caps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.mc-label { font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+
+.task-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s4); }
+.task { padding: 2px 0 2px var(--s3); border-left: 2px solid var(--rule-strong); }
+.task.s-working { border-left-color: var(--working); }
+.task.s-blocked { border-left-color: var(--signal); }
+.task.s-done, .task.s-pass { border-left-color: var(--review); }
+.task.s-fail { border-left-color: var(--fail); }
+.task-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.task-title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 500; color: var(--ink); line-height: 1.3; text-decoration: none; }
+a.task-title:hover { text-decoration: underline; }
+.task-facts { display: flex; flex-wrap: wrap; gap: 4px var(--s4); margin: 6px 0 0; }
+.task-facts div { display: flex; gap: 6px; align-items: baseline; }
+.task-facts dt { font-size: 12px; color: var(--ink-3); }
+.task-facts dd { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.task-facts dd.mono { font-family: var(--font-code); font-size: 12px; }
+.task-event { margin: 6px 0 0; font-family: var(--font-display); font-style: italic; color: var(--ink-2); font-size: var(--step-0); max-width: 64ch; }
+.crew-workers { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.crew-workers li { display: flex; gap: 8px; align-items: center; font-size: var(--step--1); }
+.crew-workers a { font-weight: 500; text-decoration: none; }
+.crew-workers a:hover { text-decoration: underline; }
+.task-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.task-report { margin-top: var(--s2); }
+.task-report pre { max-height: 360px; font-size: 12.5px; line-height: 1.5; margin: 4px 0 0; }
+.steer { margin-top: var(--s2); }
+.task-done { margin-top: var(--s3); }
+.task-done .task-list { margin-top: var(--s3); }
+
+.create-task { margin-top: var(--s4); }
+.create-task.open { padding: var(--s4); display: grid; gap: var(--s3); }
+.create-task.open h3 { font-size: var(--step-1); }
+.create-task.open .meta { margin: 0; }
+.ct-label { font-size: var(--step--1); font-weight: 600; color: var(--ink-2); }
+
+.ct-brief .reply-row > textarea { flex: 1; min-width: 0; }

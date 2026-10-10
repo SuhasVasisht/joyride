@@ -1,0 +1,62 @@
+/* Joyride design tokens — "chart room": a cool paper chart, ink-navy type,
+   and one signal colour (international orange) reserved for "needs you".
+   Every other colour encodes agent state. Override any token from
+   workspace.yaml `theme:` (applied as CSS variables at runtime). */
+:root {
+  /* paper & ink */
+  --paper: #F2F2EC;          /* cool chart paper, not cream */
+  --paper-raised: #FBFBF7;   /* panes and sheets */
+  --paper-sunk: #E7E7DF;     /* wells, code, inputs */
+  --ink: #14213D;            /* deep navy ink: primary text */
+  --ink-2: #44506A;          /* secondary text */
+  --ink-3: #7A8396;          /* tertiary, metadata */
+  --rule: #D5D7D0;           /* hairlines */
+  --rule-strong: #B9BDB6;
+
+  /* state */
+  --signal: #FF5A1F;         /* needs you: blocked, approvals (L3/L4) */
+  --signal-wash: #FFE7DC;
+  --working: #2B5B84;        /* chart blue: agent working */
+  --working-wash: #DCE7F0;
+  --review: #2E7D6B;         /* done, evidence waiting for review (L2) */
+  --review-wash: #DAEDE7;
+  --idle: #8C93A1;
+  --fail: #B42318;
+  --pass: #2E7D6B;
+
+  /* type */
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --font-code: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --step--1: 0.8125rem;   /* 13 */
+  --step-0: 0.9375rem;    /* 15 body */
+  --step-1: 1.125rem;     /* 18 */
+  --step-2: 1.5rem;       /* 24 */
+  --step-3: 2.125rem;     /* 34 mission titles */
+  --step-4: 3rem;         /* 48 */
+  --lh-tight: 1.15;
+  --lh-body: 1.5;
+  --lh-serif: 1.6;
+
+  /* space & shape */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+  --radius-sheet: 10px;      /* panes */
+  --radius-control: 6px;     /* buttons, inputs */
+  --radius-chip: 999px;      /* state chips only */
+  --shadow-sheet: 0 1px 0 rgba(20,33,61,.06), 0 12px 32px -12px rgba(20,33,61,.22);
+  --rail-w: 360px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --paper: #10182B; --paper-raised: #16203A; --paper-sunk: #0C1322;
+    --ink: #E8EAF0; --ink-2: #B5BCCB; --ink-3: #8790A3; --rule: #263150; --rule-strong: #34416A;
+    --signal-wash: #3A1E14; --working: #7FB0DA; --working-wash: #1A2C44; --review: #6CC2A9; --review-wash: #15332C; --idle: #6F778A;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10182B; --paper-raised: #16203A; --paper-sunk: #0C1322;
+  --ink: #E8EAF0; --ink-2: #B5BCCB; --ink-3: #8790A3; --rule: #263150; --rule-strong: #34416A;
+  --signal-wash: #3A1E14; --working: #7FB0DA; --working-wash: #1A2C44; --review: #6CC2A9; --review-wash: #15332C; --idle: #6F778A;
+}

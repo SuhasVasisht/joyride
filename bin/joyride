@@ -1,0 +1,4 @@
+#!/bin/sh
+# joyride CLI wrapper
+ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
+exec "$ROOT/node_modules/.bin/tsx" "$ROOT/src/cli/joyride.ts" "$@"

@@ -1,0 +1,23 @@
+# Jev attention judge. Tuned by the hill-climb engine (target judge:attention); every accepted change is a commit.
+version: 1
+level:
+  instructions: How urgently does the person supervising this coding agent need to look at it right now?
+  criteria:
+    L0: "Ambient: routine activity with nothing worth reporting; nobody needs to look."
+    L1: "Digest: progress worth a glance later; the agent finished a step or is idle with nothing pending."
+    L2: "Review: the agent says the work is finished or ready, and its result should be looked over."
+    L3: "Blocked on the human: the agent asks a question, needs a decision or permission, or hit a problem it cannot get past, and it cannot continue without a reply."
+    L4: "Urgent: something risky is about to happen or is happening now, such as runaway spending or a destructive action that proceeds or times out soon."
+needs_human:
+  instructions: The agent cannot usefully continue until a human answers, approves or decides something.
+  "true": The agent is waiting on the human
+  "false": The agent can continue on its own or has nothing pending
+kind:
+  instructions: What kind of moment is this for the person supervising the agent?
+  criteria:
+    question: The agent asks the person a question and waits for the answer.
+    decision: The agent lays out options and needs the person to choose one.
+    review: The agent says the work is finished and ready to look over.
+    progress: The agent reports progress and keeps going, or has nothing pending.
+    error: The agent hit a failure it could not get past.
+    idle: The agent is idle with nothing to report.

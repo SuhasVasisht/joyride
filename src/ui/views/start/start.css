@@ -1,0 +1,27 @@
+.guide { max-width: 860px; }
+.guide-lede { font-family: var(--font-display); font-size: var(--step-1); line-height: var(--lh-serif); color: var(--ink-2); max-width: 64ch; }
+.guide-steps { list-style: none; counter-reset: step -1; padding: 0; margin: var(--s5) 0; }
+.guide-steps > li { counter-increment: step; position: relative; padding: var(--s4) 0 var(--s4) 52px; border-top: 1px solid var(--rule); }
+.guide-steps > li::before { content: counter(step); position: absolute; left: 0; top: var(--s4); width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--rule-strong); display: grid; place-items: center; font-family: var(--font-display); font-size: var(--step-1); color: var(--ink-2); }
+.guide-steps h2 { font-size: var(--step-1); margin-bottom: var(--s2); }
+.guide-steps p { color: var(--ink-2); }
+.guide-steps .row { flex-wrap: wrap; margin-top: var(--s2); }
+.guide-later { border-top: 1px solid var(--rule); padding-top: var(--s4); }
+.guide-rail { border: 1px solid var(--rule-strong); border-radius: var(--radius-sheet); padding: var(--s3) var(--s4); margin-bottom: var(--s5); background: var(--paper-raised); }
+.guide-rail h3 { margin-bottom: var(--s1); }
+.guide-rail p { color: var(--ink-2); font-size: var(--step--1); }
+.start-session { max-width: 760px; }
+.ss-form { display: grid; gap: var(--s4); margin-top: var(--s4); }
+.ss-field { display: grid; gap: var(--s1); border: 0; padding: 0; margin: 0; }
+.ss-field > span, .ss-field legend { font-weight: 500; font-size: var(--step--1); color: var(--ink-2); }
+.ss-agent { display: flex; gap: var(--s4); align-items: center; }
+.ss-agent legend { margin-bottom: var(--s1); }
+.ha { display: inline-flex; flex-direction: column; gap: 4px; }
+.ha-note { font-size: var(--step--1); color: var(--ink-2); margin: 0; }
+.ha-note.err { color: var(--fail); }
+.setup-rail .setup-meter { height: 4px; background: var(--paper-sunk); border-radius: 2px; overflow: hidden; margin: var(--s2) 0 var(--s1); }
+.setup-rail .setup-meter span { display: block; height: 100%; background: var(--ink); }
+.setup-rail .meta { margin-bottom: var(--s3); }
+.guide-rail .row { flex-wrap: wrap; }
+.guide-rail .btn { white-space: nowrap; }
+.setup-rail .btn.ghost { padding-left: 6px; padding-right: 6px; }

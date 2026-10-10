@@ -1,0 +1,3 @@
+{"timestamp":"{{T-35d}}","type":"session_meta","payload":{"id":"019a0000-0000-7000-8000-000000000003","cwd":"/tmp/joyride-fixture-repos/gamma","source":"cli"}}
+{"timestamp":"{{T-35d}}","type":"event_msg","payload":{"type":"item_completed","thread_id":"t","turn_id":"turn","item":{"type":"UserMessage","id":"u1","content":[{"type":"text","text":"Add a license file","text_elements":[]}]},"completed_at_ms":{{MS:T-35d}}}}
+{"timestamp":"{{T-35d}}","type":"event_msg","payload":{"type":"item_completed","thread_id":"t","turn_id":"turn","item":{"type":"AgentMessage","id":"a1","content":[{"type":"Text","text":"Added an MIT license."}],"phase":"final_answer"},"completed_at_ms":{{MS:T-35d}}}}

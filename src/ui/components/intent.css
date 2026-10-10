@@ -1,0 +1,14 @@
+/* Agent intent: the goal set in the serif like a mission goal, then now and
+   next side by side in quiet type. "Waiting on you" is the one place it may use signal. */
+.intent { margin: 0 0 var(--s4); max-width: 76ch; }
+.intent-goal { margin: 0 0 4px; font-family: var(--font-display); font-style: italic; font-size: var(--step-1); line-height: 1.4; color: var(--ink); }
+.intent-steps { display: flex; flex-wrap: wrap; gap: 2px 28px; margin: 0; }
+.intent-steps > div { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.intent-steps dt { flex: none; font-size: 12px; color: var(--ink-3); }
+.intent-steps dd { margin: 0; font-size: var(--step--1); color: var(--ink-2); }
+.intent-waiting { flex-basis: 100%; }
+.intent-waiting dt { color: var(--signal); font-weight: 600; }
+.intent-waiting dd { color: var(--ink); font-weight: 500; }
+.intent-empty { font-size: var(--step--1); color: var(--ink-3); font-style: italic; font-family: var(--font-display); }
+.intent.compact { margin-bottom: var(--s3); }
+.intent.compact .intent-goal { font-size: var(--step-0); }

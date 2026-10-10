@@ -1,0 +1,22 @@
+     ls $D 2>&1; wc -l $D/claude.d.ts $D/db.d.ts 2>&1; ls "/Applications/Google Chrome.app/Contents/MacOS/" 2>&1 | head;
+     ls /Users/alice/Documents/Code/joyride/bin/ 2>&1 | head
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Bash command
+ Tip: auto mode handles these prompts for you — choose "switch to auto mode" below
+ Check capability type files, Chrome, and joyride CLI exist
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ │ D=/private/tmp/claude-502/bundled-skills/2.1.285/849fd68e35becc009460545de9246683/artifact-capabilities/0.2.66; ls
+ │ $D 2>&1; wc -l $D/claude.d.ts $D/db.d.ts 2>&1; ls "/Applications/Google Chrome.app/Contents/MacOS/" 2>&1 | head; ls
+ │ /Users/alice/Documents/Code/joyride/bin/ 2>&1 | head
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ Do you want to proceed?
+ ❯ 1. Yes
+   2. Yes, and don’t ask again for:
+      D=/private/tmp/claude-502/bundled-skills/2.1.285/849fd68e35becc009460545de9246683/artifact-capabilities/0.2.66; ls
+      $D 2>&1; wc -l $D/claude.d.ts $D/db.d.ts 2>&1; ls "/Applications/Google Chrome.app/Contents/MacOS/" 2>&1 | head;
+      ls /Users/alice/Documents/Code/joyride/bin/ 2>&1 | head
+   3. Yes, and switch to auto mode · auto mode handles these prompts for you
+   4. No
+
+ Esc to cancel · Tab to amend

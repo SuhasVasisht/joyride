@@ -1,0 +1,116 @@
+/* The control plane on the chart: task rows and cards inside ideas, asks pinned to them, next ask.
+   Navy ink for everything Firstmate owns; signal orange only for what the captain owes now. */
+
+/* ---------- tasks: mid rows ---------- */
+.task-rows { list-style: none; margin: 2px 0 0; padding: 0 0 0 10px; border-left: 1px solid var(--rule-strong); display: grid; gap: 3px; width: 100%; min-width: 0; }
+.task-row { display: grid; gap: 1px; padding: 3px 6px; border-radius: 4px; min-width: 0; }
+.task-row:hover { background: color-mix(in srgb, var(--paper-sunk) 80%, transparent); }
+.tr-head { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 13px; font-weight: 500; }
+.tr-title { flex: 1; min-width: 0; color: var(--ink); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tr-title:hover { text-decoration: underline; }
+.tr-status { flex: none; font-size: 11.5px; color: var(--ink-3); }
+.tr-now { padding-left: 14px; font-size: 11.5px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tc-dot { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--idle); }
+.tc-dot.tone-working { background: var(--working); }
+.tc-dot.tone-blocked { background: var(--ink); }
+.tc-dot.tone-done { background: var(--pass); }
+.tc-dot.tone-fail { background: var(--fail); }
+
+/* ---------- tasks: near cards ---------- */
+.task-cards { display: grid; gap: 8px; width: 100%; min-width: 0; }
+.task-card { display: grid; gap: 4px; min-width: 0; padding: 8px 10px 9px; border: 1px solid var(--rule-strong); border-radius: 6px; background: var(--paper-raised); cursor: default; }
+.task-card.needs-you { border-color: color-mix(in srgb, var(--signal) 55%, var(--rule-strong)); }
+.task-card.carried, .task-row.carried { opacity: .35; }
+/* The task whose sheet is open (#/task/<id>) stays marked on the chart underneath. */
+.task-card.selected { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.task-row.selected { background: var(--paper-raised); box-shadow: inset 0 0 0 1.5px var(--ink); }
+/* Notes mounted into the map slots (views/notes/contribute.tsx). */
+.map-notes { min-width: 0; width: 100%; cursor: auto; }
+.map-notes .notes-block { gap: 4px; }
+.tc-head { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.tc-title { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 500; font-size: 15.5px; line-height: 1.2; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.tc-title:hover { text-decoration: underline; }
+.tc-status { flex: none; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
+.tc-who { margin: 0; font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+.tc-id { font-family: var(--font-code); font-size: 11px; color: var(--ink-3); }
+.tc-now, .tc-last { margin: 0; font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere; line-height: 1.35; }
+.tc-last { color: var(--ink-3); font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tc-k { font-size: 10.5px; letter-spacing: .04em; color: var(--ink-3); margin-right: 4px; }
+.tc-crew { margin-top: 2px; }
+.tc-landed { margin: 4px 0 0; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+/* The brief card (near, not focused): its title, what it is doing now, and the captain's calls on it. */
+.task-card.brief { gap: 3px; padding: 7px 10px 8px; }
+.task-card.brief .tc-now { font-size: 12px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.task-card.brief .ask-badge { margin-top: 2px; }
+.tc-landed span { color: var(--pass); }
+
+.orphans-node .mn-title { font-style: italic; color: var(--ink-2); cursor: default; }
+
+/* ---------- asks ---------- */
+.ask-badge { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-size: 12px; color: var(--ink-2); padding-left: 2px; }
+.ab-bar { flex: none; align-self: stretch; width: 3px; border-radius: 2px; background: var(--ink-3); }
+.ab-kind { flex: none; font-weight: 600; color: var(--ink); }
+.ab-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ask-badge.needs-you .ab-bar { background: var(--signal); }
+.ask-badge.needs-you .ab-kind { color: var(--signal); }
+
+.ask-card { display: grid; gap: 6px; min-width: 0; margin: 2px 0; padding: 8px 10px 9px 12px; border-left: 3px solid var(--ink-3); border-radius: 0 5px 5px 0; background: var(--paper-sunk); cursor: default; }
+.ask-card.needs-you { border-left-color: var(--signal); background: var(--signal-wash); }
+.ak-form { display: grid; gap: 6px; min-width: 0; }
+.ask-card.reading { display: block; width: 100%; box-sizing: border-box; padding: 3px 0 3px 9px; border: 0; border-left: 2px solid var(--ink-3); border-radius: 0; background: transparent; }
+.ask-card.reading.needs-you { border-left-color: var(--signal); }
+.ak-reading { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.ak-summary { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; line-height: 1.6; color: var(--ink-2); }
+.ak-answer { flex: none; padding: 1px 3px; border: 0; background: transparent; color: var(--ink); font: 500 12px var(--font-ui); cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+.ak-answer:hover { text-decoration-color: var(--ink); }
+.ask-card.reading.expanded { padding: 7px 10px 9px; border-radius: 0 5px 5px 0; background: var(--paper-sunk); }
+.ask-card.reading.needs-you.expanded { background: var(--signal-wash); }
+.ask-card.reading.expanded .ak-reading { padding-bottom: 6px; margin-bottom: 7px; border-bottom: 1px solid var(--rule); }
+.ak-head { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ak-state { font-weight: 600; font-size: 12.5px; color: var(--ink); }
+.ask-card.needs-you .ak-state { color: var(--signal); }
+.ak-kind { flex: 1; font-size: 11.5px; color: var(--ink-3); }
+.ak-link { font-size: 11.5px; color: var(--ink-2); text-decoration: none; }
+.ak-link:hover { text-decoration: underline; }
+.ak-pre, .ak-note { margin: 0; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+.ak-q { margin: 0; font-size: 13px; color: var(--ink); line-height: 1.35; overflow-wrap: anywhere; }
+.ak-n { display: inline-block; min-width: 16px; margin-right: 6px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ak-calls { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ak-call { display: grid; gap: 4px; min-width: 0; }
+.ak-opts { display: grid; gap: 2px; padding-left: 22px; }
+.ak-opt { display: flex; align-items: flex-start; gap: 6px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; padding: 2px 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.ak-opt:hover { background: color-mix(in srgb, var(--paper-raised) 70%, transparent); }
+.ak-opt input { margin: 2px 0 0; flex: none; accent-color: var(--ink); }
+.ak-opt.on { color: var(--ink); }
+.ak-rec { font-style: normal; font-size: 11px; color: var(--ink-3); }
+.ak-words { width: 100%; box-sizing: border-box; font: inherit; font-size: 12.5px; resize: vertical; min-height: 44px; padding: 5px 7px; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); background: var(--paper-raised); color: var(--ink); }
+.ak-mode { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); }
+.ak-mode select { font: inherit; font-size: 12px; }
+.ak-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ak-actions .btn.ghost { background: transparent; box-shadow: none; color: var(--ink-3); }
+.ak-ok { margin: 0; font-size: 12px; color: var(--ink-2); }
+.ak-err { margin: 0; font-size: 12px; }
+.mission-node.ask-focus { box-shadow: inset 0 0 0 1.5px var(--signal); background: var(--paper-raised); }
+
+/* ---------- hub ---------- */
+.fm-asks-line { margin: 2px 0 0; font-size: 12.5px; }
+.fm-node .ask-card, .fm-node .ask-badge { margin-top: 6px; }
+
+/* ---------- next ask ---------- */
+.next-ask { position: absolute; left: 50%; transform: translateX(-50%); bottom: 62px; z-index: 4; display: inline-flex; align-items: center; gap: 8px; font: 500 12.5px var(--font-ui); color: var(--ink); background: var(--paper-raised); border: 1px solid var(--rule-strong); border-radius: 18px; padding: 5px 6px 5px 6px; cursor: pointer; }
+.next-ask:hover { border-color: var(--ink-3); }
+.next-ask .na-n { min-width: 20px; height: 20px; border-radius: 10px; display: inline-grid; place-items: center; font-weight: 600; font-size: 11.5px; background: var(--ink); color: var(--paper); font-variant-numeric: tabular-nums; padding: 0 5px; }
+.next-ask.needs-you .na-n { background: var(--signal); color: #fff; }
+.next-ask .na-go { padding: 2px 8px; border-left: 1px solid var(--rule); color: var(--ink-2); }
+.next-ask kbd { font-family: var(--font-code); font-size: 11px; padding: 0 4px; border: 1px solid var(--rule-strong); border-radius: 3px; }
+
+/* Firstmate's reply to a map request: quiet, in the ghost card's reply style (working rule, working wash). */
+.fm-reply { margin: 0; padding: 6px 8px; border-left: 2px solid var(--working); background: var(--working-wash); color: var(--ink); font-size: 12.5px; line-height: 1.4; min-width: 0; }
+.fm-reply p { margin: 0; }
+.fm-reply-head { display: flex; align-items: baseline; gap: var(--s2); }
+.fm-reply-k { color: var(--ink-2); font-size: 11.5px; font-weight: 600; }
+.fm-reply-body { overflow-wrap: anywhere; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.fm-reply-asked { margin-top: 2px; color: var(--ink-3); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-reply.line { font-size: 11.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-reply.line .fm-reply-k { margin-right: 4px; }

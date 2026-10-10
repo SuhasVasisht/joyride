@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "servers": [
+    {
+      "name": "atlassian",
+      "aliases": [
+        "Atlassian-MCP-Server"
+      ],
+      "mode": "install",
+      "url": "https://mcp.atlassian.com/v2/mcp",
+      "source": "https://support.atlassian.com/atlassian-ai-gateway/docs/get-started-with-the-atlassian-remote-mcp-server/",
+      "note": "Sign in to Atlassian separately in each client. Retired v1 SSE entries are upgraded in place."
+    },
+    {
+      "name": "slack",
+      "mode": "install",
+      "url": "https://mcp.slack.com/mcp",
+      "source": "https://docs.slack.dev/ai/slack-mcp-server/",
+      "note": "Endpoint only: Slack requires a registered internal or Marketplace app and static OAuth client registration. Existing client auth is preserved. Provision independent clients before login; generic dynamic registration does not work."
+    },
+    {
+      "name": "granola",
+      "mode": "install",
+      "url": "https://mcp.granola.ai/mcp",
+      "source": "https://www.granola.ai/blog/granola-mcp",
+      "note": "Browser OAuth independently per client; enterprise administrators may need to enable MCP."
+    },
+    {
+      "name": "sanity",
+      "aliases": [
+        "Sanity"
+      ],
+      "mode": "install",
+      "url": "https://mcp.sanity.io",
+      "source": "https://www.sanity.io/docs/ai/mcp-server",
+      "note": "Sign in to Sanity separately per client."
+    },
+    {
+      "name": "postman",
+      "mode": "install",
+      "url": "https://mcp.postman.com/mcp",
+      "source": "https://learning.postman.com/docs/reference/postman-api/postman-mcp-server/postman-mcp-remote-server",
+      "note": "US full tool set. Sign in per client. EU accounts should choose the EU endpoint in this manifest before installing."
+    },
+    {
+      "name": "sevalla",
+      "mode": "install",
+      "url": "https://mcp.sevalla.com/mcp",
+      "source": "https://mcp.sevalla.com/",
+      "note": "Existing credentials are untouched. Missing connections use independent Sevalla OAuth in each client."
+    },
+    {
+      "name": "microsoft365",
+      "mode": "review",
+      "url": "https://workiq.svc.cloud.microsoft/mcp",
+      "source": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/mcp/quickstart/foundry",
+      "note": "Microsoft Work IQ covers Teams, mail, calendar, files and sites. Remote setup requires Entra app registration, tenant/admin consent and client-specific OAuth compatibility. Recommend official Work IQ; do not copy Anthropic's Microsoft 365 proxy or guess credentials."
+    },
+    {
+      "name": "canva",
+      "mode": "review",
+      "url": "https://mcp.canva.com/mcp",
+      "source": "https://www.canva.dev/docs/apps/mcp/verify-app/",
+      "note": "Official endpoint exists, but requires a client registered with Canva. Confirm registration for each agent before enabling."
+    },
+    {
+      "name": "bigquery",
+      "mode": "review",
+      "url": "https://bigquery.googleapis.com/mcp",
+      "source": "https://docs.cloud.google.com/bigquery/docs/use-bigquery-mcp",
+      "note": "Official endpoint exists. Choose Google Cloud project, enable BigQuery API and provision per-client Google OAuth/IAM; verify current protocol compatibility before enabling."
+    },
+    {
+      "name": "google-drive",
+      "mode": "review",
+      "source": "https://code.claude.com/docs/en/mcp",
+      "note": "Claude-hosted connector is not a portable credential. Choose a supported Drive server and Google OAuth app/project; no verified vendor endpoint supplied."
+    },
+    {
+      "name": "hubspot",
+      "mode": "review",
+      "source": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server",
+      "note": "Official CRM endpoint requires a HubSpot MCP connector with client credentials and registered redirect URIs plus PKCE. Provision independently per agent before enabling.",
+      "url": "https://mcp.hubspot.com"
+    },
+    {
+      "name": "lucid",
+      "mode": "install",
+      "source": "https://help.lucid.co/hc/en-us/articles/53780064823188-For-admins-Lucid-MCP-server-security-and-authorization",
+      "note": "Independent browser OAuth and scope approval per client. Account admin may need to enable MCP access.",
+      "url": "https://mcp.lucid.app/mcp"
+    },
+    {
+      "name": "salesforce",
+      "mode": "review",
+      "source": "https://developer.salesforce.com/docs/platform/hosted-mcp-servers/guide/hosted-mcp-servers-overview.html",
+      "note": "Salesforce hosted MCP exists. Choose org, production/sandbox tool sets and OAuth external-client app. No single org/tool endpoint can be inferred from the hosted connector name."
+    },
+    {
+      "name": "wolfram",
+      "mode": "review",
+      "source": "captain's Claude-hosted connector inventory",
+      "note": "Confirm a supported public server and account/license requirements; do not reuse hosted connector credentials."
+    },
+    {
+      "name": "claude-docs",
+      "mode": "review",
+      "source": "https://code.claude.com/docs/en/mcp",
+      "note": "Anthropic-provided product connector. No portable server or authentication contract established; retain as Claude-only until a vendor-supported external endpoint exists."
+    },
+    {
+      "name": "node_repl",
+      "mode": "review",
+      "source": "local Codex configuration inventory (2026-10-05)",
+      "note": "ChatGPT app-managed node_repl uses app-specific launch context. Preserve in Codex; do not transplant its environment to another client."
+    },
+    {
+      "name": "computer-use",
+      "mode": "review",
+      "source": "local Codex configuration inventory (2026-10-05)",
+      "note": "Codex desktop app-specific relative executable/cwd. Preserve locally; a supported cross-client computer-use server must be chosen separately."
+    }
+  ]
+}

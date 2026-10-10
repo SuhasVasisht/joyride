@@ -1,0 +1,77 @@
+import { test, expect } from "./devtools";
+import fs from "node:fs";
+import path from "node:path";
+import { shot } from "./shot";
+
+test("expanded report returns to its artifact screen", async ({ page, context, request, devtools }) => {
+  test.setTimeout(180000);
+  const file = path.resolve(".joyride/report-back.html");
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, "<!doctype html><title>Navigation report</title><h1>Navigation report</h1><p>The expanded snapshot remains readable.</p>");
+  await request.post("/api/missions", { data: { id: "navigation-return", title: "Navigation return" } });
+  const response = await request.post("/api/artifacts", { data: { local_source: file, title: "Navigation report", mission: "navigation-return", created: "2026-01-01T00:00:00Z" } });
+  expect(response.ok()).toBe(true);
+  const artifact = await response.json();
+  for (let i = 0; i < 16; i++) {
+    const other = path.resolve(`.joyride/report-back-${i}.md`);
+    fs.writeFileSync(other, `# Navigation note ${i}\n\nA navigation fixture.`);
+    const created = await request.post("/api/artifacts", { data: { local_source: other, mission: "navigation-return" } });
+    expect(created.ok()).toBe(true);
+  }
+  await page.goto("/#/knowledge/artifacts?source=report&q=Navigation&idea=navigation-return");
+  await expect(page.getByTestId("artifact-row").filter({ hasText: "Navigation report" })).toBeVisible();
+  const row = `[data-testid=artifact-row][data-id="${artifact.id}"] button`;
+  await devtools.command(page, "eval", `() => document.querySelector(${JSON.stringify(row)}).scrollIntoView({block:'center'})`);
+  const listScroll = await page.locator(".main").evaluate(el => el.scrollTop);
+  expect(listScroll).toBeGreaterThan(100);
+  await devtools.command(page, "eval", `() => document.querySelector(${JSON.stringify(row)}).click()`);
+  await expect(page.getByTestId("artifact-detail")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close and return" })).toBeInViewport();
+  await devtools.command(page, "eval", "() => document.querySelector('.pane-sheet').scrollTop = 120");
+  const returnURL = page.url();
+  const expand = () => devtools.command(page, "eval", "() => [...document.querySelectorAll('button')].find(el => el.textContent === 'Expand report').click()");
+  await expand();
+  const expanded = page.getByTestId("artifact-expanded");
+  await expect(expanded).toBeVisible();
+  await expect(expanded.getByRole("button", { name: /Back to artifact/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/\#\/knowledge\/artifacts.*expand=/);
+  expect(context.pages()).toHaveLength(1);
+  const frame = page.frameLocator("[data-testid=artifact-expanded] iframe");
+  await expect(frame.getByRole("heading", { name: "Navigation report" })).toBeVisible();
+  await shot(page, "C6", "report-back-browser-expanded-after");
+  await devtools.command(page, "eval", "() => document.querySelector('[data-testid=artifact-expanded] button').click()");
+  await expect(expanded).toHaveCount(0);
+  await expect(page).toHaveURL(returnURL);
+  expect(await page.locator(".pane-sheet").evaluate(el => el.scrollTop)).toBe(120);
+  await expect(page.getByRole("button", { name: "Close and return" })).toBeInViewport();
+  expect(await page.locator(".main").evaluate(el => el.scrollTop)).toBe(listScroll);
+  await devtools.command(page, "eval", "() => history.forward()");
+  await expect(expanded).toBeVisible();
+  await devtools.command(page, "back");
+  await expect(expanded).toHaveCount(0);
+  await expand();
+  await expect(expanded).toBeVisible();
+  await devtools.command(page, "press", "Escape");
+  await expect(expanded).toHaveCount(0);
+  // Escape also works after keyboard focus moves into the opaque report frame.
+  await expand();
+  await expect(expanded).toBeVisible();
+  await devtools.command(page, "press", "Tab");
+  await expect(page.locator("[data-testid=artifact-expanded] iframe")).toBeFocused();
+  await devtools.command(page, "press", "Escape");
+  await expect(expanded).toHaveCount(0);
+  await expect(page).toHaveURL(returnURL);
+  await shot(page, "C6", "report-back-browser-returned-after");
+  await devtools.command(page, "eval", "() => document.querySelector('[aria-label=\"Close and return\"]').click()");
+  await expect(page.getByTestId("artifact-detail")).toHaveCount(0);
+  expect(await page.locator(".main").evaluate(el => el.scrollTop)).toBe(listScroll);
+  await expect(page.getByLabel("Search artifacts")).toHaveValue("Navigation");
+  await expect(page.getByTestId("artifact-idea-filter")).toHaveValue("navigation-return");
+  await expect(page.getByTestId("artifact-source-filter").getByRole("button", { name: /Joyride report/ })).toHaveAttribute("aria-pressed", "true");
+  // An expanded deep link has no owned history entry to pop.
+  await page.goto(returnURL + `&expand=${artifact.id}`);
+  await expect(expanded).toBeVisible();
+  await devtools.command(page, "eval", "() => document.querySelector('[data-testid=artifact-expanded] button').click()");
+  await expect(expanded).toHaveCount(0);
+  await expect(page).toHaveURL(returnURL);
+});

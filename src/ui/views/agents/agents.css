@@ -1,0 +1,92 @@
+/* #/agents: one calm list of every agent and session, in the map's groups and ideas.
+   Navy for state and your helm; signal orange only for what needs you. */
+.agents-page { padding: var(--s6) var(--s6) var(--s8); max-width: 1180px; min-width: 0; }
+.ag-head { margin-bottom: var(--s4); }
+.ag-kicker { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: .02em; color: var(--ink-3); }
+.ag-head h1 { font-size: var(--step-3); margin: 2px 0 0; }
+.ag-lede { color: var(--ink-2); max-width: 70ch; margin: var(--s2) 0 var(--s3); }
+.ag-how { margin: 0 0 var(--s4); max-width: 72ch; font-size: 13px; color: var(--ink-2); }
+.ag-how summary { cursor: pointer; color: var(--ink-3); font-size: 12.5px; }
+.ag-how summary:hover { color: var(--ink); }
+.ag-how p { margin: var(--s2) 0 0; }
+.ag-head .fm-bar { margin-bottom: var(--s3); }
+
+/* filters: four short rows of plain links, each with its count */
+.ag-filters { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); padding: var(--s3) 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.ag-seg, .ag-saved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px; min-width: 0; }
+.ag-seg-label { font-size: 11.5px; color: var(--ink-3); margin-right: 6px; }
+.ag-seg-opts { display: inline-flex; flex-wrap: wrap; gap: 2px; min-width: 0; }
+.ag-seg a, .ag-saved a { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 9px; border-radius: var(--radius-control); font-size: 13px; font-weight: 500; color: var(--ink-2); text-decoration: none; white-space: nowrap; }
+.ag-seg a:hover, .ag-saved a:hover { color: var(--ink); background: var(--paper-sunk); }
+.ag-seg a[aria-current="page"], .ag-saved a[aria-current="page"] { color: var(--paper-raised); background: var(--ink); }
+.ag-seg .n { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink-3); }
+.ag-seg a[aria-current="page"] .n { color: color-mix(in srgb, var(--paper-raised) 70%, transparent); }
+.ag-seg a.hot .n { color: var(--signal); font-weight: 600; }
+.ag-seg a.hot[aria-current="page"] .n { color: var(--signal-wash); }
+.ag-saved { padding: var(--s2) 0 0; }
+.ag-saved .meta { font-weight: 400; }
+.ag-saved .ag-clear, .ag-saved .ag-more { font-weight: 400; color: var(--ink-3); }
+.ag-note { margin: var(--s4) 0 0; font-size: 13px; color: var(--ink-2); }
+
+/* groups and ideas */
+.ag-group { margin-top: var(--s6); min-width: 0; }
+.ag-group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--rule-strong); }
+.ag-group-kicker { font-size: 11.5px; color: var(--ink-3); }
+.ag-group-head h2 { font-size: var(--step-2); margin: 0; }
+.ag-group.unfiled .ag-group-head h2 { font-style: italic; font-weight: 400; color: var(--ink-2); }
+.ag-group-link { margin-left: auto; font-size: 13px; }
+.ag-idea { margin-top: var(--s4); min-width: 0; }
+.ag-idea-title { display: flex; align-items: baseline; gap: var(--s2); margin: 0 0 var(--s1); font: 600 var(--step-0)/1.3 var(--font-ui); }
+.ag-idea-title a { color: var(--ink); text-decoration: none; }
+.ag-idea-title a:hover { text-decoration: underline; text-decoration-color: var(--ink-3); }
+.ag-idea-title .meta { font-weight: 400; font-size: 12px; }
+.ag-done-toggle { margin: var(--s1) 0 0; font-size: 12.5px; }
+
+/* rows */
+.ag-rows { list-style: none; margin: 0; padding: 0; }
+.ag-recent { margin-top: var(--s4); }
+.ag-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "main meta actions" "extra extra extra"; gap: 2px var(--s4); align-items: start;
+  padding: 10px 12px 10px 14px; border-bottom: 1px solid var(--rule); min-width: 0; }
+.ag-row.needs-you { box-shadow: inset 2px 0 0 var(--signal); }
+.ag-rows.done .ag-row { opacity: .85; }
+.ag-main { grid-area: main; min-width: 0; }
+.ag-title { display: flex; align-items: center; gap: 7px; font-weight: 500; color: var(--ink); text-decoration: none; min-width: 0; }
+.ag-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ag-title:hover span { text-decoration: underline; text-decoration-color: var(--ink-3); }
+.ag-sub { margin: 2px 0 0 19px; font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-sub .mono { font-size: 11.5px; }
+.ag-needs { margin: 3px 0 0 19px; font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.ag-meta { grid-area: meta; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; max-width: 320px; font-size: 12px; color: var(--ink-3); }
+.ag-meta .time-ago { white-space: nowrap; }
+.ag-actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 280px; }
+.ag-actions .btn { white-space: nowrap; }
+.ag-row > .ag-error, .ag-row > .ag-steer, .ag-row > .ag-asks { grid-column: 1 / -1; }
+.ag-error { margin: 4px 0 0 19px; font-size: 12px; }
+.ag-steer { margin-top: var(--s2); padding: 10px 12px; background: var(--paper-sunk); border-radius: var(--radius-control); }
+.ag-asks { display: grid; gap: 6px; margin: var(--s2) 0 0 19px; min-width: 0; }
+.ag-ask-more { all: unset; cursor: pointer; display: block; min-width: 0; }
+.ag-ask-more:focus-visible { outline: 2px solid var(--working); outline-offset: 2px; }
+
+/* a task's crewmates, one line each */
+.ag-crew { list-style: none; margin: 6px 0 0 19px; padding: 0; display: grid; gap: 3px; }
+.ag-crew li { min-width: 0; font-size: 12.5px; }
+.ag-crew-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 7px; min-width: 0; }
+.ag-crew .btn.link { font-size: 12px; }
+.ag-crew a { color: var(--ink-2); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ag-crew a:hover { color: var(--ink); text-decoration: underline; }
+
+/* an idea proposal covering this session, inline */
+.ag-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s3); margin: 6px 0 0 19px; padding: 6px 10px; border-left: 2px solid var(--working); background: var(--working-wash); border-radius: 0 var(--radius-control) var(--radius-control) 0; min-width: 0; }
+.ag-suggest-text { margin: 0; font-size: 12.5px; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.ag-suggest-acts { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.ag-suggest .cap-ok, .ag-suggest .inline-error { flex-basis: 100%; margin: 2px 0 0; font-size: 12px; }
+
+/* a saved view that lists more than agents */
+.ag-view { margin-top: var(--s5); }
+.ag-view h2 { font-size: var(--step-2); margin: 0 0 var(--s1); }
+
+@media (max-width: 860px) {
+  .agents-page { padding: var(--s5) var(--s4) var(--s7); }
+  .ag-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "meta" "actions" "extra"; }
+  .ag-meta, .ag-actions { justify-content: flex-start; max-width: none; margin-left: 19px; }
+}

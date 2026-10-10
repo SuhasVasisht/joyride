@@ -1,0 +1,80 @@
+/* Requests, notes and lists made in New: the ghost tray and the ghost card. Tokens only; navy ink for
+   the request itself, never the signal orange (a request is the captain's own, not something owed). */
+
+/* ---------- tray ---------- */
+.ghost-tray { position: fixed; left: var(--s4); bottom: var(--s4); z-index: 55; display: flex; flex-direction: column-reverse; gap: var(--s2); width: min(380px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow: visible; pointer-events: none; }
+.ghost-tray > * { pointer-events: auto; }
+
+/* ---------- ghost card ---------- */
+.ghost[data-ghost] { position: relative; z-index: 55; padding: 10px 12px; border-radius: var(--radius-sheet); background: var(--paper-raised);
+  border: 1.5px dashed var(--rule-strong); box-shadow: var(--shadow-sheet); display: flex; flex-direction: column; gap: 6px; font-size: var(--step--1); transform-origin: top left; }
+.ghost-placing { border-color: var(--ink-3); }
+.ghost-placed, .ghost-choose { border-color: var(--working); }
+.ghost-sent, .ghost-steered { border-style: solid; border-color: var(--rule-strong); }
+.ghost[data-ghost].is-task { border: 1px solid var(--ink); background: var(--paper-raised); animation: ghost-settle .5s var(--ease); }
+.ghost-failed { border-color: var(--fail); }
+.ghost-text { color: var(--ink); font-size: var(--step-0); line-height: 1.4; overflow-wrap: anywhere; }
+.ghost-where { color: var(--ink-2); overflow-wrap: anywhere; }
+.ghost-where b { color: var(--ink); font-weight: 600; }
+.ghost-verb { color: var(--ink-2); }
+.ghost-actions { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.ghost-countdown { width: 44px; height: 3px; border-radius: 2px; background: var(--paper-sunk); overflow: hidden; }
+.ghost-countdown span { display: block; height: 100%; background: var(--working); transform-origin: left; transition: transform .1s linear; }
+.ghost-options { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ghost-option { width: 100%; display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: var(--s2); align-items: baseline; text-align: left; padding: 5px 8px;
+  border: 1px solid transparent; border-radius: var(--radius-control); background: none; cursor: pointer; color: var(--ink); font: inherit; }
+.ghost-option:hover, .ghost-option:focus-visible { background: var(--paper-sunk); border-color: var(--rule); }
+.ghost-option.current { border-color: var(--working); background: var(--working-wash); }
+.ghost-option.cancel { display: block; color: var(--ink-3); }
+.ghost-kind { color: var(--ink-3); font-size: 11px; text-transform: none; }
+.ghost-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ghost-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; align-items: center; color: var(--ink-3); flex-wrap: wrap; }
+.ghost-steps li { display: inline-flex; align-items: center; gap: 5px; }
+.ghost-steps li + li::before { content: "·"; color: var(--rule-strong); margin-right: 1px; }
+.ghost-steps li.done { color: var(--ink); }
+.ghost-steps li.done::after { content: "✓"; color: var(--review); font-size: 11px; }
+.ghost-steps li.current { color: var(--working); }
+.ghost-reply { margin: 0; padding: 6px 8px; border-left: 2px solid var(--working); background: var(--working-wash); color: var(--ink); overflow-wrap: anywhere; }
+.ghost-task { display: flex; gap: var(--s2); align-items: baseline; justify-content: space-between; }
+.ghost-task a { color: var(--ink-2); white-space: nowrap; }
+.ghost-done { color: var(--review); }
+.ghost-close { position: absolute; top: 6px; right: 10px; font-size: 11px; }
+.ghost-fail .inline-error { margin: 0; }
+/* A note or a list: paper with a left ink rule, like the note cards it becomes. */
+.ghost[data-ghost].as-note, .ghost[data-ghost].as-list { border-left: 3px solid var(--ink); }
+.ghost-note ul, .ghost-list ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.ghost-note ul { padding-left: 16px; list-style: disc; }
+.ghost-list-title { display: block; font-family: var(--font-display); font-weight: 500; margin-bottom: 2px; }
+.ghost-list li { display: flex; align-items: baseline; gap: 7px; }
+.ghost-box { flex: none; width: 10px; height: 10px; border: 1.5px solid var(--ink-3); border-radius: 2px; transform: translateY(1px); }
+.ghost-kinds { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.ghost-kinds .meta { margin-right: 4px; }
+.ghost-kind-btn { padding: 3px 10px; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); background: var(--paper-raised); color: var(--ink); font: inherit; cursor: pointer; }
+.ghost-kind-btn:hover, .ghost-kind-btn:focus-visible { border-color: var(--ink-3); }
+.ghost-kind-btn.current { background: var(--ink); border-color: var(--ink); color: var(--paper-raised); }
+@keyframes ghost-settle { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ink) 35%, transparent); } 100% { box-shadow: var(--shadow-sheet); } }
+@media (prefers-reduced-motion: reduce) { .ghost[data-ghost].is-task { animation: none; } .ghost-countdown span { transition: none; } }
+@media (max-width: 640px) { .ghost-tray { left: var(--s4); right: var(--s4); width: auto; } }
+
+/* On the map (views/compose/contribute.tsx): an idea's "+ Add to this idea", which opens New on it. */
+.map-compose { align-self: flex-start; margin-top: 2px; }
+.map-compose.idea { border-style: dashed; background: transparent; color: var(--ink-2); }
+.map-compose.idea:hover { color: var(--ink); border-style: solid; }
+
+/* ---------- a board item's flight from New into its card (LandingGhost) ---------- */
+.landing-ghost { position: fixed; z-index: 70; pointer-events: none; display: flex; flex-direction: column; gap: 5px; padding: 9px 12px 9px 11px;
+  background: var(--paper-sunk); border-left: 3px solid var(--ink); border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  box-shadow: 0 1px 0 rgba(20,33,61,.06), 0 18px 36px -14px rgba(20,33,61,.38); transform-origin: top left; font-size: var(--step--1); color: var(--ink); will-change: transform, opacity; }
+.landing-ghost.bk-link { border-left-color: var(--working); }
+.lg-head { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.lg-glyph { flex: none; color: var(--ink-2); font-size: 12px; }
+.lg-label { min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; color: var(--ink-2); }
+.lg-lines li { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.lg-lines li > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-lines li.lg-text::before { content: "•"; color: var(--ink-3); width: 10px; text-align: center; flex: none; }
+.lg-lines .lg-box { flex: none; width: 10px; height: 10px; border: 1.5px solid var(--ink-3); border-radius: 2px; }
+.lg-lines li.done > span:last-child { text-decoration: line-through; color: var(--ink-3); }
+.lg-lines .lk-glyph { min-width: 20px; height: 16px; font-size: 8.5px; }
+.lg-where { color: var(--ink-3); font-size: 12px; }
+.lg-where b { color: var(--ink); font-weight: 600; }

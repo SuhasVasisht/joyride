@@ -1,0 +1,21 @@
+/* Fleet: owner and helm chips (map cards, worker pane, the Agents page) and the fleet feed line.
+   Navy for "yours at the helm", outlines for the rest; signal orange stays reserved for "needs you". */
+.fleet-chips { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; text-shadow: none; }
+.fleet-chip { display: inline-flex; align-items: center; gap: 5px; height: 19px; padding: 0 7px; border-radius: 10px; font: 500 11px/1 var(--font-ui);
+  white-space: nowrap; color: var(--ink-2); background: var(--paper-raised); box-shadow: inset 0 0 0 1px var(--rule-strong); }
+.fleet-chip.owner.t-crew { color: var(--working); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--working) 55%, transparent); background: var(--working-wash); }
+.fleet-chip.owner.t-control { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.fleet-chip.owner.t-excluded { color: var(--ink-3); background: transparent; box-shadow: inset 0 0 0 1px var(--rule); }
+.fleet-chip .fc-task { font: 10.5px/1 var(--font-code); color: var(--ink-3); max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.fleet-chip.helm.by-firstmate { color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--rule); background: transparent; }
+.fleet-chip.helm.by-captain { color: var(--paper-raised); background: var(--ink); box-shadow: none; font-weight: 600; }
+.fleet-chips.compact { flex: none; flex-wrap: nowrap; }
+.fleet-chips.compact:empty { display: none; }
+.fleet-chips.compact .fleet-chip { height: 16px; padding: 0 5px; font-size: 10px; }
+.wn-chips { display: block; padding: 3px 0 0 27px; }
+.wl-chips { display: block; padding: 1px 0 0 20px; }
+
+/* ---------- the fleet feed line on the Agents page ---------- */
+.fleet-feed { margin: 0 0 var(--s4); font-size: 12.5px; color: var(--ink-3); }
+.fleet-feed.on::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--working); vertical-align: 1px; }
+.fleet-feed code { font: 12px/1 var(--font-code); white-space: nowrap; }

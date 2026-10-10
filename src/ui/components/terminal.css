@@ -1,0 +1,23 @@
+/* The browser terminal: a deep navy screen (the ink of the chart room) on the
+   paper page. It stays dark in both themes because agents colour their output
+   for dark terminals; xterm's minimum contrast keeps any colour legible. */
+.term {
+  --term-bg: #121c33; --term-fg: #e6e9f0; --term-selection: rgba(127, 176, 218, .35);
+  display: grid; gap: 0; border: 1px solid var(--rule-strong); border-radius: var(--radius-sheet); overflow: hidden; background: var(--term-bg);
+}
+.term-bar { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: #0d1528; color: #aab3c5; font-size: 12px; border-bottom: 1px solid #23304e; }
+.term-bar .mono { color: #dfe4ee; font-size: 11.5px; }
+.term-dot { width: 7px; height: 7px; border-radius: 50%; background: #6f7a92; flex: none; }
+.term-dot.s-live { background: #7fb0da; box-shadow: 0 0 0 3px rgba(127, 176, 218, .18); }
+.term-dot.s-error { background: #e8806c; }
+.term-size { margin-left: auto; font-family: var(--font-code); font-size: 11px; color: #7f8aa1; }
+.term-screen { position: relative; padding: 10px 12px; min-height: 240px; overflow-x: auto; overflow-y: hidden; cursor: text; outline: none; }
+.term-screen.focused { box-shadow: inset 0 0 0 1px rgba(127, 176, 218, .55); }
+.term-screen .xterm { padding: 0; }
+.term-screen .xterm-viewport { background: transparent !important; overflow-y: hidden !important; }
+.term-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 9px 12px; background: var(--paper-raised); border-top: 1px solid var(--rule-strong); }
+.term-status { margin: 0; flex: 1 1 260px; font-size: 12.5px; color: var(--ink-3); }
+.term-status.err { color: var(--ink); }
+.term-keys { display: flex; flex-wrap: wrap; gap: 4px; }
+.term-keys .btn.small { font-family: var(--font-code); font-size: 11.5px; padding: 2px 8px; }
+.term + .inline-error { margin-top: var(--s2); }

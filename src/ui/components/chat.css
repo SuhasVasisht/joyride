@@ -1,0 +1,93 @@
+/* Chat view and agent markdown. Your prompts sit on the right on sunk paper;
+   the agent writes on the page itself in the serif, like the transcript it is.
+   Tool calls are quiet one-line chips. No signal colour here: it belongs to "needs you". */
+
+/* ---------- markdown ---------- */
+.md { min-width: 0; overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 .7em; max-width: 70ch; }
+.md .md-h { font-family: var(--font-ui); font-weight: 600; color: var(--ink); margin: 1em 0 .35em; }
+.md .md-h1 { font-size: 1.08em; }
+.md .md-h2, .md .md-h3 { font-size: 1em; }
+.md ul, .md ol { margin: 0 0 .7em; padding-left: 1.4em; max-width: 70ch; }
+.md li { margin: .15em 0; }
+.md li > .md { margin-top: .15em; }
+.md li::marker { color: var(--ink-3); }
+.md blockquote { margin: 0 0 .7em; padding: 2px 0 2px 12px; border-left: 2px solid var(--rule-strong); color: var(--ink-2); }
+.md hr { border: 0; border-top: 1px solid var(--rule); margin: 1em 0; }
+.md a { color: var(--working); text-decoration-color: color-mix(in srgb, var(--working) 40%, transparent); }
+.md .md-url { word-break: break-all; }
+.md-pre { margin: 0 0 .8em; padding: 10px 12px; font: 12.5px/1.5 var(--font-code); background: var(--paper-sunk); border-radius: var(--radius-control); white-space: pre; overflow: auto; max-height: 26em; word-break: normal; color: var(--ink); }
+.md-pre code { font: inherit; }
+.md-table-wrap { overflow-x: auto; margin: 0 0 .8em; }
+.md-table { border-collapse: collapse; font-family: var(--font-ui); font-size: 13px; line-height: 1.4; }
+.md-table th, .md-table td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.md-table th { font-weight: 600; color: var(--ink); border-bottom-color: var(--rule-strong); }
+
+/* ---------- chat ---------- */
+.chat { position: relative; display: flex; flex-direction: column; min-height: 0; height: var(--chat-h, clamp(420px, calc(100vh - 330px), 980px));
+  border: 1px solid var(--rule); border-radius: var(--radius-sheet); background: var(--paper); overflow: hidden; }
+.chat-main { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.chat-log { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14px); mask-image: linear-gradient(to bottom, transparent 0, #000 14px); padding: var(--s4) var(--s5) var(--s5); scroll-padding-bottom: var(--s4); }
+.chat-turns { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s4); }
+.chat-earlier { display: block; margin: 0 auto var(--s4); }
+.chat-loading, .chat-empty { margin: var(--s4) 0; }
+.chat-empty .empty-state { padding: 0; }
+
+.msg { display: grid; gap: 4px; min-width: 0; }
+.msg-meta { display: flex; gap: 8px; align-items: baseline; font-size: 12px; color: var(--ink-3); }
+.msg-meta .time-ago { color: var(--ink-3); }
+
+.msg.r-user { justify-items: end; }
+.msg.r-user .msg-meta { justify-content: flex-end; }
+.msg-bubble { max-width: min(78%, 62ch); padding: 9px 14px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 12px 12px 3px 12px;
+  font-size: var(--step--1); line-height: 1.5; color: var(--ink); box-shadow: 0 1px 0 rgba(20, 33, 61, .04); }
+.msg-bubble .md p { max-width: none; }
+.msg-bubble .md-pre { max-height: 14em; }
+.msg-more { font-size: 12px; margin-top: 4px; }
+
+/* a reply from Joyride the agent hasn't taken yet: your side, drawn as not sent */
+.msg.r-staged { justify-items: end; }
+.msg.r-staged .msg-bubble { background: var(--paper); border-style: dashed; border-color: var(--rule-strong); color: var(--ink-2); }
+.msg.r-staged .staged-note { justify-content: flex-end; flex-wrap: wrap; max-width: min(78%, 62ch); text-align: right; }
+.msg.r-staged.s-queued .staged-label { color: var(--working); }
+.msg.r-staged.s-failed .msg-bubble, .msg.r-staged.s-unclaimed .msg-bubble, .msg.r-staged.s-pulled .msg-bubble { border-color: var(--fail); border-style: solid; }
+.msg.r-staged.s-failed .staged-label, .msg.r-staged.s-unclaimed .staged-label, .msg.r-staged.s-pulled .staged-label { color: var(--ink); }
+.staged-actions { justify-content: flex-end; gap: 6px; }
+
+.msg.r-assistant { justify-items: start; padding-right: 6%; }
+.msg-body { display: grid; gap: 8px; min-width: 0; width: 100%; }
+.msg-text { font-family: var(--font-display); font-size: 16.5px; line-height: var(--lh-serif); color: var(--ink); }
+.msg-text code.md-code { font-size: .78em; }
+.msg-text .md-table, .msg-text .md-pre { font-size: 12.5px; }
+
+/* one-line tool chips */
+.tool-chips { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; justify-items: start; min-width: 0; }
+.tool-chip { max-width: 100%; min-width: 0; }
+.tc { display: inline-flex; align-items: baseline; gap: 8px; max-width: 100%; min-width: 0; padding: 3px 10px 3px 8px; border: 1px solid var(--rule); border-radius: var(--radius-control);
+  background: var(--paper-raised); cursor: pointer; font-size: 12px; color: var(--ink-2); text-align: left; }
+.tc::before { content: ""; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); opacity: .7; align-self: center; }
+.tc:hover { border-color: var(--rule-strong); color: var(--ink); }
+.tc-name { flex: none; font-weight: 600; }
+.tc-sum { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px; color: var(--ink-3); }
+.tool-chip.open .tc { border-color: var(--rule-strong); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.tc-full { margin: 0; padding: 7px 10px; font: 12px/1.45 var(--font-code); color: var(--ink-2); background: var(--paper-raised); border: 1px solid var(--rule-strong); border-top: 0;
+  border-radius: 0 var(--radius-control) var(--radius-control) var(--radius-control); white-space: pre-wrap; word-break: break-word; max-width: 100%; }
+.tc-more { font-size: 12px; color: var(--ink-3); padding-left: 4px; }
+.tool-run { font-size: 12px; }
+.tool-run > summary { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer; list-style: none; padding: 3px 10px 3px 8px; border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-control); color: var(--ink-2); max-width: 100%; }
+.tool-run > summary::-webkit-details-marker { display: none; }
+.tool-run > summary::before { content: "▸"; font-size: 9px; color: var(--ink-3); }
+.tool-run[open] > summary::before { content: "▾"; }
+.tool-run > summary:hover { color: var(--ink); border-color: var(--ink-3); }
+.tr-count { font-weight: 600; white-space: nowrap; }
+.tr-names { font-family: var(--font-code); font-size: 11.5px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tool-run > .tool-chips { margin: 6px 0 0 10px; padding-left: 10px; border-left: 1px solid var(--rule-strong); }
+
+.msg.r-tail { padding-right: 0; }
+.chat-jump { position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 2; box-shadow: var(--shadow-sheet); }
+.chat-footer { flex: none; border-top: 1px solid var(--rule); background: var(--paper-raised); padding: var(--s3) var(--s4) var(--s3); }
+.chat-footer .reply-box { margin-top: 0; }
+.chat-footer > p:last-child, .chat-footer .wp-outside p:last-child { margin-bottom: 0; }
